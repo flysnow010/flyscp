@@ -1,0 +1,39 @@
+# Prerequisites
+*.d
+*.user
+*.Debug
+*.Release
+*.stash
+Makefile*
+
+
+# Compiled Object files
+out/release
+out/debug
+*.slo
+*.lo
+*.o
+*.obj
+*.rc
+
+# Precompiled Headers
+*.gch
+*.pch
+ui_*.h
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.lib
+
+# Executables
+*.out
+*.app
