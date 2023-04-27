@@ -106,6 +106,24 @@ QIcon Utils::dirIcon()
     return fip.icon(QFileIconProvider::Folder);
 }
 
+QIcon Utils::computerIcon()
+{
+    QFileIconProvider fip;
+    return fip.icon(QFileIconProvider::Computer);
+}
+
+QIcon Utils::driverIcon()
+{
+    QFileIconProvider fip;
+    return fip.icon(QFileIconProvider::Drive);
+}
+
+QIcon Utils::networkIcon()
+{
+    QFileIconProvider fip;
+    return fip.icon(QFileIconProvider::Network);
+}
+
 QIcon Utils::fileIcon(QString const& suffix)
 {
     QFileIconProvider fip;

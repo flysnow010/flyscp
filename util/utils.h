@@ -81,6 +81,9 @@ public:
     static QString formatVideoTime(int time_ms);
 
     static QIcon dirIcon();
+    static QIcon computerIcon();
+    static QIcon driverIcon();
+    static QIcon networkIcon();
     static QIcon fileIcon(QString const& suffix);
     static QIcon GetIcon(QString const& fileName, int index = 0);
     static QString GetText(QString const& fileName, quint32 index);
