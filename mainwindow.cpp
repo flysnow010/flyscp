@@ -52,10 +52,11 @@ void MainWindow::createConnects()
 {
     connect(ui->actionConnect, &QAction::triggered, this, [=](bool){
         ConnectDialog dialog;
-        dialog.exec();
-        RemoteDockWidget* rightDirView = new RemoteDockWidget(this);
-        rightPanelWidget->addRemoteDir(rightDirView);
-
+        if(dialog.exec() == QDialog::Accepted)
+        {
+            RemoteDockWidget* rightDirView = new RemoteDockWidget(this);
+            rightPanelWidget->addRemoteDir(rightDirView);
+        }
     });
     connect(ui->actionAbout,  &QAction::triggered, this, [](bool){
         AboutDialog dialog;

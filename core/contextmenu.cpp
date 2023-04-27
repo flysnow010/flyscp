@@ -94,7 +94,7 @@ void ContextMenu::GetShellExContextItems(QString const& fileName,ContextMenuItem
             if(key == ".")
             {
                 QString value = reg.value(key).toString();
-                qDebug() << group;
+                //qDebug() << group;
                 GetShellExContextItem(
                             QString("HKEY_CLASSES_ROOT\\CLSID\\%1\\Settings").arg(value), item);
 //                GetShellExContextMenu(QString("HKEY_CLASSES_ROOT\\CLSID\\%1\\InprocServer32").arg(value),
