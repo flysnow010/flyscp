@@ -104,6 +104,7 @@ void LocalDirModel::sort(int index, bool isDescendingOrder)
     if(!isDescendingOrder)
         sortFlag |=  QDir::SortFlag::Reversed;
     fileInfos_ = dir_.entryInfoList(QDir::AllEntries | QDir::NoDot, (QDir::SortFlag)sortFlag);
+    modifyFileInfos(fileInfos_);
     setupData();
 }
 
@@ -174,5 +175,19 @@ void LocalDirModel::setupModelData(TreeItem *parent)
         }
         TreeItem* item = new TreeItem(rowData, parent);
         parent->appendChild(item);
+    }
+}
+
+void LocalDirModel::modifyFileInfos(QFileInfoList &fileInfos)
+{
+    for(int i = 0; i < fileInfos.size(); i++)
+    {
+        if(fileInfos[i].fileName() == ".." && i != 0)
+        {
+            QFileInfo filInfo = fileInfos[i];
+            fileInfos.removeAt(i);
+            fileInfos.push_front(filInfo);
+            break;
+        }
     }
 }

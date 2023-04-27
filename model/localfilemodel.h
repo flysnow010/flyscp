@@ -29,6 +29,8 @@ protected:
     virtual void setupModelData(TreeItem *parent);
     virtual QVariant foreColor(const QModelIndex &index) const;
 private:
+    void modifyFileInfos(QFileInfoList &fileIfos);
+private:
     QDir dir_;
     QFileInfoList fileInfos_;
     QMap<QString, QIcon> iconMap;
