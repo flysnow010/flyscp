@@ -14,40 +14,50 @@ SOURCES += \
     core/filemanager.cpp \
     core/filetransfer.cpp \
     dialog/aboutdialog.cpp \
+    dialog/connectdialog.cpp \
     dialog/fileprogressdialog.cpp \
     main.cpp \
     mainwindow.cpp \
     model/localfilemodel.cpp \
+    model/remotefilemodel.cpp \
     model/treeitem.cpp \
     model/treemodel.cpp \
     util/utils.cpp \
     view/localdirdockwidget.cpp \
     view/panelwidget.cpp \
+    view/remotedockwidget.cpp \
     view/treeview.cpp
 
 HEADERS += \
     core/clipboard.h \
+    core/connecttype.h \
     core/contextmenu.h \
     core/filemanager.h \
     core/filename.h \
     core/filetransfer.h \
+    core/sshsettings.h \
     dialog/aboutdialog.h \
+    dialog/connectdialog.h \
     dialog/fileprogressdialog.h \
     mainwindow.h \
     model/localfilemodel.h \
+    model/remotefilemodel.h \
     model/treeitem.h \
     model/treemodel.h \
     util/utils.h \
     view/localdirdockwidget.h \
     view/panelwidget.h \
+    view/remotedockwidget.h \
     view/treeview.h
 
 FORMS += \
     dialog/aboutdialog.ui \
+    dialog/connectdialog.ui \
     dialog/fileprogressdialog.ui \
     mainwindow.ui \
     view/localdirdockwidget.ui \
-    view/panelwidget.ui
+    view/panelwidget.ui \
+    view/remotedockwidget.ui
 
 RC_ICONS = FlyScp.ico
 # Default rules for deployment.

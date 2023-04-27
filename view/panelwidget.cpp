@@ -1,6 +1,7 @@
 #include "panelwidget.h"
 #include "ui_panelwidget.h"
 #include "view/localdirdockwidget.h"
+#include "util/utils.h"
 #include <QDir>
 #include <QHBoxLayout>
 #include <QToolButton>
@@ -13,7 +14,7 @@ PanelWidget::PanelWidget(QWidget *parent)
     , buttonGroup(new QButtonGroup(this))
 {
     ui->setupUi(this);
-    ui->tabWidget->setTabBarAutoHide(true);
+    //ui->tabWidget->setTabBarAutoHide(true);
     updateDrivers();
     connect(buttonGroup, SIGNAL(buttonToggled(QAbstractButton*, bool)),
             this, SLOT(dirverChanged(QAbstractButton*, bool)));
@@ -24,9 +25,18 @@ PanelWidget::~PanelWidget()
     delete ui;
 }
 
-void PanelWidget::addDir(QWidget* widget, QString const& text)
+void PanelWidget::addLocalDir(QWidget* widget, QString const& text)
 {
-    ui->tabWidget->addTab(widget, text);
+    ui->tabWidget->addTab(widget, Utils::driverIcon(), text);
+}
+
+void PanelWidget::addremoteDir(QWidget* widget, QString const& text)
+{
+    ui->tabWidget->addTab(widget, Utils::networkIcon(), text);
+}
+
+void PanelWidget::updateTexts(QWidget* widget)
+{
     LocalDirDockWidget* localDirWidget = dynamic_cast<LocalDirDockWidget *>(widget);
     if(localDirWidget)
     {

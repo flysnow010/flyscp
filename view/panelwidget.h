@@ -17,7 +17,9 @@ public:
     explicit PanelWidget(QWidget *parent = nullptr);
     ~PanelWidget();
 
-    void addDir(QWidget* widget, QString const& text);
+    void addLocalDir(QWidget* widget, QString const& text = "Local");
+    void addremoteDir(QWidget* widget, QString const& text = "Remote");
+    void updateTexts(QWidget* widget);
 
 private slots:
     void dirverChanged(QAbstractButton* button, bool checked);
