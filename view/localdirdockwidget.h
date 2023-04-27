@@ -20,6 +20,13 @@ public:
     QString dir();
 
     void cd(QString const& dir);
+
+    void resizeSection(int logicalIndex, int size);
+    void saveSettings(QString const& name);
+    void loadSettings(QString const& name);
+signals:
+    void sectionResized(int logicalIndex, int oldSize, int newSize);
+
 protected:
      bool eventFilter(QObject *obj, QEvent *event) override;
 private slots:

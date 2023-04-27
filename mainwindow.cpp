@@ -3,6 +3,7 @@
 #include "model/localfilemodel.h"
 #include "view/panelwidget.h"
 #include "view/localdirdockwidget.h"
+#include "dialog/connectdialog.h"
 #include "dialog/aboutdialog.h"
 #include <QSplitter>
 #include <QTabWidget>
@@ -14,6 +15,8 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
     , leftPanelWidget(new PanelWidget(this))
     , rightPanelWidget(new PanelWidget(this))
+    , leftDirView(new LocalDirDockWidget(this))
+    , rightDirView(new LocalDirDockWidget(this))
 {
     ui->setupUi(this);
     QSplitter *spliter = new QSplitter(this);
@@ -21,14 +24,10 @@ MainWindow::MainWindow(QWidget *parent)
     spliter->addWidget(leftPanelWidget);
     spliter->addWidget(rightPanelWidget);
 
-    LocalDirDockWidget* leftDirView = new LocalDirDockWidget(this);
-    leftDirView->setDir("d:/test");
-    leftPanelWidget->addDir(leftDirView, "d:/test");
-    LocalDirDockWidget* rightDirView = new LocalDirDockWidget(this);
-    rightDirView->setDir("e:/Software");
-    rightPanelWidget->addDir(rightDirView, "e:/Software");
+    leftPanelWidget->addLocalDir(leftDirView);
+    rightPanelWidget->addLocalDir(rightDirView);
     setCentralWidget(spliter);
-    loadSettings();
+
 
     QMenuBar *bar = new QMenuBar(ui->menubar);
 
@@ -37,21 +36,49 @@ MainWindow::MainWindow(QWidget *parent)
     menuHelp->addAction(ui->actionAbout);
 
     ui->menubar->setCornerWidget(bar);
+
+    load();
     createConnects();
 }
 
 MainWindow::~MainWindow()
 {
-    saveSettings();
+    save();
     delete ui;
 }
 
 void MainWindow::createConnects()
 {
-    connect(ui->actionAbout,  &QAction::triggered, [=](bool){
+    connect(ui->actionConnect, &QAction::triggered, this, [=](bool){
+        ConnectDialog dialog;
+        dialog.exec();
+    });
+    connect(ui->actionAbout,  &QAction::triggered, this, [](bool){
         AboutDialog dialog;
         dialog.exec();
     });
+    connect(leftDirView, &LocalDirDockWidget::sectionResized, this, [&](int index, int, int newSize){
+        rightDirView->resizeSection(index, newSize);
+    });
+    connect(rightDirView, &LocalDirDockWidget::sectionResized, this, [&](int index, int, int newSize){
+        leftDirView->resizeSection(index, newSize);
+    });
+}
+
+void MainWindow::save()
+{
+    saveSettings();
+    leftDirView->saveSettings("LeftDirView");
+    rightDirView->saveSettings("RightDirView");
+}
+
+void MainWindow::load()
+{
+    loadSettings();
+    leftDirView->loadSettings("LeftDirView");
+    rightDirView->loadSettings("RightDirView");
+    leftPanelWidget->updateTexts(leftDirView);
+    rightPanelWidget->updateTexts(rightDirView);
 }
 
 void MainWindow::saveSettings()

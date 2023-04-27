@@ -8,6 +8,7 @@
 #include "dialog/fileprogressdialog.h"
 
 #include <QMenu>
+#include <QSettings>
 
 LocalDirDockWidget::LocalDirDockWidget(QWidget *parent)
     : QDockWidget(parent)
@@ -15,7 +16,6 @@ LocalDirDockWidget::LocalDirDockWidget(QWidget *parent)
     , model_(new LocalDirModel(this))
 {
     ui->setupUi(this);
-    model_->setDir("");
     ui->treeView->setRootIsDecorated(false);
     ui->treeView->setModel(model_);
     ui->treeView->setSortingEnabled(true);
@@ -27,6 +27,8 @@ LocalDirDockWidget::LocalDirDockWidget(QWidget *parent)
                     this, SLOT(customContextMenuRequested(QPoint)));
     connect(ui->treeView->header(), SIGNAL(sortIndicatorChanged(int,Qt::SortOrder)),
             this, SLOT(sortIndicatorChanged(int,Qt::SortOrder)));
+    connect(ui->treeView->header(), SIGNAL(sectionResized(int,int,int)),
+            this, SIGNAL(sectionResized(int,int,int)));
 }
 
 LocalDirDockWidget::~LocalDirDockWidget()
@@ -49,6 +51,47 @@ void LocalDirDockWidget::cd(QString const& dir)
 {
     if(model_->cd(dir))
         setWindowTitle(model_->dir());
+}
+
+void LocalDirDockWidget::resizeSection(int logicalIndex, int size)
+{
+    if(ui->treeView->header()->sectionSize(logicalIndex) != size)
+        ui->treeView->header()->resizeSection(logicalIndex, size);
+}
+
+void LocalDirDockWidget::saveSettings(QString const& name)
+{
+    QSettings settings(QCoreApplication::applicationName(),
+                       QCoreApplication::applicationVersion());
+    settings.beginGroup(name);
+    QHeaderView *headerView = ui->treeView->header();
+    settings.setValue("DirName", windowTitle());
+    settings.beginWriteArray("sectionSizes", headerView->count());
+    for(int i = 0; i < headerView->count(); i++)
+    {
+        settings.setArrayIndex(i);
+        settings.setValue("sectionSize", headerView->sectionSize(i));
+    }
+    settings.endArray();
+    settings.endGroup();
+}
+
+void LocalDirDockWidget::loadSettings(QString const& name)
+{
+    QSettings settings(QCoreApplication::applicationName(),
+                       QCoreApplication::applicationVersion());
+    settings.beginGroup(name);
+    cd(settings.value("DirName").toString());
+    QHeaderView *headerView = ui->treeView->header();
+    int size = settings.beginReadArray("sectionSizes");
+    for(int i = 0; i < size && i < headerView->count(); i++)
+    {
+        settings.setArrayIndex(i);
+        settings.value("sectionSize").toInt();
+        headerView->resizeSection(i, settings.value("sectionSize").toInt());
+    }
+    settings.endArray();
+    settings.endGroup();
 }
 
 bool LocalDirDockWidget::eventFilter(QObject *obj, QEvent *event)
