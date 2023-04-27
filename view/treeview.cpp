@@ -1,4 +1,5 @@
 #include "treeview.h"
+#include <QHeaderView>
 #include <QMouseEvent>
 #include <QApplication>
 
@@ -8,6 +9,9 @@ TreeView::TreeView(QWidget *parent)
 {
     setMouseTracking(true);
     setAcceptDrops(true);
+    setRootIsDecorated(false);
+    setSortingEnabled(true);
+    header()->setStretchLastSection(false);
 }
 
 void TreeView::mousePressEvent(QMouseEvent *event)

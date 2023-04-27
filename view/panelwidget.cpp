@@ -30,9 +30,10 @@ void PanelWidget::addLocalDir(QWidget* widget, QString const& text)
     ui->tabWidget->addTab(widget, Utils::driverIcon(), text);
 }
 
-void PanelWidget::addremoteDir(QWidget* widget, QString const& text)
+void PanelWidget::addRemoteDir(QWidget* widget, QString const& text)
 {
     ui->tabWidget->addTab(widget, Utils::networkIcon(), text);
+    ui->tabWidget->setCurrentIndex(ui->tabWidget->count() - 1);
 }
 
 void PanelWidget::updateTexts(QWidget* widget)

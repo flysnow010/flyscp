@@ -6,7 +6,7 @@
 namespace Ui {
 class RemoteDockWidget;
 }
-
+class RemoteDirModel;
 class RemoteDockWidget : public QDockWidget
 {
     Q_OBJECT
@@ -17,6 +17,7 @@ public:
 
 private:
     Ui::RemoteDockWidget *ui;
+    RemoteDirModel* model_;
 };
 
 #endif // REMOTEDOCKWIDGET_H

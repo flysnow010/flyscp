@@ -1,5 +1,5 @@
-#ifndef LOCALFILEMODEL_H
-#define LOCALFILEMODEL_H
+#ifndef LOCALDIRMODEL_H
+#define LOCALDIRMODEL_H
 
 #include "treemodel.h"
 #include <QIcon>
@@ -16,7 +16,7 @@ public:
     void update();
 
     bool cd(const QString &dirName);
-    void sort(int index, bool isDescendingOrder);
+    void sortItems(int index, bool isDescendingOrder);
 
     QString fileName(int index);
     QString filePath(int index);
@@ -38,4 +38,4 @@ private:
     QIcon backIcon;
 };
 
-#endif // LOCALFILEMODEL_H
+#endif // LOCALDIRMODEL_H

@@ -1,6 +1,6 @@
 #include "localdirdockwidget.h"
 #include "ui_localdirdockwidget.h"
-#include "model/localfilemodel.h"
+#include "model/localdirmodel.h"
 #include "core/filemanager.h"
 #include "core/filetransfer.h"
 #include "core/clipboard.h"
@@ -16,9 +16,7 @@ LocalDirDockWidget::LocalDirDockWidget(QWidget *parent)
     , model_(new LocalDirModel(this))
 {
     ui->setupUi(this);
-    ui->treeView->setRootIsDecorated(false);
     ui->treeView->setModel(model_);
-    ui->treeView->setSortingEnabled(true);
     ui->treeView->installEventFilter(this);
 
     connect(ui->treeView, SIGNAL(doubleClicked(QModelIndex)),
@@ -138,9 +136,9 @@ void LocalDirDockWidget::viewClick(QModelIndex const& index)
 void LocalDirDockWidget::sortIndicatorChanged(int logicalIndex, Qt::SortOrder order)
 {
     if(order == Qt::SortOrder::AscendingOrder)
-        model_->sort(logicalIndex, false);
+        model_->sortItems(logicalIndex, false);
     else
-        model_->sort(logicalIndex, true);
+        model_->sortItems(logicalIndex, true);
 }
 
 void LocalDirDockWidget::customContextMenuRequested(const QPoint &)

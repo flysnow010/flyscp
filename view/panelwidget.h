@@ -18,7 +18,7 @@ public:
     ~PanelWidget();
 
     void addLocalDir(QWidget* widget, QString const& text = "Local");
-    void addremoteDir(QWidget* widget, QString const& text = "Remote");
+    void addRemoteDir(QWidget* widget, QString const& text = "Remote");
     void updateTexts(QWidget* widget);
 
 private slots:

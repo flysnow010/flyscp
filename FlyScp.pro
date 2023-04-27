@@ -18,8 +18,8 @@ SOURCES += \
     dialog/fileprogressdialog.cpp \
     main.cpp \
     mainwindow.cpp \
-    model/localfilemodel.cpp \
-    model/remotefilemodel.cpp \
+    model/localdirmodel.cpp \
+    model/remotedirmodel.cpp \
     model/treeitem.cpp \
     model/treemodel.cpp \
     util/utils.cpp \
@@ -40,8 +40,8 @@ HEADERS += \
     dialog/connectdialog.h \
     dialog/fileprogressdialog.h \
     mainwindow.h \
-    model/localfilemodel.h \
-    model/remotefilemodel.h \
+    model/localdirmodel.h \
+    model/remotedirmodel.h \
     model/treeitem.h \
     model/treemodel.h \
     util/utils.h \

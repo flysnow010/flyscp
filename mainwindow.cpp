@@ -1,8 +1,9 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "model/localfilemodel.h"
+#include "model/localdirmodel.h"
 #include "view/panelwidget.h"
 #include "view/localdirdockwidget.h"
+#include "view/remotedockwidget.h"
 #include "dialog/connectdialog.h"
 #include "dialog/aboutdialog.h"
 #include <QSplitter>
@@ -52,6 +53,9 @@ void MainWindow::createConnects()
     connect(ui->actionConnect, &QAction::triggered, this, [=](bool){
         ConnectDialog dialog;
         dialog.exec();
+        RemoteDockWidget* rightDirView = new RemoteDockWidget(this);
+        rightPanelWidget->addRemoteDir(rightDirView);
+
     });
     connect(ui->actionAbout,  &QAction::triggered, this, [](bool){
         AboutDialog dialog;

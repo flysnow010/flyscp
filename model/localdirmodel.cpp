@@ -1,4 +1,4 @@
-#include "localfilemodel.h"
+#include "localdirmodel.h"
 #include "treeitem.h"
 #include "util/utils.h"
 
@@ -89,7 +89,7 @@ void LocalDirModel::update()
     setupData();
 }
 
-void LocalDirModel::sort(int index, bool isDescendingOrder)
+void LocalDirModel::sortItems(int index, bool isDescendingOrder)
 {
     uint16_t sortFlag = QDir::SortFlag::DirsFirst;
 
@@ -130,13 +130,13 @@ QString LocalDirModel::filePath(QString const& fileName)
 
 bool LocalDirModel::cd(const QString &dirName)
 {
-if(!dir_.cd(dirName))
-    return false;
+    if(!dir_.cd(dirName))
+        return false;
 
-fileInfos_ = dir_.entryInfoList(QDir::AllEntries | QDir::NoDot,
-                                QDir::DirsFirst);
-setupData();
-return true;
+    fileInfos_ = dir_.entryInfoList(QDir::AllEntries | QDir::NoDot,
+                                    QDir::DirsFirst);
+    setupData();
+    return true;
 }
 
 QVariant LocalDirModel::foreColor(const QModelIndex &index) const
@@ -144,6 +144,7 @@ QVariant LocalDirModel::foreColor(const QModelIndex &index) const
     Q_UNUSED(index)
     return QBrush(QColor(QString("#454545")));
 }
+
 void LocalDirModel::setupModelData(TreeItem *parent)
 {
     iconMap.clear();

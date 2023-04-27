@@ -47,7 +47,14 @@ QToolButton:checked {
     <number>0</number>
    </property>
    <item>
-    <widget class="QWidget" name="driversWidget" native="true"/>
+    <widget class="QFrame" name="driversWidget">
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QTabWidget" name="tabWidget">
