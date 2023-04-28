@@ -6,6 +6,7 @@ struct SSHSettings
 {
     QString hostName;
     QString userName;
+    QString passWord;
     QString privateKeyFileName;
     int port = 22;
     bool usePrivateKey = false;

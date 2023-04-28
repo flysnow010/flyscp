@@ -52,9 +52,16 @@ void MainWindow::createConnects()
 {
     connect(ui->actionConnect, &QAction::triggered, this, [=](bool){
         ConnectDialog dialog;
+        SSHSettings settings;
+        settings.hostName = "192.168.3.197";
+        settings.userName = "james";
+        dialog.setType(ConnectType::SSH);
+        dialog.setSshSettings(settings);
         if(dialog.exec() == QDialog::Accepted)
         {
             RemoteDockWidget* rightDirView = new RemoteDockWidget(this);
+            settings.passWord = "james010";
+            rightDirView->start(settings);
             rightPanelWidget->addRemoteDir(rightDirView);
         }
     });

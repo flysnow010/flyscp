@@ -28,6 +28,7 @@ public:
     int write(void *dest, uint32_t count);
 
 private:
+    friend class SFtp;
     Channel(Channel const&);
     Channel & operator == (Channel const&);
 

@@ -39,6 +39,11 @@ bool Session::connect()
     return ssh_connect(d->session) == SSH_OK;
 }
 
+void Session::disconnect()
+{
+    ssh_disconnect(d->session);
+}
+
 bool Session::verify()
 {
     ssh_key srv_pubkey = NULL;

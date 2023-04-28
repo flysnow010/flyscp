@@ -24,6 +24,7 @@ SOURCES += \
     model/remotedirmodel.cpp \
     model/treeitem.cpp \
     model/treemodel.cpp \
+    sftp/sftpsession.cpp \
     ssh/channel.cpp \
     ssh/dir.cpp \
     ssh/file.cpp \
@@ -52,6 +53,7 @@ HEADERS += \
     model/remotedirmodel.h \
     model/treeitem.h \
     model/treemodel.h \
+    sftp/sftpsession.h \
     ssh/channel.h \
     ssh/dir.h \
     ssh/file.h \

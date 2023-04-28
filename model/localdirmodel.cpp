@@ -91,7 +91,7 @@ void LocalDirModel::update()
 
 void LocalDirModel::sortItems(int index, bool isDescendingOrder)
 {
-    uint16_t sortFlag = QDir::SortFlag::DirsFirst;
+    QDir::SortFlags sortFlag = QDir::DirsFirst;
 
     if(index == NAME_INDEX)
         sortFlag |= QDir::SortFlag::Name;
@@ -103,7 +103,7 @@ void LocalDirModel::sortItems(int index, bool isDescendingOrder)
         sortFlag |= QDir::SortFlag::Type;
     if(!isDescendingOrder)
         sortFlag |=  QDir::SortFlag::Reversed;
-    fileInfos_ = dir_.entryInfoList(QDir::AllEntries | QDir::NoDot, (QDir::SortFlag)sortFlag);
+    fileInfos_ = dir_.entryInfoList(QDir::AllEntries | QDir::NoDot, sortFlag);
     modifyFileInfos(fileInfos_);
     setupData();
 }

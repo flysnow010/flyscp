@@ -2,12 +2,16 @@
 #define REMOTEDIRMODEL_H
 
 #include "treemodel.h"
+#include "ssh/dir.h"
+#include "ssh/fileinfo.h"
 #include <QIcon>
 
 class RemoteDirModel : public TreeModel
 {
 public:
     explicit RemoteDirModel(QObject *parent = nullptr);
+
+    void setDir(ssh::DirPtr const& dir);
 
 protected:
     virtual TreeItem *createRootItem();
@@ -17,6 +21,8 @@ protected:
     virtual void setupModelData(TreeItem *parent);
     virtual QVariant foreColor(const QModelIndex &index) const;
 private:
+    ssh::DirPtr dir_;
+    ssh::FileInfos fileInfos_;
     QMap<QString, QIcon> iconMap;
     QIcon dirIcon;
     QIcon backIcon;

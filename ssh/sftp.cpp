@@ -1,5 +1,6 @@
 #include "sftp.h"
 #include "session.h"
+#include "channel.h"
 #include "dir.h"
 #include "sshprivate.h"
 #include <sys/stat.h>
@@ -10,6 +11,13 @@ namespace ssh {
 SFtp::SFtp(Session const& session)
     : d(new SFtpPrivate(session.d->session))
 {
+}
+
+SFtp::SFtp(Session const& session, Channel const& channel)
+    : d(new SFtpPrivate(session.d->session, channel.d->channel))
+{
+    ssh_channel_open_session(d->channel);
+    ssh_channel_request_sftp(d->channel);
 }
 
 SFtp::~SFtp()
@@ -56,20 +64,17 @@ bool SFtp::mkdir(const char*path)
 
 DirPtr SFtp::home() const
 {
-    DirPtr dir(new Dir(*this, "."));
-    return dir;
+    return DirPtr(new Dir(*this, "."));
 }
 
 DirPtr SFtp::root() const
 {
-    DirPtr dir(new Dir(*this, "/"));
-    return dir;
+    return DirPtr(new Dir(*this, "/"));
 }
 
 DirPtr SFtp::dir(const char* path) const
 {
-    DirPtr dir(new Dir(*this, path));
-    return dir;
+    return DirPtr(new Dir(*this, path));
 }
 
 }

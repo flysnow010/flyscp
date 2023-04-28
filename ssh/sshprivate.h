@@ -33,9 +33,19 @@ public:
         : session(s)
         , sftp(sftp_new(s))
         , isInited(false)
+    {
+        channel =  sftp->channel;
+    }
+
+    SFtpPrivate(ssh_session s, ssh_channel c)
+        : session(s)
+        , channel(c)
+        , sftp(sftp_new_channel(s, c))
+        , isInited(false)
     {}
 
     ssh_session session;
+    ssh_channel channel;
     sftp_session sftp;
     bool isInited;
 };
@@ -70,9 +80,17 @@ class FileInfoPrivate
 public:
     FileInfoPrivate()
         : info(0)
+        , isParent(false)
     {}
     sftp_attributes info;
-    std::string temp_;
+    bool isParent;
+    std::string basename;
+    std::string suffix;
+
 };
+
+int const FileType_File    = 1;
+int const FileType_Dir     = 2;
+int const FileType_SymLink = 3;
 };
 #endif // SSHPRIVATE_H

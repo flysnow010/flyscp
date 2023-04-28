@@ -1,8 +1,9 @@
 #ifndef SSH_FILEINFO_H
 #define SSH_FILEINFO_H
 #include <cstdint>
-#include <list>
+#include <vector>
 #include <memory>
+#include <string>
 
 namespace ssh {
 class FileInfoPrivate;
@@ -12,9 +13,24 @@ public:
     ~FileInfo();
 
     bool isNull() const;
-    const char* name();
-    const char* longname();
-    uint64_t size();
+    bool isDir() const;
+    bool isFile() const;
+    bool isSymLink() const;
+    bool isParent() const;
+
+    const char* name() const;
+    std::string const& basename() const;
+    std::string const& suffix() const;
+    const char* owner() const;
+    const char* group() const;
+    const char* longname() const;
+
+    uint32_t uid() const;
+    uint32_t gid() const;
+    uint32_t permissions() const;
+    uint32_t time() const;
+
+    uint64_t size() const;
 private:
     friend class Dir;
     FileInfo();
@@ -32,7 +48,7 @@ public:
     {}
 };
 
-class FileInfos : public std::list<FileInfoPtr>
+class FileInfos : public std::vector<FileInfoPtr>
 {
 
 };
