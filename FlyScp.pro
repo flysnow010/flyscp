@@ -4,6 +4,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
 
+INCLUDEPATH += ./include
+LIBS += -L$$(PWD)\lib -lssh.dll
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
@@ -22,6 +24,12 @@ SOURCES += \
     model/remotedirmodel.cpp \
     model/treeitem.cpp \
     model/treemodel.cpp \
+    ssh/channel.cpp \
+    ssh/dir.cpp \
+    ssh/file.cpp \
+    ssh/fileinfo.cpp \
+    ssh/session.cpp \
+    ssh/sftp.cpp \
     util/utils.cpp \
     view/localdirdockwidget.cpp \
     view/panelwidget.cpp \
@@ -44,6 +52,13 @@ HEADERS += \
     model/remotedirmodel.h \
     model/treeitem.h \
     model/treemodel.h \
+    ssh/channel.h \
+    ssh/dir.h \
+    ssh/file.h \
+    ssh/fileinfo.h \
+    ssh/session.h \
+    ssh/sftp.h \
+    ssh/sshprivate.h \
     util/utils.h \
     view/localdirdockwidget.h \
     view/panelwidget.h \
