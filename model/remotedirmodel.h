@@ -12,7 +12,13 @@ public:
     explicit RemoteDirModel(QObject *parent = nullptr);
 
     void setDir(ssh::DirPtr const& dir);
+    QString dirName();
 
+    void sortItems(int index, bool isDescendingOrder);
+
+    ssh::FileInfoPtr fileInfo(int row);
+    std::string filePath(const char* path);
+    std::string parentPath();
 protected:
     virtual TreeItem *createRootItem();
     virtual QVariant textAlignment(int column) const;
@@ -20,6 +26,8 @@ protected:
     virtual QVariant userData(const QModelIndex &index) const;
     virtual void setupModelData(TreeItem *parent);
     virtual QVariant foreColor(const QModelIndex &index) const;
+private:
+    QString property(uint32_t permissions, bool isDir) const;
 private:
     ssh::DirPtr dir_;
     ssh::FileInfos fileInfos_;

@@ -18,6 +18,8 @@ public:
 
     void start(SSHSettings const& settings);
 private slots:
+    void viewClick(QModelIndex const& index);
+    void sortIndicatorChanged(int logicalIndex, Qt::SortOrder order);
     void connected();
     void unconnected();
     void connectionError(QString const& error);
