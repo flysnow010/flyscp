@@ -7,10 +7,13 @@
 #include <QDateTime>
 #include <QDir>
 #include <QFileIconProvider>
+namespace  {
 int const NAME_INDEX = 0;
 int const SUFFIX_INDEX = 1;
 int const SIZE_INDEX = 2;
 int const TIME_INDEX = 3;
+}
+
 
 LocalDirModel::LocalDirModel(QObject *parent)
     : TreeModel(parent)
