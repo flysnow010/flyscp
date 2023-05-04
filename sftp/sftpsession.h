@@ -14,7 +14,8 @@ public:
     explicit SFtpSession(QObject *parent = nullptr);
 
     inline ssh::DirPtr home() const { return sftp->home(); }
-    inline ssh::DirPtr dir(QString const& path) const { return sftp->dir(path.toStdString().c_str()); }
+    inline ssh::DirPtr dir(std::string const& path) const { return sftp->dir(path.c_str()); }
+    std::string homeDir();
 public slots:
     void start(SSHSettings const& settings);
     void stop();

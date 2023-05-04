@@ -1,4 +1,5 @@
 #include "sftpsession.h"
+#include "ssh/channel.h"
 
 SFtpSession::SFtpSession(QObject *parent)
     : QObject(parent)
@@ -39,4 +40,21 @@ void SFtpSession::stop()
 {
     sessioin->disconnect();
     emit unconnected();
+}
+
+std::string SFtpSession::homeDir()
+{
+    ssh::Channel channel(*sessioin);
+    if(!channel.open()
+        || !channel.exec("pwd")
+        || !channel.poll(1000))
+        return std::string();
+
+    char buf[512];
+    std::string dir;
+
+    int size = channel.read_nonblocking(buf, sizeof(buf));
+    if(size > 0)
+        return std::string(buf, size -1);
+    return std::string();
 }
