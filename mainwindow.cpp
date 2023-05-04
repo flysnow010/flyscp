@@ -53,7 +53,8 @@ void MainWindow::createConnects()
     connect(ui->actionConnect, &QAction::triggered, this, [=](bool){
         ConnectDialog dialog;
         SSHSettings settings;
-        settings.hostName = "192.168.3.197";
+        //settings.hostName = "192.168.3.197";
+        settings.hostName = "13.13.13.159";
         settings.userName = "james";
         dialog.setType(ConnectType::SSH);
         dialog.setSshSettings(settings);
