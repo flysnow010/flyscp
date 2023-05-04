@@ -34,7 +34,12 @@ Dir::~Dir()
     delete d;
 }
 
-const char* Dir::dirName()
+bool Dir::isRoot() const
+{
+    return d->path == std::string("/");
+}
+
+const char* Dir::dirName() const
 {
     return d->path.c_str();
 }
@@ -109,6 +114,13 @@ struct FileInfoCompare
 
     bool operator() (FileInfoPtr const& l, FileInfoPtr const& r)
     {
+        if(flag & Dir::Reversed)
+            return !compare(l, r);
+        return compare(l, r);
+    }
+
+    bool compare(FileInfoPtr const& l, FileInfoPtr const& r)
+    {
         if(flag & Dir::DirsFirst)
         {
             if(l->isDir())
@@ -117,7 +129,15 @@ struct FileInfoCompare
                     return true;
                 else
                 {
-                    return l->basename() < r->basename();
+                    uint32_t sortMask = flag & Dir::SortByMask;
+                    if(sortMask == Dir::Name)
+                        return l->basename() < r->basename();
+                    else if(sortMask == Dir::Time)
+                        return l->time() < r->time();
+                    else if(sortMask == Dir::Size)
+                        return l->size() < r->size();
+                    else
+                        return l->basename() < r->basename();
                 }
             }
             else
@@ -125,7 +145,17 @@ struct FileInfoCompare
                 if(r->isDir())
                     return false;
                 else
-                    return l->basename() < r->basename();
+                {
+                    uint32_t sortMask = flag & Dir::SortByMask;
+                    if(sortMask == Dir::Name)
+                        return l->basename() < r->basename();
+                    else if(sortMask == Dir::Time)
+                        return l->time() < r->time();
+                    else if(sortMask == Dir::Size)
+                        return l->size() < r->size();
+                    else
+                        return l->basename() < r->basename();
+                }
             }
         }
         return false;
@@ -137,14 +167,6 @@ struct FileInfoCompare
 void Dir::sort(FileInfos &fileInfos, SortFlag sortFlag)
 {
     std::sort(fileInfos.begin(), fileInfos.end(), FileInfoCompare(sortFlag));
-}
-
-FileInfoPtr Dir::fileInfo(const char* path)
-{
-    sftp_attributes info = sftp_stat(d->sftp, path);
-    FileInfoPtr fileInfo(new FileInfo());
-    fileInfo->d->info = info;
-    return fileInfo;
 }
 
 }

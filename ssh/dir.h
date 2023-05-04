@@ -54,9 +54,9 @@ public:
     Dir(SFtp const& sftp, const char* path);
     ~Dir();
 
-    const char* dirName();
+    bool isRoot() const;
+    const char* dirName() const;
     FileInfos fileInfoList(Filter filter = NoFilter, SortFlag sortFlag = NoSort);
-    FileInfoPtr fileInfo(const char* path);
 private:
     void sort(FileInfos &fileInfos, SortFlag sortFlag);
     Dir(Dir const&);
