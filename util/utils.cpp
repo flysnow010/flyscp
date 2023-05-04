@@ -201,6 +201,8 @@ QString Utils::formatFileSizeB(qint64 byte)
     }
     if(size)
         sizes.push_front(QString("%1").arg(size));
+    if(byte == 0)
+        return QString("0");
     return sizes.join(",");
 }
 QString Utils::formatFileSizeKB(qint64 byte)
