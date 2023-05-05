@@ -15,7 +15,7 @@ void SFtpSession::start(SSHSettings const& settings)
 
     if(!sessioin->connect())
     {
-        emit connectionError("connect is timeout");
+        emit connectionError(sessioin->error());
         return;
     }
 
