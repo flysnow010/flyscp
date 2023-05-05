@@ -4,6 +4,9 @@
 #include "sftp/sftpsession.h"
 #include <QDebug>
 
+#include <QMenu>
+#include <QSettings>
+
 RemoteDockWidget::RemoteDockWidget(QWidget *parent)
     : QDockWidget(parent)
     , ui(new Ui::RemoteDockWidget)
@@ -14,6 +17,8 @@ RemoteDockWidget::RemoteDockWidget(QWidget *parent)
     ui->treeView->setModel(model_);
     connect(ui->treeView, SIGNAL(doubleClicked(QModelIndex)),
                     this, SLOT(viewClick(QModelIndex)));
+    connect(ui->treeView, SIGNAL(customContextMenuRequested(QPoint)),
+                    this, SLOT(customContextMenuRequested(QPoint)));
     connect(ui->treeView->header(), SIGNAL(sortIndicatorChanged(int,Qt::SortOrder)),
             this, SLOT(sortIndicatorChanged(int,Qt::SortOrder)));
     connect(sftp, &SFtpSession::connected, this, &RemoteDockWidget::connected);
@@ -53,6 +58,55 @@ void RemoteDockWidget::viewClick(QModelIndex const& index)
     }
 }
 
+void RemoteDockWidget::customContextMenuRequested(const QPoint &pos)
+{
+    QModelIndex index = ui->treeView->indexAt(pos);
+    QMenu menu;
+    if(!index.isValid())
+    {
+        menu.addAction(QIcon(":/image/back.png"), "Parent directory", this, SLOT(parentDirectory()));
+        menu.addSeparator();
+        menu.addAction("New directory", this, SLOT(makeDirectory()));
+        menu.addAction("New file", this, SLOT(newFile()));
+        menu.addSeparator();
+        menu.addAction("Refresh current folder", this, SLOT(refreshFolder()));
+        menu.addAction("Upload to current folder", this, SLOT(upload()));
+    }
+    else
+    {
+        ssh::FileInfoPtr fileInfo = model_->fileInfo(index.row());
+        if(!fileInfo)
+            return;
+        if(fileInfo->isDir())
+        {
+             menu.addAction("Open", this, SLOT(open()));
+             menu.addAction("Download", this, SLOT(download()));
+             menu.addSeparator();
+             menu.addAction("Delete", this, SLOT(del()));
+             menu.addAction("Rename", this, SLOT(rename()));
+             menu.addSeparator();
+             menu.addAction("Copy file path", this, SLOT(copyFilepath()));
+             menu.addAction("Properties", this, SLOT(properties()));
+             menu.addAction("Permissions", this, SLOT(permissions()));
+        }
+
+        else if(fileInfo->isFile())
+        {
+            menu.addAction("Open", this, SLOT(open()));
+            menu.addAction("Open with...", this, SLOT(openWith()));
+            menu.addAction("Download", this, SLOT(download()));
+            menu.addSeparator();
+            menu.addAction("Delete", this, SLOT(del()));
+            menu.addAction("Rename", this, SLOT(rename()));
+            menu.addSeparator();
+            menu.addAction("Copy file path", this, SLOT(copyFilepath()));
+            menu.addAction("Properties", this, SLOT(properties()));
+            menu.addAction("Permissions", this, SLOT(permissions()));
+        }
+    }
+    menu.exec(QCursor::pos());
+}
+
 void RemoteDockWidget::sortIndicatorChanged(int logicalIndex, Qt::SortOrder order)
 {
     if(order == Qt::SortOrder::AscendingOrder)
@@ -79,4 +133,66 @@ void RemoteDockWidget::unconnected()
 void RemoteDockWidget::connectionError(QString const& error)
 {
     qDebug() << "error: " << error;
+}
+
+void RemoteDockWidget::parentDirectory()
+{
+
+}
+
+void RemoteDockWidget::makeDirectory()
+{
+
+}
+
+void RemoteDockWidget::newFile()
+{
+
+}
+
+void RemoteDockWidget::refreshFolder()
+{
+
+}
+
+void RemoteDockWidget::upload()
+{
+
+}
+
+void RemoteDockWidget::open()
+{
+
+}
+
+void RemoteDockWidget::openWith()
+{
+
+}
+
+void RemoteDockWidget::download()
+{
+
+}
+
+void RemoteDockWidget::del(){
+
+}
+
+void RemoteDockWidget::rename(){
+
+}
+
+void RemoteDockWidget::copyFilepath(){
+
+}
+
+void RemoteDockWidget::properties()
+{
+
+}
+
+void RemoteDockWidget::permissions()
+{
+
 }

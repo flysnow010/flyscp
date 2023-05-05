@@ -19,10 +19,26 @@ public:
     void start(SSHSettings const& settings);
 private slots:
     void viewClick(QModelIndex const& index);
+    void customContextMenuRequested(const QPoint &pos);
     void sortIndicatorChanged(int logicalIndex, Qt::SortOrder order);
     void connected();
     void unconnected();
     void connectionError(QString const& error);
+
+    void parentDirectory();
+    void makeDirectory();
+    void newFile();
+    void refreshFolder();
+    void upload();
+
+    void open();
+    void openWith();
+    void download();
+    void del();
+    void rename();
+    void copyFilepath();
+    void properties();
+    void permissions();
 private:
     Ui::RemoteDockWidget *ui;
     RemoteDirModel* model_;
