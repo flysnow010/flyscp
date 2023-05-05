@@ -39,15 +39,16 @@ public:
     enum SortFlag { Name        = 0x00,
                     Time        = 0x01,
                     Size        = 0x02,
-                    Unsorted    = 0x03,
-                    SortByMask  = 0x03,
+                    Type        = 0x03,
+                    Property    = 0x04,
+                    Unsorted    = 0x07,
+                    SortByMask  = 0x07,
 
-                    DirsFirst   = 0x04,
-                    Reversed    = 0x08,
-                    IgnoreCase  = 0x10,
-                    DirsLast    = 0x20,
-                    LocaleAware = 0x40,
-                    Type        = 0x80,
+                    DirsFirst   = 0x08,
+                    Reversed    = 0x10,
+                    IgnoreCase  = 0x20,
+                    DirsLast    = 0x40,
+                    LocaleAware = 0x80,
                     NoSort = -1
     };
 

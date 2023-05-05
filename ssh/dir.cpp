@@ -114,51 +114,60 @@ struct FileInfoCompare
 
     bool operator() (FileInfoPtr const& l, FileInfoPtr const& r)
     {
-        if(flag & Dir::Reversed)
-            return !compare(l, r);
-        return compare(l, r);
+        if(flag == Dir::NoSort)
+            return false;
+
+        if(l->isDir())
+        {
+            if(r->isFile())
+            {
+                if(flag & Dir::DirsFirst)
+                    return true;
+                return false;
+            }
+            else
+            {
+                if(l->isParent())
+                    return true;
+                if(r->isParent())
+                    return false;
+                if(flag & Dir::Reversed)
+                    return compare(l, r);
+                return compare(r, l);
+            }
+        }
+        else
+        {
+            if(r->isDir())
+            {
+                if(flag & Dir::DirsFirst)
+                    return false;
+                return true;
+            }
+            else
+            {
+                if(flag & Dir::Reversed)
+                    return compare(l, r);
+                return compare(r, l);
+            }
+        }
     }
 
     bool compare(FileInfoPtr const& l, FileInfoPtr const& r)
     {
-        if(flag & Dir::DirsFirst)
-        {
-            if(l->isDir())
-            {
-                if(r->isFile())
-                    return true;
-                else
-                {
-                    uint32_t sortMask = flag & Dir::SortByMask;
-                    if(sortMask == Dir::Name)
-                        return l->basename() < r->basename();
-                    else if(sortMask == Dir::Time)
-                        return l->time() < r->time();
-                    else if(sortMask == Dir::Size)
-                        return l->size() < r->size();
-                    else
-                        return l->basename() < r->basename();
-                }
-            }
-            else
-            {
-                if(r->isDir())
-                    return false;
-                else
-                {
-                    uint32_t sortMask = flag & Dir::SortByMask;
-                    if(sortMask == Dir::Name)
-                        return l->basename() < r->basename();
-                    else if(sortMask == Dir::Time)
-                        return l->time() < r->time();
-                    else if(sortMask == Dir::Size)
-                        return l->size() < r->size();
-                    else
-                        return l->basename() < r->basename();
-                }
-            }
-        }
-        return false;
+        uint32_t sort = flag & Dir::SortByMask;
+        if(sort == Dir::Name)
+            return l->basename() < r->basename();
+        else if(sort == Dir::Time)
+            return l->time() < r->time();
+        else if(sort == Dir::Size)
+            return l->size() < r->size();
+        else if(sort == Dir::Type)
+            return l->suffix() < r->suffix();
+        else if(sort == Dir::Property)
+            return l->permissions() < r->permissions();
+        else
+            return false;
     }
 
     Dir::SortFlag flag;
