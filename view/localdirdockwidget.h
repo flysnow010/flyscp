@@ -39,7 +39,7 @@ private slots:
     void paste();
     void delfile();
     void rename();
-    void property();
+    void properties();
 private:
     QStringList selectedileNames(QString const& prefix = QString());
     QString selectFileName();

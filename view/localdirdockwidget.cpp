@@ -150,6 +150,7 @@ void LocalDirDockWidget::customContextMenuRequested(const QPoint &)
         items = ContextMenu::FileCommands();
     else
         items = ContextMenu::DirCommands();
+
     QMenu menu;
     foreach(auto const& item, items)
     {
@@ -157,6 +158,7 @@ void LocalDirDockWidget::customContextMenuRequested(const QPoint &)
             item.exec(fileName);
         });
     }
+
     menu.addSeparator();
     menu.addAction(QIcon(":/image/cut.png"), "Cut", this, SLOT(cut()));
     menu.addAction(QIcon(":/image/copy.png"), "Copy", this, SLOT(copy()));
@@ -166,7 +168,7 @@ void LocalDirDockWidget::customContextMenuRequested(const QPoint &)
     menu.addAction("Delete", this, SLOT(delfile()));
     menu.addAction("Rename", this, SLOT(rename()));
     menu.addSeparator();
-    menu.addAction("Property", this, SLOT(property()));
+    menu.addAction("Properties", this, SLOT(properties()));
 
     menu.exec(QCursor::pos());
 }
@@ -212,7 +214,7 @@ void LocalDirDockWidget::rename()
     ContextMenu::PrintCommand(items);
 }
 
-void LocalDirDockWidget::property()
+void LocalDirDockWidget::properties()
 {
     QModelIndex index = ui->treeView->currentIndex();
     if(!index.isValid())
