@@ -8,6 +8,7 @@ int const NAME_INDEX = 0;
 int const SUFFIX_INDEX = 1;
 int const SIZE_INDEX = 2;
 int const TIME_INDEX = 3;
+int const PROPERTY_INDEX = 4;
 }
 
 RemoteDirModel::RemoteDirModel(QObject *parent)
@@ -22,9 +23,10 @@ void RemoteDirModel::setDir(ssh::DirPtr const& dir)
 {
     dir_ = dir;
     uint32_t filter = ssh::Dir::AllEntries | ssh::Dir::NoSymLinks | ssh::Dir::NoDot;
+    ssh::Dir::SortFlag sortFlag = ssh::Dir::DirsFirst;
     if(dir_->isRoot())
         filter |= ssh::Dir::NoDotDot;
-    fileInfos_ = dir_->fileInfoList(static_cast<ssh::Dir::Filter>(filter));
+    fileInfos_ = dir_->fileInfoList(static_cast<ssh::Dir::Filter>(filter), sortFlag);
     setupData();
 }
 
@@ -37,7 +39,7 @@ QString RemoteDirModel::dirName()
 
 void RemoteDirModel::sortItems(int index, bool isDescendingOrder)
 {
-   uint32_t sortFlag = ssh::Dir::DirsFirst;
+    uint32_t sortFlag = ssh::Dir::DirsFirst;
 
     if(index == NAME_INDEX)
         sortFlag |= ssh::Dir::Name;
@@ -47,6 +49,8 @@ void RemoteDirModel::sortItems(int index, bool isDescendingOrder)
         sortFlag |=  ssh::Dir::Time;
     else if(index == SUFFIX_INDEX)
         sortFlag |= ssh::Dir::Type;
+    else if(index == PROPERTY_INDEX)
+        sortFlag |= ssh::Dir::Property;
     if(!isDescendingOrder)
         sortFlag |=  ssh::Dir::Reversed;
     uint32_t filter = ssh::Dir::AllEntries | ssh::Dir::NoSymLinks | ssh::Dir::NoDot;
