@@ -74,4 +74,9 @@ bool Session::login(const char* user, const char* password)
 {
     return ssh_userauth_password(d->session, user, password) == SSH_AUTH_SUCCESS;
 }
+
+const char* Session::error()
+{
+    return ssh_get_error(d->session);
+}
 }
