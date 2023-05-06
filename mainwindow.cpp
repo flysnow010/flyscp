@@ -54,8 +54,9 @@ void MainWindow::createConnects()
         ConnectDialog dialog;
         SSHSettings settings;
         //settings.hostName = "192.168.3.197";
-        settings.hostName = "13.13.13.159";
         //settings.hostName = "192.168.40.80";
+        settings.hostName = "13.13.13.159";
+
         settings.userName = "james";
         dialog.setType(ConnectType::SSH);
         dialog.setSshSettings(settings);
@@ -65,7 +66,7 @@ void MainWindow::createConnects()
             settings = dialog.sshSettings();
             settings.passWord = "james010";
             rightDirView->start(settings);
-            rightPanelWidget->addRemoteDir(rightDirView);
+            rightPanelWidget->addRemoteDir(rightDirView, rightDirView->name());
         }
     });
     connect(ui->actionAbout,  &QAction::triggered, this, [](bool){
