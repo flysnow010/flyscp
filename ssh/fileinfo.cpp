@@ -41,6 +41,11 @@ bool FileInfo::isParent() const
     return d->isParent;
 }
 
+bool FileInfo::otherCanRead() const
+{
+    return d->info->permissions & Other_Read;
+}
+
 const char* FileInfo::name() const
 {
     return d->info->name;
@@ -81,7 +86,6 @@ uint32_t FileInfo::gid() const
     return d->info->gid;
 }
 
-
 uint32_t FileInfo::permissions() const
 {
     return d->info->permissions;
@@ -91,7 +95,6 @@ uint32_t FileInfo::time() const
 {
     return d->info->mtime;
 }
-
 
 uint64_t FileInfo::size() const
 {

@@ -19,7 +19,8 @@ public:
         Group_Exe   = (0x1 << 3),
         Other_Read  = (0x1 << 2),
         Other_Write = (0x1 << 1),
-        Other_Exe   = (0x1 << 0)
+        Other_Exe   = (0x1 << 0),
+        ALlMask     = 0x1FF
     };
     ~FileInfo();
 
@@ -28,6 +29,7 @@ public:
     bool isFile() const;
     bool isSymLink() const;
     bool isParent() const;
+    bool otherCanRead() const;
 
     const char* name() const;
     std::string const& basename() const;

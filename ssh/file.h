@@ -1,5 +1,7 @@
 #ifndef SSH_FILE_H
 #define SSH_FILE_H
+#include <memory>
+
 #include <cstdint>
 #include <sys/types.h>
 
@@ -11,6 +13,8 @@ class File
 public:
     File(SFtp const& sftp);
     ~File();
+
+    typedef std::shared_ptr<File> Ptr;
 
     bool open(const char *file, int accesstype, mode_t mode);
     bool close();
