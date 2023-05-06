@@ -3,6 +3,7 @@
 #include "core/sshsettings.h"
 #include "ssh/sftp.h"
 #include "ssh/dir.h"
+#include "ssh/file.h"
 #include "ssh/session.h"
 
 #include <QObject>
@@ -15,7 +16,12 @@ public:
 
     inline ssh::DirPtr home() const { return sftp->home(); }
     inline ssh::DirPtr dir(std::string const& path) const { return sftp->dir(path.c_str()); }
-    std::string homeDir();
+
+    ssh::File::Ptr openForRead(const char* filename);
+    ssh::File::Ptr openForWrite(const char* filename);
+
+    std::string homeDir() const;
+    std::string userName() const { return username_; }
 public slots:
     void start(SSHSettings const& settings);
     void stop();
@@ -28,6 +34,7 @@ signals:
 private:
     ssh::Session::Ptr sessioin;
     ssh::SFtp::Ptr sftp;
+    std::string username_;
 };
 
 #endif // SFTPSESSION_H

@@ -1,5 +1,6 @@
 #include "sftpsession.h"
 #include "ssh/channel.h"
+#include <fcntl.h>
 
 SFtpSession::SFtpSession(QObject *parent)
     : QObject(parent)
@@ -11,7 +12,8 @@ void SFtpSession::start(SSHSettings const& settings)
 {
     sessioin->setHost(settings.hostName.toStdString().c_str());
     sessioin->setPort(settings.port);
-    sessioin->setUser(settings.userName.toStdString().c_str());
+    username_ = settings.userName.toStdString();
+    sessioin->setUser(username_.c_str());
 
     if(!sessioin->connect())
     {
@@ -42,7 +44,23 @@ void SFtpSession::stop()
     emit unconnected();
 }
 
-std::string SFtpSession::homeDir()
+ssh::File::Ptr SFtpSession::openForRead(const char* filename)
+{
+    ssh::File::Ptr file(new ssh::File(*sftp));
+    if(file->open(filename, O_RDONLY, 0644))
+        return file;
+    return ssh::File::Ptr();
+}
+
+ssh::File::Ptr SFtpSession::openForWrite(const char* filename)
+{
+    ssh::File::Ptr file(new ssh::File(*sftp));
+    if(file->open(filename, O_WRONLY, 0644))
+        return file;
+    return ssh::File::Ptr();
+}
+
+std::string SFtpSession::homeDir() const
 {
     ssh::Channel channel(*sessioin);
     if(!channel.open()
