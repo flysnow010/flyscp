@@ -1,6 +1,7 @@
 #include "utils.h"
+#include "ssh/fileinfo.h"
 
-#include <QDir>
+
 #include <QApplication>
 #include <QFileIconProvider>
 #include <QFileInfo>
@@ -17,29 +18,14 @@ QString Utils::currentPath()
     return QApplication::applicationDirPath();
 }
 
-QByteArray Utils::readFile(QString const& filename)
+QDir Utils::tempPath()
 {
-    QFile file(filename);
-    if(file.open(QIODevice::ReadOnly))
-        return file.readAll();
-    return QByteArray();
+    QDir dir = QDir::temp();
+    QString appName = QApplication::applicationName();
+    dir.mkdir(appName);
+    dir.cd(appName);
+    return dir;
 }
-
-bool Utils::parseJson(QString const& filename, QJsonDocument &doc)
-{
-    QByteArray bytes = readFile(filename);
-    return parseJson(bytes, doc);
-}
-
-bool Utils::parseJson(QByteArray const& bytes, QJsonDocument &doc)
-{
-    QJsonParseError json_error;
-    doc = QJsonDocument::fromJson(bytes, &json_error);
-    if(json_error.error == QJsonParseError::NoError)
-        return true;
-    return false;
-}
-
 
 QString Utils::formatTime(int time_ms)
 {
@@ -179,7 +165,7 @@ qint64 const SIZE_TB = 0x10000000000;
 QString Utils::formatFileSize(qint64 byte)
 {
     if(byte < SIZE_KB)
-        return QString("%1 B").arg(byte);
+        return QString("%1 Bytes").arg(byte);
     else if(byte >= SIZE_KB  && byte < SIZE_MB)
         return QString("%1 KB").arg(static_cast<double>(byte) / SIZE_KB, 0, 'f', 2);
     else if(byte >= SIZE_MB && byte < SIZE_GB)
@@ -205,11 +191,30 @@ QString Utils::formatFileSizeB(qint64 byte)
         return QString("0");
     return sizes.join(",");
 }
+
 QString Utils::formatFileSizeKB(qint64 byte)
 {
     return QString("%1 KB").arg(formatFileSizeB((byte +SIZE_KB - 1) / SIZE_KB));
 }
+
 QString Utils::formatFileSizeMB(qint64 byte)
 {
     return QString("%1 MB").arg(formatFileSizeB((byte +SIZE_MB - 1) / SIZE_MB));
+}
+
+QString Utils::permissionsText(quint32 permissions, bool isDir)
+{
+    QString p;
+    p += isDir   ? "d" : "-";
+    p += (permissions & ssh::FileInfo::User_Read)   ? "r" : "-";
+    p += (permissions & ssh::FileInfo::User_Write)  ? "w" : "-";
+    p += (permissions & ssh::FileInfo::User_Exe)    ? "x" : "-";
+    p += (permissions & ssh::FileInfo::Group_Read)  ? "r" : "-";
+    p += (permissions & ssh::FileInfo::Group_Write) ? "w" : "-";
+    p += (permissions & ssh::FileInfo::Group_Exe)   ? "x" : "-";
+    p += (permissions & ssh::FileInfo::Other_Read)  ? "r" : "-";
+    p += (permissions & ssh::FileInfo::Other_Write) ? "w" : "-";
+    p += (permissions & ssh::FileInfo::Other_Exe)   ? "x" : "-";
+
+    return p;
 }
