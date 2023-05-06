@@ -25,7 +25,6 @@ public:
     DirPtr home() const;
     DirPtr root() const;
     DirPtr dir(const char* path) const;
-    bool mkdir(const char*path);
 private:
     friend class Dir;
     friend class File;
