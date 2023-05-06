@@ -18,6 +18,8 @@ SOURCES += \
     dialog/aboutdialog.cpp \
     dialog/connectdialog.cpp \
     dialog/fileprogressdialog.cpp \
+    dialog/permissionsdialog.cpp \
+    dialog/propertydialog.cpp \
     main.cpp \
     mainwindow.cpp \
     model/localdirmodel.cpp \
@@ -48,6 +50,8 @@ HEADERS += \
     dialog/aboutdialog.h \
     dialog/connectdialog.h \
     dialog/fileprogressdialog.h \
+    dialog/permissionsdialog.h \
+    dialog/propertydialog.h \
     mainwindow.h \
     model/localdirmodel.h \
     model/remotedirmodel.h \
@@ -71,6 +75,8 @@ FORMS += \
     dialog/aboutdialog.ui \
     dialog/connectdialog.ui \
     dialog/fileprogressdialog.ui \
+    dialog/permissionsdialog.ui \
+    dialog/propertydialog.ui \
     mainwindow.ui \
     view/localdirdockwidget.ui \
     view/panelwidget.ui \
