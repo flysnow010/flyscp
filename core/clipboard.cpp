@@ -48,6 +48,11 @@ void ClipBoard::copy(QStringList const& fileNames)
     QApplication::clipboard()->setMimeData(mineData);
 }
 
+void ClipBoard::copy(QString const& text)
+{
+    QApplication::clipboard()->setText(text);
+}
+
 uint32_t ClipBoard::dropEffect()
 {
     const QMimeData *mineData = QApplication::clipboard()->mimeData();
