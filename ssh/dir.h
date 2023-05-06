@@ -58,6 +58,13 @@ public:
     bool isRoot() const;
     const char* dirName() const;
     FileInfos fileInfoList(Filter filter = NoFilter, SortFlag sortFlag = NoSort);
+
+    bool mkdir(const char* path);
+    bool rmdir(const char* path);
+    bool mkFile(const char* filename);
+    bool rmFile(const char* filename);
+    bool rename(const char *original, const  char *newname);
+    bool chmod(const char* filename, uint16_t mode);
 private:
     void sort(FileInfos &fileInfos, SortFlag sortFlag);
     Dir(Dir const&);

@@ -2,6 +2,9 @@
 #include "sftp.h"
 #include "fileinfo.h"
 #include "sshprivate.h"
+#include <sys/stat.h>
+#include <fcntl.h>
+
 #include <algorithm>
 
 namespace ssh {
@@ -176,6 +179,51 @@ struct FileInfoCompare
 void Dir::sort(FileInfos &fileInfos, SortFlag sortFlag)
 {
     std::sort(fileInfos.begin(), fileInfos.end(), FileInfoCompare(sortFlag));
+}
+
+bool Dir::mkdir(const char*path)
+{
+    if(sftp_mkdir(d->sftp, path, S_IRWXU) != SSH_OK)
+        return false;
+    return true;
+}
+
+bool Dir::rmdir(const char* path)
+{
+    if(sftp_rmdir(d->sftp, path) != SSH_OK)
+        return false;
+    return true;
+}
+
+
+bool Dir::mkFile(const char* filename)
+{
+    sftp_file file = sftp_open(d->sftp, filename, O_CREAT | O_EXCL, 0644);
+    if(!file)
+        return false;
+    sftp_close(file);
+    return true;
+}
+
+bool Dir::rmFile(const char* filename)
+{
+    if(sftp_unlink(d->sftp, filename) != SSH_OK)
+        return false;
+    return true;
+}
+
+bool Dir::rename(const char *original, const  char *newname)
+{
+     if(sftp_rename(d->sftp, original, newname) != SSH_OK)
+         return false;
+     return true;
+}
+
+bool Dir::chmod(const char* filename, uint16_t mode)
+{
+    if(sftp_chmod(d->sftp, filename, mode) != SSH_OK)
+        return false;
+    return true;
 }
 
 }
