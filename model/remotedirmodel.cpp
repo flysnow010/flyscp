@@ -22,6 +22,11 @@ RemoteDirModel::RemoteDirModel(QObject *parent)
 void RemoteDirModel::setDir(ssh::DirPtr const& dir)
 {
     dir_ = dir;
+    refresh();
+}
+
+void RemoteDirModel::refresh()
+{
     uint32_t filter = ssh::Dir::AllEntries | ssh::Dir::NoSymLinks | ssh::Dir::NoDot;
     ssh::Dir::SortFlag sortFlag = ssh::Dir::DirsFirst;
     if(dir_->isRoot())
@@ -61,15 +66,19 @@ void RemoteDirModel::sortItems(int index, bool isDescendingOrder)
     setupData();
 }
 
-ssh::FileInfoPtr RemoteDirModel::fileInfo(int row)
+ssh::FileInfoPtr RemoteDirModel::fileInfo(int row) const
 {
     size_t index = static_cast<size_t>(row);
-    if(index < fileInfos_.size())
+    try
+    {
         return fileInfos_.at(index);
+    }  catch (...) {
+
+    }
     return ssh::FileInfoPtr();
 }
 
-std::string RemoteDirModel::filePath(const char* path)
+std::string RemoteDirModel::filePath(const char* path) const
 {
     if(dir_)
     {
@@ -82,7 +91,7 @@ std::string RemoteDirModel::filePath(const char* path)
     return std::string(path);
 }
 
-std::string RemoteDirModel::parentPath()
+std::string RemoteDirModel::parentPath() const
 {
     if(dir_)
     {
@@ -94,6 +103,68 @@ std::string RemoteDirModel::parentPath()
     }
     return std::string();
 }
+
+bool RemoteDirModel::mkdir(std::string const& path)
+{
+    if(dir_)
+    {
+        std::string filepath = filePath(path.c_str());
+        return dir_->mkdir(filepath.c_str());
+    }
+    return false;
+}
+
+bool RemoteDirModel::rmdir(std::string const& path)
+{
+    if(dir_)
+    {
+        std::string filepath = filePath(path.c_str());
+        return dir_->rmdir(filepath.c_str());
+    }
+    return false;
+}
+
+bool RemoteDirModel::mkFile(std::string const& filename)
+{
+    if(dir_)
+    {
+        std::string filepath = filePath(filename.c_str());
+        return dir_->mkFile(filepath.c_str());
+    }
+    return false;
+}
+
+bool RemoteDirModel::rmFile(std::string const& filename)
+{
+    if(dir_)
+    {
+        std::string filepath = filePath(filename.c_str());
+        return dir_->rmFile(filepath.c_str());
+    }
+    return false;
+}
+
+bool RemoteDirModel::rename(std::string const& original, std::string const& newname)
+{
+    if(dir_)
+    {
+        std::string originalPath = filePath(original.c_str());
+        std::string newnamePath = filePath(newname.c_str());
+        return dir_->rename(originalPath.c_str(), newnamePath.c_str());
+    }
+    return false;
+}
+
+bool RemoteDirModel::chmod(const char *file, uint16_t mode)
+{
+    if(dir_)
+    {
+        std::string filename = filePath(file);
+        return dir_->chmod(filename.c_str(), mode);
+    }
+    return false;
+}
+
 
 TreeItem* RemoteDirModel::createRootItem()
 {
@@ -129,9 +200,22 @@ QVariant RemoteDirModel::userData(const QModelIndex &index) const
     return QVariant();
 }
 
-QVariant RemoteDirModel::textAlignment(int column) const
+QVariant RemoteDirModel::textAlignment(const QModelIndex &index) const
 {
-    if(column == 0)
+    if(index.column() == NAME_INDEX)
+        return int(Qt::AlignLeft | Qt::AlignVCenter);
+    else if(index.column() == SIZE_INDEX)
+    {
+        ssh::FileInfoPtr info = fileInfo(index.row());
+        if(info && info->isFile())
+            return int(Qt::AlignRight | Qt::AlignVCenter);
+    }
+    return QVariant();
+}
+
+QVariant RemoteDirModel::headerTextAlignment(int column) const
+{
+    if(column == NAME_INDEX)
         return int(Qt::AlignLeft | Qt::AlignVCenter);
     return QVariant();
 }
@@ -154,7 +238,7 @@ void RemoteDirModel::setupModelData(TreeItem *parent)
             rowData << suffix
                     << Utils::formatFileSizeB(fileInfo->size())
                     << QDateTime::fromSecsSinceEpoch(fileInfo->time()).toString("yyyy-MM-dd HH:mm:ss")
-                    << property(fileInfo->permissions(), false);
+                    << Utils::permissionsText(fileInfo->permissions(), false);
 
             if(!iconMap.contains(suffix))
                 iconMap.insert(suffix, Utils::fileIcon(suffix));
@@ -164,26 +248,10 @@ void RemoteDirModel::setupModelData(TreeItem *parent)
         {
             rowData << QString() << QString("<DIR>")
                     << QDateTime::fromSecsSinceEpoch(fileInfo->time()).toString("yyyy-MM-dd HH:mm:ss")
-                    << property(fileInfo->permissions(), true);
+                    << Utils::permissionsText(fileInfo->permissions(), true);
         }
         TreeItem* item = new TreeItem(rowData, parent);
         parent->appendChild(item);
     }
 }
 
-QString RemoteDirModel::property(uint32_t permissions, bool isDir) const
-{
-    QString p;
-    p += isDir   ? "d" : "-";
-    p += (permissions & ssh::FileInfo::User_Read)   ? "r" : "-";
-    p += (permissions & ssh::FileInfo::User_Write)  ? "w" : "-";
-    p += (permissions & ssh::FileInfo::User_Exe)    ? "x" : "-";
-    p += (permissions & ssh::FileInfo::Group_Read)  ? "r" : "-";
-    p += (permissions & ssh::FileInfo::Group_Write) ? "w" : "-";
-    p += (permissions & ssh::FileInfo::Group_Exe)   ? "x" : "-";
-    p += (permissions & ssh::FileInfo::Other_Read)  ? "r" : "-";
-    p += (permissions & ssh::FileInfo::Other_Write) ? "w" : "-";
-    p += (permissions & ssh::FileInfo::Other_Exe)   ? "x" : "-";
-
-    return p;
-}

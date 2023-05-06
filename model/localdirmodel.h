@@ -23,7 +23,8 @@ public:
     QString filePath(QString const& fileName);
 protected:
     virtual TreeItem *createRootItem();
-    virtual QVariant textAlignment(int column) const;
+    virtual QVariant textAlignment(const QModelIndex &index) const;
+    virtual QVariant headerTextAlignment(int column) const;
     virtual QVariant icon(const QModelIndex &index) const;
     virtual QVariant userData(const QModelIndex &index) const;
     virtual void setupModelData(TreeItem *parent);

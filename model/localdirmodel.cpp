@@ -65,9 +65,22 @@ QVariant LocalDirModel::userData(const QModelIndex &index) const
     return fileInfos_[index.row()].size();
 }
 
-QVariant LocalDirModel::textAlignment(int column) const
+QVariant LocalDirModel::textAlignment(const QModelIndex &index) const
 {
-    if(column == 0)
+    if(index.column() == NAME_INDEX)
+        return int(Qt::AlignLeft | Qt::AlignVCenter);
+    else if(index.column() == SIZE_INDEX)
+    {
+        if(fileInfos_.at(index.row()).isFile())
+            return int(Qt::AlignRight | Qt::AlignVCenter);
+    }
+    return QVariant();
+}
+
+
+QVariant LocalDirModel::headerTextAlignment(int column) const
+{
+    if(column == NAME_INDEX)
         return int(Qt::AlignLeft | Qt::AlignVCenter);
     return QVariant();
 }

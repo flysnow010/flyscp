@@ -43,7 +43,7 @@ QVariant TreeModel::data(const QModelIndex &index, int role) const
     if(role == Qt::BackgroundRole)
         return backColor(index);
     if(role == Qt::TextAlignmentRole)
-        return textAlignment(index.column());
+        return textAlignment(index);
     if(role == Qt::UserRole)
         return userData(index);
     if(role == Qt::DecorationRole)
@@ -74,7 +74,7 @@ QVariant TreeModel::headerData(int section, Qt::Orientation orientation,
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
         return rootItem->data(section);
     if(role == Qt::TextAlignmentRole)
-        return textAlignment(section);
+        return headerTextAlignment(section);
     return QVariant();
 }
 
@@ -156,9 +156,15 @@ QVariant TreeModel::backColor(const QModelIndex &index) const
         return QBrush(QColor(QString("#ffffff")));
 }
 
-QVariant TreeModel::textAlignment(int column) const
+QVariant TreeModel::textAlignment(const QModelIndex &index) const
 {
-    Q_UNUSED(column)
+    Q_UNUSED(index)
+    return QVariant();
+}
+
+QVariant TreeModel::headerTextAlignment(int col) const
+{
+    Q_UNUSED(col)
     return QVariant();
 }
 
