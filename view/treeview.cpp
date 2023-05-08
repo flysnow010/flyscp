@@ -47,45 +47,15 @@ void TreeView::mouseReleaseEvent(QMouseEvent *event)
 
 void TreeView::dragEnterEvent(QDragEnterEvent * event)
 {
-//    const ClipMimeData* clipData = dynamic_cast<const ClipMimeData*>(event->mimeData());
-//    if(clipData)
-//    {
-//        event->acceptProposedAction();
-//        dragObjectType_ = ClipObjectType;
-//        return;
-//    }
+    emit dragEnter(event);
 }
 
 void TreeView::dragMoveEvent(QDragMoveEvent * event)
 {
-//    QModelIndex index = indexAt(event->pos());
-//    if(dragObjectType_ == ClipObjectType
-//        || dragObjectType_ == FilterObjectType)
-//    {
-//        if(index.isValid() && index.row() %2 == 0)
-//            event->acceptProposedAction();
-//        else
-//            event->ignore();
-//    }
-//    else if(dragObjectType_ == TranstionObjectType)
-//    {
-//        if(index.isValid() && index.row()%2 != 0)
-//            event->acceptProposedAction();
-//        else
-//            event->ignore();
-//    }
+    emit dragMove(event);
 }
 
 void TreeView::dropEvent(QDropEvent * event)
 {
-//    QModelIndex index = indexAt(event->pos());
-//    if(dragObjectType_ == ClipObjectType)
-//    {
-//        const ClipMimeData* clipData = dynamic_cast<const ClipMimeData*>(event->mimeData());
-//        if(index.isValid() && index.row() % 2 == 0)
-//        {
-//            ClipPtr clip = clipData->clip();
-//            emit insertClip(clip, index.row());
-//        }
-//    }
+    emit drop(event);
 }

@@ -11,6 +11,9 @@ public:
 
 signals:
     void prepareDrag(QPoint const& point);
+    void dragEnter(QDragEnterEvent * event);
+    void dragMove(QDragMoveEvent * event);
+    void drop(QDropEvent * event);
 
 protected:
     void mousePressEvent(QMouseEvent *event);

@@ -14,7 +14,7 @@ PanelWidget::PanelWidget(QWidget *parent)
     , buttonGroup(new QButtonGroup(this))
 {
     ui->setupUi(this);
-    //ui->tabWidget->setTabBarAutoHide(true);
+    ui->tabWidget->setTabBarAutoHide(true);
     updateDrivers();
     connect(buttonGroup, SIGNAL(buttonToggled(QAbstractButton*,bool)),
             this, SLOT(dirverChanged(QAbstractButton*,bool)));

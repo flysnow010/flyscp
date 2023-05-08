@@ -5,10 +5,14 @@
 #include "core/filetransfer.h"
 #include "core/clipboard.h"
 #include "core/contextmenu.h"
+#include "util/utils.h"
 #include "dialog/fileprogressdialog.h"
 
 #include <QMenu>
 #include <QSettings>
+#include <QDrag>
+#include <QMimeData>
+
 
 LocalDirDockWidget::LocalDirDockWidget(QWidget *parent)
     : QDockWidget(parent)
@@ -23,6 +27,14 @@ LocalDirDockWidget::LocalDirDockWidget(QWidget *parent)
                     this, SLOT(viewClick(QModelIndex)));
     connect(ui->treeView, SIGNAL(customContextMenuRequested(QPoint)),
                     this, SLOT(customContextMenuRequested(QPoint)));
+    connect(ui->treeView, SIGNAL(prepareDrag(QPoint)),
+                    this, SLOT(beginDragFile(QPoint)));
+    connect(ui->treeView, SIGNAL(dragEnter(QDragEnterEvent*)),
+                    this, SLOT(dragEnter(QDragEnterEvent*)));
+    connect(ui->treeView, SIGNAL(dragMove(QDragMoveEvent*)),
+                    this, SLOT(dragMove(QDragMoveEvent*)));
+    connect(ui->treeView, SIGNAL(drop(QDropEvent*)),
+                    this, SLOT(drop(QDropEvent*)));
     connect(ui->treeView->header(), SIGNAL(sortIndicatorChanged(int,Qt::SortOrder)),
             this, SLOT(sortIndicatorChanged(int,Qt::SortOrder)));
     connect(ui->treeView->header(), SIGNAL(sectionResized(int,int,int)),
@@ -171,6 +183,63 @@ void LocalDirDockWidget::customContextMenuRequested(const QPoint &)
     menu.addAction("Properties", this, SLOT(properties()));
 
     menu.exec(QCursor::pos());
+}
+
+void LocalDirDockWidget::beginDragFile(QPoint const& point)
+{
+    QModelIndex index = ui->treeView->indexAt(point);
+    if(!index.isValid())
+        return;
+    QDrag *drag = new QDrag(ui->treeView);
+    QMimeData* mimeData = new QMimeData();
+    QString fileName = selectFileName();
+    mimeData->setText(fileName);
+    drag->setMimeData(mimeData);
+
+    drag->setPixmap(Utils::fileIcon("").pixmap(32, 32));
+    drag->exec();
+}
+
+void LocalDirDockWidget::dragEnter(QDragEnterEvent * event)
+{
+    QMimeData const* mimeData = event->mimeData();
+    if(mimeData)
+        event->acceptProposedAction();
+}
+
+void LocalDirDockWidget::dragMove(QDragMoveEvent * event)
+{
+    QModelIndex index = ui->treeView->indexAt(event->pos());
+    bool isSelf = (event->source() == ui->treeView);
+    if(index.isValid())
+    {
+        if(isSelf && model_->fileInfo(index.row()).isFile())
+            event->ignore();
+        else
+            event->acceptProposedAction();
+    }
+    else
+    {
+        if(isSelf)
+            event->ignore();
+        else
+            event->acceptProposedAction();
+    }
+}
+
+void LocalDirDockWidget::drop(QDropEvent * event)
+{
+    QModelIndex index = ui->treeView->indexAt(event->pos());
+    QString filePath;
+    if(!index.isValid())
+        filePath = model_->dir();
+    else
+    {
+        if(model_->fileInfo(index.row()).isFile())
+            filePath = model_->dir();
+        else
+            filePath = model_->filePath(index.row());
+    }
 }
 
 void LocalDirDockWidget::cut()

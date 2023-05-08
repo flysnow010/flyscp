@@ -33,6 +33,10 @@ private slots:
     void viewClick(QModelIndex const& index);
     void sortIndicatorChanged(int logicalIndex, Qt::SortOrder order);
     void customContextMenuRequested(const QPoint &pos);
+    void beginDragFile(QPoint const& point);
+    void dragEnter(QDragEnterEvent * event);
+    void dragMove(QDragMoveEvent * event);
+    void drop(QDropEvent * event);
 
     void cut();
     void copy();

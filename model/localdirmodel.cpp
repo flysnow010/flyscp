@@ -134,6 +134,11 @@ QString LocalDirModel::fileName(int index)
     return fileInfos_.at(index).fileName();
 }
 
+QFileInfo const& LocalDirModel::fileInfo(int index)
+{
+    return fileInfos_.at(index);
+}
+
 QString LocalDirModel::filePath(int index)
 {
     return fileInfos_.at(index).filePath();

@@ -18,6 +18,7 @@ public:
     bool cd(const QString &dirName);
     void sortItems(int index, bool isDescendingOrder);
 
+    QFileInfo const& fileInfo(int index);
     QString fileName(int index);
     QString filePath(int index);
     QString filePath(QString const& fileName);
