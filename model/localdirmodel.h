@@ -13,7 +13,7 @@ public:
 
     void setDir(QString const& dir);
     QString dir();
-    void update();
+    void refresh();
 
     bool cd(const QString &dirName);
     void sortItems(int index, bool isDescendingOrder);

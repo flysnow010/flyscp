@@ -40,12 +40,26 @@ void ClipBoard::copy(QStringList const& fileNames)
     if(fileNames.size() > 1)
         text += "\n";
 
+    QMimeData* mimeData = new QMimeData();
+    mimeData->setText(text);
+    QByteArray data(4, 0);
+    data[0] = 5;
+    mimeData->setData("Preferred DropEffect", data);
+    QApplication::clipboard()->setMimeData(mimeData);
+}
+
+QMimeData* ClipBoard::copyMimeData(QStringList const& fileNames)
+{
+    QString text = fileNames.join("\n");
+    if(fileNames.size() > 1)
+        text += "\n";
+
     QMimeData* mineData = new QMimeData();
     mineData->setText(text);
     QByteArray data(4, 0);
     data[0] = 5;
     mineData->setData("Preferred DropEffect", data);
-    QApplication::clipboard()->setMimeData(mineData);
+    return mineData;
 }
 
 void ClipBoard::copy(QString const& text)
@@ -78,7 +92,7 @@ bool ClipBoard::isCopy(uint32_t dropEffect)
 
 QStringList ClipBoard::fileNames()
 {
-    const QMimeData *mineData = QApplication::clipboard()->mimeData();
-    return mineData->text().split("\n");
+    const QMimeData *mimeData = QApplication::clipboard()->mimeData();
+    return mimeData->text().split("\n");
 }
 

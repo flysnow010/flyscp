@@ -98,7 +98,7 @@ void LocalDirModel::setDir(QString const& dir)
     setupData();
 }
 
-void LocalDirModel::update()
+void LocalDirModel::refresh()
 {
     fileInfos_ = dir_.entryInfoList(QDir::AllEntries | QDir::NoDot,
                                     QDir::DirsFirst);

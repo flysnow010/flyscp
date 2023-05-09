@@ -47,6 +47,7 @@ private slots:
 private:
     QStringList selectedileNames(QString const& prefix = QString());
     QString selectFileName();
+    FileNames getFileNames(QStringList const& fileNames, QString const& filePath);
     void copyFilels(QStringList const& fileNames);
     void cutFiles(QStringList const& fileNames);
     void fileTransfer(FileNames const& fileNames, bool isMove);

@@ -191,12 +191,10 @@ void LocalDirDockWidget::beginDragFile(QPoint const& point)
     if(!index.isValid())
         return;
     QDrag *drag = new QDrag(ui->treeView);
-    QMimeData* mimeData = new QMimeData();
-    QString fileName = selectFileName();
-    mimeData->setText(fileName);
+    QStringList fileNames = selectedileNames("file:///");
+    QMimeData* mimeData = ClipBoard::copyMimeData(fileNames);
     drag->setMimeData(mimeData);
-
-    drag->setPixmap(Utils::fileIcon("").pixmap(32, 32));
+    drag->setPixmap(QPixmap(":/image/copy.png"));
     drag->exec();
 }
 
@@ -240,6 +238,15 @@ void LocalDirDockWidget::drop(QDropEvent * event)
         else
             filePath = model_->filePath(index.row());
     }
+
+    QMimeData const* mimeData = event->mimeData();
+    if(!mimeData)
+        return;
+
+    QStringList fileNames = mimeData->text().split("\n");
+    FileNames  newFileNames = getFileNames(fileNames, filePath);
+    fileTransfer(newFileNames, false);
+    model_->refresh();
 }
 
 void LocalDirDockWidget::cut()
@@ -261,7 +268,7 @@ void LocalDirDockWidget::paste()
         cutFiles(ClipBoard::fileNames());
     else if(ClipBoard::isCopy(dropMask))
         copyFilels(ClipBoard::fileNames());
-    model_->update();
+    model_->refresh();
 }
 
 void LocalDirDockWidget::delfile()
@@ -269,7 +276,7 @@ void LocalDirDockWidget::delfile()
     QStringList fileNames = selectedileNames();
     FileManager fileManger;
     fileManger.delereFiles(fileNames);
-    model_->update();
+    model_->refresh();
 }
 
 void LocalDirDockWidget::rename()
@@ -309,9 +316,10 @@ QString LocalDirDockWidget::selectFileName()
     return model_->filePath(index.row());
 }
 
-void LocalDirDockWidget::copyFilels(QStringList const& fileNames)
+FileNames LocalDirDockWidget::getFileNames(QStringList const& fileNames, QString const& filePath)
 {
     FileNames  newFileNames;
+    QDir dir(filePath);
     for(int i = 0; i < fileNames.size(); i++)
     {
         if(fileNames[i].isEmpty())
@@ -321,26 +329,21 @@ void LocalDirDockWidget::copyFilels(QStringList const& fileNames)
 
         FileName fileName;
         fileName.src = fileInfo.filePath();
-        fileName.dst = model_->filePath(fileInfo.fileName());
-        newFileNames << fileName;
+        fileName.dst = dir.filePath(fileInfo.fileName());
+        if(fileName.src != fileName.dst)//??
+            newFileNames << fileName;
     }
+    return newFileNames;
+}
+void LocalDirDockWidget::copyFilels(QStringList const& fileNames)
+{
+    FileNames  newFileNames = getFileNames(fileNames, model_->dir());
     fileTransfer(newFileNames, false);
 }
 
 void LocalDirDockWidget::cutFiles(QStringList const& fileNames)
 {
-    FileNames  newFileNames;
-    for(int i = 0; i < fileNames.size(); i++)
-    {
-        if(fileNames[i].isEmpty())
-            continue;
-
-        QFileInfo fileInfo(fileNames[i].mid(QString("file:///").size()));
-        FileName fileName;
-        fileName.src = fileInfo.filePath();
-        fileName.dst = model_->filePath(fileInfo.fileName());
-        newFileNames << fileName;
-    }
+    FileNames  newFileNames = getFileNames(fileNames, model_->dir());
     fileTransfer(newFileNames, true);
 }
 
