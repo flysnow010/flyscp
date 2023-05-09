@@ -14,8 +14,9 @@ public:
     static quint32 Progress(void *pData, qint64 TotalFileSize, qint64 TotalBytesTransferred);
 
     static void Property(QString const& fileName);
+    static void OpenWith(QString const& fileName);
     static void Execute(QString const& fileName);
-
+    static void Open(QString const& fileName);
 public slots:
     void copyFiles(FileNames const& fileNames);
     void moveFiles(FileNames const& fileNames);

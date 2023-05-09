@@ -153,34 +153,69 @@ void LocalDirDockWidget::sortIndicatorChanged(int logicalIndex, Qt::SortOrder or
         model_->sortItems(logicalIndex, true);
 }
 
-void LocalDirDockWidget::customContextMenuRequested(const QPoint &)
+void LocalDirDockWidget::customContextMenuRequested(const QPoint & pos)
 {
-    QString fileName = selectFileName();
-    QFileInfo fileInfo(fileName);
-    ContextMenuItems items;
-    if(!fileInfo.isDir())
-        items = ContextMenu::FileCommands();
-    else
-        items = ContextMenu::DirCommands();
-
+    QModelIndex index = ui->treeView->indexAt(pos);
     QMenu menu;
-    foreach(auto const& item, items)
+    if(!index.isValid())
     {
-        menu.addAction(item.icon, item.name, [=](bool){
-            item.exec(fileName);
-        });
-    }
+        QFileInfo fileInfo(model_->dir());
 
-    menu.addSeparator();
-    menu.addAction(QIcon(":/image/cut.png"), "Cut", this, SLOT(cut()));
-    menu.addAction(QIcon(":/image/copy.png"), "Copy", this, SLOT(copy()));
-    if(ClipBoard::canPaste())
-        menu.addAction(QIcon(":/image/paste.png"), "Paste", this, SLOT(paste()));
-    menu.addSeparator();
-    menu.addAction("Delete", this, SLOT(delfile()));
-    menu.addAction("Rename", this, SLOT(rename()));
-    menu.addSeparator();
-    menu.addAction("Properties", this, SLOT(properties()));
+        QAction* action = menu.addAction(fileInfo.fileName(), this, [=]()
+        {
+            FileManager::Open(fileInfo.filePath());
+        });
+        QFont font = action->font();
+        font.setBold(true);
+        action->setFont(font);
+    }
+    else
+    {
+        QString fileName = selectFileName();
+        QFileInfo fileInfo(fileName);
+        ContextMenuItems items;
+        if(!fileInfo.isDir())
+        {
+            QAction* action = menu.addAction(tr("Open with"), this, [=](){
+                FileManager::OpenWith(fileInfo.filePath());
+            });
+            QFont font = action->font();
+            font.setBold(true);
+            action->setFont(font);
+            items = ContextMenu::FileCommands();
+        }
+        else
+        {
+            QString name = fileInfo.fileName();
+            QAction* action = menu.addAction(name, this, [=]()
+            {
+                if(model_->cd(name))
+                    setWindowTitle(model_->dir());
+            });
+            QFont font = action->font();
+            font.setBold(true);
+            action->setFont(font);
+            items = ContextMenu::DirCommands();
+        }
+
+        foreach(auto const& item, items)
+        {
+            menu.addAction(item.icon, item.name, [=](bool){
+                item.exec(fileName);
+            });
+        }
+
+        menu.addSeparator();
+        menu.addAction(QIcon(":/image/cut.png"), "Cut", this, SLOT(cut()));
+        menu.addAction(QIcon(":/image/copy.png"), "Copy", this, SLOT(copy()));
+        if(ClipBoard::canPaste())
+            menu.addAction(QIcon(":/image/paste.png"), "Paste", this, SLOT(paste()));
+        menu.addSeparator();
+        menu.addAction("Delete", this, SLOT(delfile()));
+        menu.addAction("Rename", this, SLOT(rename()));
+        menu.addSeparator();
+        menu.addAction("Properties", this, SLOT(properties()));
+    }
 
     menu.exec(QCursor::pos());
 }

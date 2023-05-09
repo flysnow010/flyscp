@@ -96,7 +96,16 @@ void FileManager::findFilenames(QString const& fileName, QStringList &fileNames)
         fileNames << fileInfoList[i].filePath();
     }
 }
-
+/*
+edit 用编辑器打开 lpFile 指定的文档，如果 lpFile 不是文档，则会失败
+explore 浏览 lpFile 指定的文件夹
+find 搜索 lpDirectory 指定的目录
+open 打开 lpFile 文件，lpFile 可以是文件或文件夹
+openas
+print 打印 lpFile，如果 lpFile 不是文档，则函数失败
+properties 显示属性
+runas 请求以管理员权限运行，比如以管理员权限运行某个exe
+*/
 void FileManager::Property(QString const& fileName)
 {
     SHELLEXECUTEINFO shellExecInfo;
@@ -112,9 +121,30 @@ void FileManager::Property(QString const& fileName)
     WaitForSingleObject(shellExecInfo.hProcess, INFINITE);
 }
 
+void FileManager::OpenWith(QString const& fileName)
+{
+    SHELLEXECUTEINFO shellExecInfo;
+    memset(&shellExecInfo, 0, sizeof(shellExecInfo));
+
+    shellExecInfo.cbSize = sizeof(shellExecInfo);
+    shellExecInfo.lpFile = fileName.toStdWString().c_str();
+    shellExecInfo.lpVerb = L"openas";
+    shellExecInfo.nShow = SW_SHOWNORMAL;
+    shellExecInfo.fMask = SEE_MASK_INVOKEIDLIST;
+
+    ShellExecuteEx(&shellExecInfo);
+    WaitForSingleObject(shellExecInfo.hProcess, INFINITE);
+}
+
 void FileManager::Execute(QString const& fileName)
 {
     ShellExecute(0, L"open", fileName.toStdWString().c_str(), 0, 0, SW_SHOWNORMAL);
+}
+
+void FileManager::Open(QString const& fileName)
+{
+    QString filePath = fileName.split("/").join("\\");
+    ShellExecute(0, L"open", L"explorer", filePath.toStdWString().c_str(), 0, SW_SHOWNORMAL);
 }
 
 void FileManager::delereFiles(QStringList const& fileNames)
