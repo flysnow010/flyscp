@@ -136,12 +136,12 @@ void FileManager::OpenWith(QString const& fileName)
     WaitForSingleObject(shellExecInfo.hProcess, INFINITE);
 }
 
-void FileManager::Execute(QString const& fileName)
+void FileManager::Open(QString const& fileName)
 {
     ShellExecute(0, L"open", fileName.toStdWString().c_str(), 0, 0, SW_SHOWNORMAL);
 }
 
-void FileManager::Open(QString const& fileName)
+void FileManager::OpenByExplorer(QString const& fileName)
 {
     QString filePath = fileName.split("/").join("\\");
     ShellExecute(0, L"open", L"explorer", filePath.toStdWString().c_str(), 0, SW_SHOWNORMAL);

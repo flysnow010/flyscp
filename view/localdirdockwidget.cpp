@@ -141,7 +141,7 @@ void LocalDirDockWidget::viewClick(QModelIndex const& index)
     else
     {
         QString filePath = model_->filePath(index.row());
-        FileManager::Execute(filePath);
+        FileManager::Open(filePath);
     }
 }
 
@@ -163,7 +163,7 @@ void LocalDirDockWidget::customContextMenuRequested(const QPoint & pos)
 
         QAction* action = menu.addAction(fileInfo.fileName(), this, [=]()
         {
-            FileManager::Open(fileInfo.filePath());
+            FileManager::OpenByExplorer(fileInfo.filePath());
         });
         QFont font = action->font();
         font.setBold(true);

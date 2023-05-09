@@ -223,34 +223,22 @@ void RemoteDockWidget::open()
         openDir(fileInfo);
     else
     {
-        ssh::File::Ptr remotefile = sftp->openForRead(model_->filePath(fileInfo->name()).c_str());
-        if(!remotefile)
-            return;
-        QDir dir = Utils::tempPath();
-        QString fileName =  dir.filePath(QString::fromStdString(fileInfo->name()));
-        QFile file(fileName);
-        if(!file.open(QIODevice::WriteOnly))
-            return;
-
-        uint64_t filesize = fileInfo->size();
-        remotefile->set_noblocking(true);
-        while(filesize > 0)
-        {
-            char data[1024];
-            ssize_t size = remotefile->read(data, sizeof(data));
-            if(size < 0)
-                break;
-            filesize -= size;
-            file.write(data, size);
-        }
-        if(!filesize)
-            FileManager::Execute(fileName);
+        QString fileName = download(fileInfo, Utils::tempPath());
+        if(!fileName.isEmpty())
+            FileManager::Open(fileName);
     }
 }
 
 void RemoteDockWidget::openWith()
 {
+    QModelIndex index = ui->treeView->currentIndex();
+    ssh::FileInfoPtr fileInfo = model_->fileInfo(index.row());
+    if(!fileInfo)
+        return;
 
+    QString fileName = download(fileInfo, Utils::tempPath());
+    if(!fileName.isEmpty())
+        FileManager::OpenWith(fileName);
 }
 
 void RemoteDockWidget::download()
@@ -361,4 +349,29 @@ void RemoteDockWidget::openDir(ssh::FileInfoPtr const& fileInfo)
         filePath = model_->filePath(fileInfo->name());
     model_->setDir(sftp->dir(filePath));
     setWindowTitle(model_->dirName());
+}
+
+QString RemoteDockWidget::download(ssh::FileInfoPtr const& fileInfo, QDir const& dstDir)
+{
+    ssh::File::Ptr remotefile = sftp->openForRead(model_->filePath(fileInfo->name()).c_str());
+    if(!remotefile)
+        return QString();
+
+     QString fileName =  dstDir.filePath(QString::fromStdString(fileInfo->name()));
+     QFile file(fileName);
+     if(!file.open(QIODevice::WriteOnly))
+         return QString();
+     uint64_t filesize = fileInfo->size();
+     while(filesize > 0)
+     {
+         char data[1024];
+         ssize_t size = remotefile->read(data, sizeof(data));
+         if(size <= 0)
+             break;
+         filesize -= size;
+         file.write(data, size);
+     }
+     if(filesize > 0)
+         return QString();
+     return fileName;
 }

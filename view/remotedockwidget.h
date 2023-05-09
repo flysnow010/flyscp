@@ -8,6 +8,7 @@ class RemoteDockWidget;
 }
 class RemoteDirModel;
 class SFtpSession;
+class QDir;
 namespace ssh {
 class FileInfoPtr;
 }
@@ -50,6 +51,7 @@ private:
     void loadSettings();
     QString getText(QString const& label, QString const& value = QString());
     void openDir(ssh::FileInfoPtr const& fileInfo);
+    QString download(ssh::FileInfoPtr const& fileInfo, QDir const& dstDir);
 private:
     Ui::RemoteDockWidget *ui;
     RemoteDirModel* model_;
