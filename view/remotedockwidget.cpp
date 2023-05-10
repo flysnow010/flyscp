@@ -43,6 +43,23 @@ RemoteDockWidget::~RemoteDockWidget()
     delete ui;
 }
 
+void RemoteDockWidget::setDir(QString const& dir)
+{
+    Q_UNUSED(dir)
+}
+
+QString RemoteDockWidget::dir() const
+{
+    return QString();
+}
+
+void RemoteDockWidget::cd(QString const& dir)
+{
+    if(dir == "..")
+        parentDirectory();
+
+}
+
 void RemoteDockWidget::start(SSHSettings const& settings)
 {
     name_ = QString("%1@%2").arg(settings.userName, settings.hostName);

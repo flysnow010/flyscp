@@ -1,6 +1,7 @@
 #ifndef LOCALDIRDOCKWIDGET_H
 #define LOCALDIRDOCKWIDGET_H
 #include "core/filename.h"
+#include "core/basedir.h"
 #include <QDockWidget>
 
 namespace Ui {
@@ -8,7 +9,7 @@ class LocalDirDockWidget;
 }
 class LocalDirModel;
 class QMimeData;
-class LocalDirDockWidget : public QDockWidget
+class LocalDirDockWidget : public QDockWidget, public BaseDir
 {
     Q_OBJECT
 
@@ -16,10 +17,10 @@ public:
     explicit LocalDirDockWidget(QWidget *parent = nullptr);
     ~LocalDirDockWidget();
 
-    void setDir(QString const& dir);
-    QString dir();
-
-    void cd(QString const& dir);
+    bool isRemote() const override { return false; }
+    void setDir(QString const& dir) override;
+    QString dir() const override;
+    void cd(QString const& dir) override;
 
     void resizeSection(int logicalIndex, int size);
     void saveSettings(QString const& name);

@@ -9,6 +9,7 @@ class PanelWidget;
 
 class QButtonGroup;
 class QAbstractButton;
+class QIcon;
 class PanelWidget : public QWidget
 {
     Q_OBJECT
@@ -17,16 +18,17 @@ public:
     explicit PanelWidget(QWidget *parent = nullptr);
     ~PanelWidget();
 
-    void addLocalDir(QWidget* widget, QString const& text = "Local");
-    void addRemoteDir(QWidget* widget, QString const& text = "Remote");
+    void addDirTab(QWidget* widget, QIcon const& icon, QString const& text);
     void updateTexts(QWidget* widget);
 
 private slots:
     void dirverChanged(QAbstractButton* button, bool checked);
     void backToRoot();
     void backToPrePath();
+    void currentChanged(int index);
 private:
-    void updateDrivers();
+    void updateLocalDrivers();
+    void remoteDirvers();
     void updateDir(QString const& driver);
 private:
     Ui::PanelWidget *ui;

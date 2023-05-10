@@ -1,6 +1,7 @@
 #ifndef REMOTEDOCKWIDGET_H
 #define REMOTEDOCKWIDGET_H
 #include <core/sshsettings.h>
+#include "core/basedir.h"
 #include <QDockWidget>
 
 namespace Ui {
@@ -13,13 +14,18 @@ namespace ssh {
 class FileInfoPtr;
 }
 
-class RemoteDockWidget : public QDockWidget
+class RemoteDockWidget : public QDockWidget, public BaseDir
 {
     Q_OBJECT
 
 public:
     explicit RemoteDockWidget(QWidget *parent = nullptr);
     ~RemoteDockWidget();
+
+    bool isRemote() const override { return true; }
+    void setDir(QString const& dir) override;
+    QString dir() const override;
+    void cd(QString const& dir) override;
 
     void start(SSHSettings const& settings);
     QString const& name() const { return name_; }

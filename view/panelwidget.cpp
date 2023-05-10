@@ -15,9 +15,13 @@ PanelWidget::PanelWidget(QWidget *parent)
 {
     ui->setupUi(this);
     ui->tabWidget->setTabBarAutoHide(true);
-    updateDrivers();
+    ui->localDrivers->hide();
+    ui->remoteDrivers->hide();
+    updateLocalDrivers();
+    remoteDirvers();
     connect(buttonGroup, SIGNAL(buttonToggled(QAbstractButton*,bool)),
             this, SLOT(dirverChanged(QAbstractButton*,bool)));
+    connect(ui->tabWidget, &QTabWidget::currentChanged, this, &PanelWidget::currentChanged);
 }
 
 PanelWidget::~PanelWidget()
@@ -25,27 +29,22 @@ PanelWidget::~PanelWidget()
     delete ui;
 }
 
-void PanelWidget::addLocalDir(QWidget* widget, QString const& text)
+void PanelWidget::addDirTab(QWidget* widget, QIcon const& icon, QString const& text)
 {
-    ui->tabWidget->addTab(widget, Utils::driverIcon(), text);
-}
-
-void PanelWidget::addRemoteDir(QWidget* widget, QString const& text)
-{
-    ui->tabWidget->addTab(widget, Utils::networkIcon(), text);
+    ui->tabWidget->addTab(widget, icon, text);
     ui->tabWidget->setCurrentIndex(ui->tabWidget->count() - 1);
 }
 
 void PanelWidget::updateTexts(QWidget* widget)
 {
-    LocalDirDockWidget* localDirWidget = dynamic_cast<LocalDirDockWidget *>(widget);
-    if(localDirWidget)
+    BaseDir* dir = dynamic_cast<BaseDir *>(widget);
+    if(dir)
     {
         QList<QAbstractButton*> buttons = buttonGroup->buttons();
-        QString dir = localDirWidget->dir().toUpper();
+        QString filePath = dir->dir().toUpper();
         for(int i = 0; i < buttons.size(); i++)
         {
-            if(dir.startsWith(buttons[i]->text()))
+            if(filePath.startsWith(buttons[i]->text()))
             {
                 isChecked = false;
                 buttons[i]->setChecked(true);
@@ -55,7 +54,7 @@ void PanelWidget::updateTexts(QWidget* widget)
     }
 }
 
-void PanelWidget::updateDrivers()
+void PanelWidget::updateLocalDrivers()
 {
     QFileInfoList drivers = QDir::drives();
     QHBoxLayout* layout = new QHBoxLayout();
@@ -85,7 +84,31 @@ void PanelWidget::updateDrivers()
     connect(rootButton, SIGNAL(clicked()), this, SLOT(backToRoot()));
     connect(topButton, SIGNAL(clicked()), this, SLOT(backToPrePath()));
     layout->addStretch();
-    ui->driversWidget->setLayout(layout);
+    ui->localDrivers->setLayout(layout);
+}
+
+void PanelWidget::remoteDirvers()
+{
+    QHBoxLayout* layout = new QHBoxLayout();
+    layout->setMargin(3);
+    layout->setSpacing(5);
+
+    QToolButton* homeButton = new QToolButton();
+    homeButton->setIcon(Utils::computerIcon());
+    layout->addWidget(homeButton);
+
+    QToolButton* rootButton = new QToolButton();
+    rootButton->setText("/");
+    layout->addWidget(rootButton);
+
+    QToolButton *topButton = new QToolButton();
+    topButton->setText("..");
+    layout->addWidget(topButton);
+
+    connect(rootButton, SIGNAL(clicked()), this, SLOT(backToRoot()));
+    connect(topButton, SIGNAL(clicked()), this, SLOT(backToPrePath()));
+    layout->addStretch();
+    ui->remoteDrivers->setLayout(layout);
 }
 
 void PanelWidget::dirverChanged(QAbstractButton* button, bool checked)
@@ -101,25 +124,32 @@ void PanelWidget::dirverChanged(QAbstractButton* button, bool checked)
 
 void PanelWidget::backToRoot()
 {
-    LocalDirDockWidget* localDirWidget = dynamic_cast<LocalDirDockWidget *>(ui->tabWidget->currentWidget());
-    if(localDirWidget)
-    {
-        QAbstractButton* button = buttonGroup->checkedButton();
-        if(button)
-            updateDir(button->text());
-    }
+    QAbstractButton* button = buttonGroup->checkedButton();
+    if(button)
+        updateDir(button->text());
 }
 
 void PanelWidget::backToPrePath()
 {
-    LocalDirDockWidget* localDirWidget = dynamic_cast<LocalDirDockWidget *>(ui->tabWidget->currentWidget());
-    if(localDirWidget)
-        localDirWidget->cd("..");
+    BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
+    if(dir)
+        dir->cd("..");
 }
 
 void PanelWidget::updateDir(QString const& driver)
 {
-    LocalDirDockWidget* localDirWidget = dynamic_cast<LocalDirDockWidget *>(ui->tabWidget->currentWidget());
-    if(localDirWidget)
-        localDirWidget->setDir(driver + ":/");
+    BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
+    if(dir)
+        dir->setDir(driver + ":/");
+}
+
+void PanelWidget::currentChanged(int index)
+{
+    BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(index));
+    if(!dir)
+        return;
+
+    ui->localDrivers->setVisible(!dir->isRemote());
+    ui->remoteDrivers->setVisible(dir->isRemote());
+
 }

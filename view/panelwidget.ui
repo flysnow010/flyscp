@@ -47,7 +47,17 @@ QToolButton:checked {
     <number>0</number>
    </property>
    <item>
-    <widget class="QFrame" name="driversWidget">
+    <widget class="QFrame" name="localDrivers">
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="remoteDrivers">
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
@@ -60,6 +70,12 @@ QToolButton:checked {
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
       <number>-1</number>
+     </property>
+     <property name="tabsClosable">
+      <bool>true</bool>
+     </property>
+     <property name="movable">
+      <bool>true</bool>
      </property>
     </widget>
    </item>

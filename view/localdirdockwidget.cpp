@@ -52,7 +52,7 @@ void LocalDirDockWidget::setDir(QString const& dir)
     setWindowTitle(dir);
 }
 
-QString LocalDirDockWidget::dir()
+QString LocalDirDockWidget::dir() const
 {
     return model_->dir();
 }

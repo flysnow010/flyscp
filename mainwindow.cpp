@@ -6,6 +6,7 @@
 #include "view/remotedockwidget.h"
 #include "dialog/connectdialog.h"
 #include "dialog/aboutdialog.h"
+#include "util/utils.h"
 #include <QSplitter>
 #include <QTabWidget>
 #include <QSettings>
@@ -25,10 +26,9 @@ MainWindow::MainWindow(QWidget *parent)
     spliter->addWidget(leftPanelWidget);
     spliter->addWidget(rightPanelWidget);
 
-    leftPanelWidget->addLocalDir(leftDirView);
-    rightPanelWidget->addLocalDir(rightDirView);
+    leftPanelWidget->addDirTab(leftDirView, Utils::driverIcon(), "Local of left");
+    rightPanelWidget->addDirTab(rightDirView, Utils::driverIcon(), "Local of right");
     setCentralWidget(spliter);
-
 
     QMenuBar *bar = new QMenuBar(ui->menubar);
 
@@ -66,7 +66,7 @@ void MainWindow::createConnects()
             settings = dialog.sshSettings();
             settings.passWord = "james010";
             rightDirView->start(settings);
-            rightPanelWidget->addRemoteDir(rightDirView, rightDirView->name());
+            rightPanelWidget->addDirTab(rightDirView, Utils::networkIcon(), rightDirView->name());
         }
     });
     connect(ui->actionAbout,  &QAction::triggered, this, [](bool){
