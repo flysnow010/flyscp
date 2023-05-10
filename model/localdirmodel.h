@@ -12,7 +12,7 @@ public:
     explicit LocalDirModel(QObject *parent = nullptr);
 
     void setDir(QString const& dir);
-    QString dir();
+    QString dir() const;
     void refresh();
 
     bool cd(const QString &dirName);

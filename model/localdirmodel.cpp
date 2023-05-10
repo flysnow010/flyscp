@@ -124,7 +124,7 @@ void LocalDirModel::sortItems(int index, bool isDescendingOrder)
     setupData();
 }
 
-QString LocalDirModel::dir()
+QString LocalDirModel::dir() const
 {
     return dir_.path();
 }
