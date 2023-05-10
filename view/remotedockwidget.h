@@ -52,6 +52,7 @@ private:
     QString getText(QString const& label, QString const& value = QString());
     void openDir(ssh::FileInfoPtr const& fileInfo);
     QString download(ssh::FileInfoPtr const& fileInfo, QDir const& dstDir);
+    bool upload(QString const& fileName);
 private:
     Ui::RemoteDockWidget *ui;
     RemoteDirModel* model_;

@@ -13,6 +13,7 @@
 #include <QMenu>
 #include <QSettings>
 #include <QInputDialog>
+#include <QFileDialog>
 #include <QApplication>
 #include <QMessageBox>
 
@@ -210,7 +211,9 @@ void RemoteDockWidget::refreshFolder()
 
 void RemoteDockWidget::upload()
 {
-
+    QString fileName = QFileDialog::getOpenFileName(this, QApplication::applicationName());
+    if(!fileName.isEmpty() && upload(fileName))
+        model_->refresh();
 }
 
 void RemoteDockWidget::open()
@@ -243,7 +246,18 @@ void RemoteDockWidget::openWith()
 
 void RemoteDockWidget::download()
 {
+    QString filePath = QFileDialog::getExistingDirectory(this, QApplication::applicationName());
+    if(filePath.isEmpty())
+        return;
 
+    QModelIndex index = ui->treeView->currentIndex();
+    ssh::FileInfoPtr fileInfo = model_->fileInfo(index.row());
+    if(!fileInfo)
+        return;
+
+    QString fileName = download(fileInfo, QDir(filePath));
+    if(!fileName.isEmpty())
+        ;
 }
 
 void RemoteDockWidget::deleteDir()
@@ -374,4 +388,33 @@ QString RemoteDockWidget::download(ssh::FileInfoPtr const& fileInfo, QDir const&
      if(filesize > 0)
          return QString();
      return fileName;
+}
+
+bool RemoteDockWidget::upload(QString const& fileName)
+{
+    QFileInfo fileInfo(fileName);
+    std::string filename = fileInfo.fileName().toStdString();
+    ssh::File::Ptr remotefile = sftp->openForWrite(model_->filePath(filename.c_str()).c_str());
+    if(!remotefile)
+        return false;
+
+    QFile file(fileName);
+    if(!file.open(QIODevice::ReadOnly))
+        return false;
+
+    qint64 filesize = fileInfo.size();
+    while(filesize > 0)
+    {
+        char data[1024];
+        qint64 size = file.read(data, sizeof(data));
+        if(size <= 0)
+            break;
+        ssize_t write_size = remotefile->write(data, size);
+        if(write_size != size)
+            break;
+        filesize -= size;
+    }
+    if(filesize > 0)
+        return false;
+    return true;
 }

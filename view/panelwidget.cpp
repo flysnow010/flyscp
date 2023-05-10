@@ -86,7 +86,6 @@ void PanelWidget::updateDrivers()
     connect(topButton, SIGNAL(clicked()), this, SLOT(backToPrePath()));
     layout->addStretch();
     ui->driversWidget->setLayout(layout);
-
 }
 
 void PanelWidget::dirverChanged(QAbstractButton* button, bool checked)
