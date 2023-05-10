@@ -11,6 +11,7 @@ LIBS += -L$$(PWD)\lib -lssh.dll
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    core/basedir.cpp \
     core/clipboard.cpp \
     core/contextmenu.cpp \
     core/filemanager.cpp \
@@ -40,6 +41,7 @@ SOURCES += \
     view/treeview.cpp
 
 HEADERS += \
+    core/basedir.h \
     core/clipboard.h \
     core/connecttype.h \
     core/contextmenu.h \
