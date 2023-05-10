@@ -6,7 +6,8 @@ namespace ssh {
 Session::Session()
     : d(new SessionPrivate(ssh_new()))
 {
-
+    ssh_options_set(d->session, SSH_OPTIONS_HOSTKEYS, "ssh-rsa");
+    ssh_options_set(d->session, SSH_OPTIONS_PUBLICKEY_ACCEPTED_TYPES, "ssh-rsa");
 }
 Session::~Session()
 {
