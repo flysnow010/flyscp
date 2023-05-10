@@ -66,4 +66,8 @@ DirPtr SFtp::dir(const char* path) const
     return DirPtr(new Dir(*this, path));
 }
 
+const char* SFtp::error()
+{
+    return ssh_get_error(d->session);
+}
 }

@@ -25,6 +25,8 @@ public:
     DirPtr home() const;
     DirPtr root() const;
     DirPtr dir(const char* path) const;
+
+    const char* error();
 private:
     friend class Dir;
     friend class File;

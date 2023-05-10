@@ -55,7 +55,7 @@ ssh::File::Ptr SFtpSession::openForRead(const char* filename)
 ssh::File::Ptr SFtpSession::openForWrite(const char* filename)
 {
     ssh::File::Ptr file(new ssh::File(*sftp));
-    if(file->open(filename, O_WRONLY, 0644))
+    if(file->open(filename, O_CREAT | O_WRONLY, 0644))
         return file;
     return ssh::File::Ptr();
 }
@@ -75,4 +75,9 @@ std::string SFtpSession::homeDir() const
     if(size > 0)
         return std::string(buf, size -1);
     return std::string();
+}
+
+std::string SFtpSession::error() const
+{
+    return sftp->error();
 }

@@ -22,6 +22,7 @@ public:
 
     std::string homeDir() const;
     std::string userName() const { return username_; }
+    std::string error() const;
 public slots:
     void start(SSHSettings const& settings);
     void stop();
