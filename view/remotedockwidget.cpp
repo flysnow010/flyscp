@@ -12,7 +12,6 @@
 
 #include <QMenu>
 #include <QSettings>
-#include <QInputDialog>
 #include <QFileDialog>
 #include <QApplication>
 #include <QMessageBox>
@@ -45,19 +44,39 @@ RemoteDockWidget::~RemoteDockWidget()
 
 void RemoteDockWidget::setDir(QString const& dir)
 {
-    Q_UNUSED(dir)
+    model_->setDir(sftp->dir(dir.toStdString()));
+    setWindowTitle(model_->dirName());
 }
 
 QString RemoteDockWidget::dir() const
 {
-    return QString();
+    return model_->dirName();
 }
 
 void RemoteDockWidget::cd(QString const& dir)
 {
     if(dir == "..")
         parentDirectory();
+    else
+    {
 
+        ssh::FileInfoPtr fileInfo = model_->fileInfo(dir);
+        if(!fileInfo)
+            return;
+
+        if(fileInfo->isDir())
+            openDir(fileInfo);
+    }
+}
+
+QString RemoteDockWidget::home() const
+{
+    return QString::fromStdString(sftp->homeDir());
+}
+
+QString RemoteDockWidget::root() const
+{
+    return QString("/");
 }
 
 void RemoteDockWidget::start(SSHSettings const& settings)
@@ -205,7 +224,7 @@ void RemoteDockWidget::parentDirectory()
 
 void RemoteDockWidget::makeDirectory()
 {
-    QString path = getText(tr("New folder"));
+    QString path = Utils::getText(tr("New folder"));
     if(path.isEmpty())
         return;
     if(model_->mkdir(path.toStdString()))
@@ -214,7 +233,7 @@ void RemoteDockWidget::makeDirectory()
 
 void RemoteDockWidget::newFile()
 {
-    QString fileName = getText(tr("New file"));
+    QString fileName = Utils::getText(tr("New file"));
     if(fileName.isEmpty())
         return;
     if(model_->mkFile(fileName.toStdString()))
@@ -305,7 +324,7 @@ void RemoteDockWidget::rename()
     if(!fileInfo)
         return;
 
-    QString fileName = getText(tr("New filename"), QString::fromStdString(fileInfo->name()));
+    QString fileName = Utils::getText(tr("New filename"), QString::fromStdString(fileInfo->name()));
     if(fileName.isEmpty())
         return;
 
@@ -349,19 +368,6 @@ void RemoteDockWidget::permissions()
         model_->chmod(fileInfo->name(), dialog.permissions());
         model_->refresh();
     }
-}
-
-QString RemoteDockWidget::getText(QString const& label, QString const& value)
-{
-    QInputDialog dialog(this);
-    dialog.setInputMode(QInputDialog::TextInput);
-    dialog.setWindowTitle(QApplication::applicationName());
-    dialog.setLabelText(label);
-    dialog.setTextValue(value);
-    dialog.setWindowFlags(dialog.windowFlags() & ~Qt::WindowContextHelpButtonHint);
-    if(dialog.exec() == QDialog::Accepted)
-        return dialog.textValue();
-    return QString();
 }
 
 void RemoteDockWidget::openDir(ssh::FileInfoPtr const& fileInfo)

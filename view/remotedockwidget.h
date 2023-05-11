@@ -26,6 +26,8 @@ public:
     void setDir(QString const& dir) override;
     QString dir() const override;
     void cd(QString const& dir) override;
+    QString home() const override;
+    QString root() const override;
 
     void start(SSHSettings const& settings);
     QString const& name() const { return name_; }
