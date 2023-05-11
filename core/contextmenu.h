@@ -12,6 +12,7 @@ struct ContextMenuItem
     QString command;
     QString parameters;
     void exec(QString const& fileName) const;
+    void exec(QStringList const& fileNames) const;
     bool operator == (ContextMenuItem const& r)
     {
         return this->name == r.name;

@@ -210,10 +210,35 @@ QIcon ContextMenu::GetIcon(QString const& name)
 void ContextMenuItem::exec(QString const& fileName) const
 {
     QString params = parameters;
-    params.replace("%1", fileName)
-            .replace("%L", fileName)
-            .replace("%V", fileName)
-            .replace("%1", fileName);
+    QString newFileName = QString("\"%1\"").arg(fileName);
+    params.replace("\"%1\"", newFileName)
+            .replace("\"%L\"", newFileName)
+            .replace("\"%V\"", newFileName)
+            .replace("%L", newFileName)
+            .replace("%V", newFileName)
+            .replace("%1", newFileName);
+    ShellExecute(0, L"open", command.toStdWString().c_str(),
+                 params.toStdWString().c_str(), 0, SW_SHOWNORMAL);
+}
+
+void ContextMenuItem::exec(QStringList const& fileNames) const
+{
+    if(fileNames.isEmpty())
+        return;
+
+    QStringList newFileNames;
+    foreach(auto const& fileName, fileNames)
+    {
+        newFileNames << QString("\"%1\"").arg(fileName);
+    }
+    QString newFileName = newFileNames.join(" ");
+    QString params = parameters;
+    params.replace("\"%1\"", newFileName)
+            .replace("\"%L\"", newFileName)
+            .replace("\"%V\"", newFileName)
+            .replace("%L", newFileName)
+            .replace("%V", newFileName)
+            .replace("%1", newFileName);
     ShellExecute(0, L"open", command.toStdWString().c_str(),
                  params.toStdWString().c_str(), 0, SW_SHOWNORMAL);
 }
