@@ -60,21 +60,23 @@ ssh::File::Ptr SFtpSession::openForWrite(const char* filename)
     return ssh::File::Ptr();
 }
 
-std::string SFtpSession::homeDir() const
+std::string SFtpSession::homeDir()
 {
+    if(!homedir_.empty())
+        return homedir_;
     ssh::Channel channel(*sessioin);
     if(!channel.open()
         || !channel.exec("pwd")
         || !channel.poll(1000))
-        return std::string();
+        return homedir_;
 
     char buf[512];
-    std::string dir;
 
     int size = channel.read_nonblocking(buf, sizeof(buf));
     if(size > 0)
-        return std::string(buf, size -1);
-    return std::string();
+        homedir_ = std::string(buf, size -1);
+
+    return homedir_;
 }
 
 std::string SFtpSession::error() const

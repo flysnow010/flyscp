@@ -20,7 +20,7 @@ public:
     ssh::File::Ptr openForRead(const char* filename);
     ssh::File::Ptr openForWrite(const char* filename);
 
-    std::string homeDir() const;
+    std::string homeDir();
     std::string userName() const { return username_; }
     std::string error() const;
 public slots:
@@ -36,6 +36,7 @@ private:
     ssh::Session::Ptr sessioin;
     ssh::SFtp::Ptr sftp;
     std::string username_;
+    std::string homedir_;
 };
 
 #endif // SFTPSESSION_H
