@@ -66,6 +66,17 @@ void RemoteDirModel::sortItems(int index, bool isDescendingOrder)
     setupData();
 }
 
+ssh::FileInfoPtr RemoteDirModel::fileInfo(QString const& fileName) const
+{
+    std::string filename = fileName.toStdString();
+    for(auto const& fileInfo: fileInfos_)
+    {
+        if(fileInfo->basename() == filename)
+            return fileInfo;
+    }
+    return ssh::FileInfoPtr();
+}
+
 ssh::FileInfoPtr RemoteDirModel::fileInfo(int row) const
 {
     size_t index = static_cast<size_t>(row);
