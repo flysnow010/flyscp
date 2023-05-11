@@ -33,6 +33,12 @@ void PanelWidget::addDirTab(QWidget* widget, QIcon const& icon, QString const& t
 {
     ui->tabWidget->addTab(widget, icon, text);
     ui->tabWidget->setCurrentIndex(ui->tabWidget->count() - 1);
+    emit tabCountChanged(ui->tabWidget->count());
+}
+
+void PanelWidget::setTabBarAutoHide(int count)
+{
+    ui->tabWidget->setTabBarAutoHide(count > 1 ? false : true);
 }
 
 void PanelWidget::updateTexts(QWidget* widget)
@@ -94,7 +100,7 @@ void PanelWidget::remoteDirvers()
     layout->setSpacing(5);
 
     QToolButton* homeButton = new QToolButton();
-    homeButton->setIcon(Utils::computerIcon());
+    homeButton->setIcon(QIcon(":/image/home.png"));
     layout->addWidget(homeButton);
 
     QToolButton* rootButton = new QToolButton();
@@ -105,6 +111,7 @@ void PanelWidget::remoteDirvers()
     topButton->setText("..");
     layout->addWidget(topButton);
 
+    connect(homeButton, SIGNAL(clicked()), this, SLOT(backToHome()));
     connect(rootButton, SIGNAL(clicked()), this, SLOT(backToRoot()));
     connect(topButton, SIGNAL(clicked()), this, SLOT(backToPrePath()));
     layout->addStretch();
@@ -122,11 +129,18 @@ void PanelWidget::dirverChanged(QAbstractButton* button, bool checked)
     }
 }
 
+void PanelWidget::backToHome()
+{
+    BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
+    if(dir)
+        dir->setDir(dir->home());
+}
+
 void PanelWidget::backToRoot()
 {
-    QAbstractButton* button = buttonGroup->checkedButton();
-    if(button)
-        updateDir(button->text());
+    BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
+    if(dir)
+        dir->setDir(dir->root());
 }
 
 void PanelWidget::backToPrePath()

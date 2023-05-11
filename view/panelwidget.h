@@ -21,8 +21,14 @@ public:
     void addDirTab(QWidget* widget, QIcon const& icon, QString const& text);
     void updateTexts(QWidget* widget);
 
+signals:
+    void tabCountChanged(int count);
+public slots:
+    void setTabBarAutoHide(int count);
+
 private slots:
     void dirverChanged(QAbstractButton* button, bool checked);
+    void backToHome();
     void backToRoot();
     void backToPrePath();
     void currentChanged(int index);
