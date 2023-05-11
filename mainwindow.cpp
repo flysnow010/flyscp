@@ -69,6 +69,13 @@ void MainWindow::createConnects()
             rightPanelWidget->addDirTab(rightDirView, Utils::networkIcon(), rightDirView->name());
         }
     });
+    connect(ui->actionToolBar,  &QAction::triggered, this, [&](bool on){
+        ui->toolBar->setVisible(on);
+    });
+    connect(ui->actionStatusBar,  &QAction::triggered, this, [&](bool on){
+        ui->statusbar->setVisible(on);
+    });
+
     connect(ui->actionAbout,  &QAction::triggered, this, [](bool){
         AboutDialog dialog;
         dialog.exec();
@@ -109,6 +116,8 @@ void MainWindow::saveSettings()
                        QCoreApplication::applicationVersion());
     settings.setValue("geometry", saveGeometry());
     settings.setValue("windowState", saveState());
+    settings.setValue("toolBarIsVisible", ui->actionToolBar->isChecked());
+    settings.setValue("statusBarIsVisible", ui->actionStatusBar->isChecked());
 }
 
 void MainWindow::loadSettings()
@@ -127,5 +136,11 @@ void MainWindow::loadSettings()
     }
     if(!windowState.isEmpty())
         restoreState(windowState);
+    bool toolBarIsVisible = settings.value("toolBarIsVisible", true).toBool();
+    bool statusBarIsVisible = settings.value("statusBarIsVisible", true).toBool();
+    ui->actionToolBar->setChecked(toolBarIsVisible);
+    ui->actionStatusBar->setChecked(statusBarIsVisible);
+    ui->toolBar->setVisible(toolBarIsVisible);
+    ui->statusbar->setVisible(statusBarIsVisible);
 }
 
