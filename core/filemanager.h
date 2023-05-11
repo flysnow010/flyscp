@@ -14,6 +14,7 @@ public:
     static quint32 Progress(void *pData, qint64 TotalFileSize, qint64 TotalBytesTransferred);
 
     static void Property(QString const& fileName);
+    static void Property(QStringList const& fileNames);
     static void Open(QString const& fileName);
     static void OpenWith(QString const& fileName);
     static void OpenByExplorer(QString const& fileName);

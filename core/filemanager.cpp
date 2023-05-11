@@ -1,6 +1,7 @@
 #include "filemanager.h"
 #include <windows.h>
 #include <oleidl.h>
+#include <Shlobj.h>
 #include <QDebug>
 #include <QFileInfo>
 #include <QDir>
@@ -119,6 +120,44 @@ void FileManager::Property(QString const& fileName)
 
     ShellExecuteEx(&shellExecInfo);
     WaitForSingleObject(shellExecInfo.hProcess, INFINITE);
+}
+
+void FileManager::Property(QStringList const& fileNames)
+{
+    IShellFolder* psfDesktop;
+    HRESULT hr = SHGetDesktopFolder(&psfDesktop);
+    if(FAILED(hr))
+        return;
+
+    LPITEMIDLIST *pidlDrives = (LPITEMIDLIST *)malloc(sizeof(LPITEMIDLIST)*fileNames.size());
+    bool isFailed = false;
+    for(int i = 0; i < fileNames.size(); i++)
+    {
+        QString fileName = fileNames[i].split("/").join("\\");
+        hr = psfDesktop->ParseDisplayName(0, 0, (LPWSTR)(fileName.toStdWString().c_str()),
+                                     0, (LPITEMIDLIST*)&pidlDrives[i], 0);
+        if(FAILED(hr))
+        {
+            isFailed = true;
+            break;
+        }
+    }
+
+    if(!isFailed)
+    {
+        IDataObject* pData;
+        hr = psfDesktop->GetUIObjectOf(0, fileNames.size(), (PCUITEMID_CHILD_ARRAY)pidlDrives,
+                                       IID_IDataObject, 0, (void **)&pData);
+        if(SUCCEEDED(hr))
+        {
+            SHMultiFileProperties(pData, 0);
+            pData->Release();
+        }
+    }
+    psfDesktop->Release();
+    for(int i = 0; i < fileNames.size(); i++)
+        ILFree(pidlDrives[i]);
+    free(pidlDrives);
 }
 
 void FileManager::OpenWith(QString const& fileName)
