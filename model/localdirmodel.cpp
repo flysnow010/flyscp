@@ -77,12 +77,18 @@ QVariant LocalDirModel::textAlignment(const QModelIndex &index) const
     return QVariant();
 }
 
-
 QVariant LocalDirModel::headerTextAlignment(int column) const
 {
     if(column == NAME_INDEX)
         return int(Qt::AlignLeft | Qt::AlignVCenter);
     return QVariant();
+}
+
+bool LocalDirModel::editable(const QModelIndex &index) const
+{
+    if(index.column() != 0 || fileInfos_[index.row()].fileName() == "..")
+        return false;
+    return true;
 }
 
 void LocalDirModel::setDir(QString const& dir)
@@ -127,6 +133,16 @@ void LocalDirModel::sortItems(int index, bool isDescendingOrder)
 QString LocalDirModel::dir() const
 {
     return dir_.path();
+}
+
+bool LocalDirModel::mkdir(QString const& dir)
+{
+    return dir_.mkdir(dir);
+}
+
+bool LocalDirModel::rename(QString const& original, QString const& newname)
+{
+    return dir_.rename(original, newname);
 }
 
 QString LocalDirModel::fileName(int index)

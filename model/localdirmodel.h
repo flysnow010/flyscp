@@ -13,6 +13,8 @@ public:
 
     void setDir(QString const& dir);
     QString dir() const;
+    bool mkdir(QString const& dir);
+    bool rename(QString const& original, QString const& newname);
     void refresh();
 
     bool cd(const QString &dirName);
@@ -25,6 +27,7 @@ public:
 protected:
     virtual TreeItem *createRootItem();
     virtual QVariant textAlignment(const QModelIndex &index) const;
+    virtual bool editable(const QModelIndex &index) const;
     virtual QVariant headerTextAlignment(int column) const;
     virtual QVariant icon(const QModelIndex &index) const;
     virtual QVariant userData(const QModelIndex &index) const;
