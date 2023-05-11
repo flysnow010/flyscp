@@ -57,6 +57,23 @@ QString LocalDirDockWidget::dir() const
     return model_->dir();
 }
 
+QString LocalDirDockWidget::home() const
+{
+    return QDir::homePath();
+}
+
+QString LocalDirDockWidget::root() const
+{
+    QString dir = model_->dir();
+    QFileInfoList dirvers = QDir::drives();
+    foreach(auto const& dirver, dirvers)
+    {
+        if(dir.startsWith(dirver.path()))
+            return dirver.path();
+    }
+    return QString();
+}
+
 void LocalDirDockWidget::cd(QString const& dir)
 {
     if(model_->cd(dir))
@@ -157,28 +174,42 @@ void LocalDirDockWidget::customContextMenuRequested(const QPoint & pos)
 {
     QModelIndex index = ui->treeView->indexAt(pos);
     QMenu menu;
+    ContextMenuItems items;
+    QString fileName;
+    QFileInfo fileInfo;
+
     if(!index.isValid())
     {
-        QFileInfo fileInfo(model_->dir());
+        fileInfo.setFile(model_->dir());
+        fileName = fileInfo.filePath();
 
-        QAction* action = menu.addAction(fileInfo.fileName(), this, [=]()
+        QString name = fileInfo.fileName();
+        if(name.isEmpty())
+            name = fileName;
+
+        QAction* action = menu.addAction(name, this, [=]()
         {
-            FileManager::OpenByExplorer(fileInfo.filePath());
+            FileManager::OpenByExplorer(fileName);
         });
+
         QFont font = action->font();
         font.setBold(true);
         action->setFont(font);
+
+        items = ContextMenu::DirCommands();
     }
     else
     {
-        QString fileName = selectFileName();
-        QFileInfo fileInfo(fileName);
-        ContextMenuItems items;
-        if(!fileInfo.isDir())
+        fileName = selectFileName();
+        fileName = model_->filePath(index.row());
+        fileInfo.setFile(fileName);
+
+        if(fileInfo.isFile())
         {
             QAction* action = menu.addAction(tr("Open with"), this, [=](){
                 FileManager::OpenWith(fileInfo.filePath());
             });
+
             QFont font = action->font();
             font.setBold(true);
             action->setFont(font);
@@ -197,25 +228,57 @@ void LocalDirDockWidget::customContextMenuRequested(const QPoint & pos)
             action->setFont(font);
             items = ContextMenu::DirCommands();
         }
+    }
 
-        foreach(auto const& item, items)
-        {
-            menu.addAction(item.icon, item.name, [=](bool){
-                item.exec(fileName);
-            });
-        }
+    foreach(auto const& item, items)
+    {
+        menu.addAction(item.icon, item.name, [=](bool){
+            QStringList fileNames = selectedileNames(QString(), true);
+            item.exec(fileNames);
+        });
+    }
 
-        menu.addSeparator();
-        menu.addAction(QIcon(":/image/cut.png"), "Cut", this, SLOT(cut()));
-        menu.addAction(QIcon(":/image/copy.png"), "Copy", this, SLOT(copy()));
-        if(ClipBoard::canPaste())
-            menu.addAction(QIcon(":/image/paste.png"), "Paste", this, SLOT(paste()));
-        menu.addSeparator();
+    menu.addSeparator();
+    menu.addAction(QIcon(":/image/cut.png"), "Cut", this, SLOT(cut()));
+    menu.addAction(QIcon(":/image/copy.png"), "Copy", this, SLOT(copy()));
+    if(ClipBoard::canPaste())
+        menu.addAction(QIcon(":/image/paste.png"), "Paste", [&](bool){
+            uint32_t dropMask = ClipBoard::dropEffect();
+            QString filePath;
+            if(fileInfo.isDir())
+                filePath = fileInfo.filePath();
+            else
+                filePath = model_->dir();
+            if(ClipBoard::isCut(dropMask))
+                cutFiles(ClipBoard::fileNames(), filePath);
+            else if(ClipBoard::isCopy(dropMask))
+                copyFilels(ClipBoard::fileNames(), filePath);
+            ClipBoard::clear();
+            model_->refresh();
+        });
+    menu.addSeparator();
+    menu.addAction("Create shortcut", this, SLOT(createShortcut()));
+    QMenu newMenu("New");
+    if(index.isValid())
+    {
         menu.addAction("Delete", this, SLOT(delfile()));
         menu.addAction("Rename", this, SLOT(rename()));
-        menu.addSeparator();
-        menu.addAction("Properties", this, SLOT(properties()));
     }
+    else
+    {
+        newMenu.addAction("File Folder", this, SLOT(newFolder()));
+        newMenu.addSeparator();
+        newMenu.addAction("Txt File", this, SLOT(newTxtFile()));
+        menu.addMenu(&newMenu);
+    }
+    menu.addSeparator();
+    menu.addAction("Properties", this, [&](bool) {
+        QStringList fileNames = selectedileNames(QString(), true);
+        if(fileNames.size() > 1)
+            FileManager::Property(fileNames);
+        else
+            FileManager::Property(fileName);
+    });
 
     menu.exec(QCursor::pos());
 }
@@ -286,13 +349,13 @@ void LocalDirDockWidget::drop(QDropEvent * event)
 
 void LocalDirDockWidget::cut()
 {
-    QStringList fileNames = selectedileNames("file:///");
+    QStringList fileNames = selectedileNames("file:///", true);
     ClipBoard::cut(fileNames);
 }
 
 void LocalDirDockWidget::copy()
 {
-    QStringList fileNames = selectedileNames("file:///");
+    QStringList fileNames = selectedileNames("file:///", true);
     ClipBoard::copy(fileNames);
 }
 
@@ -300,9 +363,9 @@ void LocalDirDockWidget::paste()
 {
     uint32_t dropMask = ClipBoard::dropEffect();
     if(ClipBoard::isCut(dropMask))
-        cutFiles(ClipBoard::fileNames());
+        cutFiles(ClipBoard::fileNames(), model_->dir());
     else if(ClipBoard::isCopy(dropMask))
-        copyFilels(ClipBoard::fileNames());
+        copyFilels(ClipBoard::fileNames(), model_->dir());
     model_->refresh();
 }
 
@@ -316,38 +379,67 @@ void LocalDirDockWidget::delfile()
 
 void LocalDirDockWidget::rename()
 {
-    QFileInfo fileInfo(selectFileName());
-    ContextMenuItems items;
-    if(!fileInfo.isDir())
-        items = ContextMenu::FileCommands();
-    else
-        items = ContextMenu::DirCommands();
-    ContextMenu::PrintCommand(items);
-}
-
-void LocalDirDockWidget::properties()
-{
-    QModelIndex index = ui->treeView->currentIndex();
-    if(!index.isValid())
+    QString fileName = selectFileName(true);
+    if(fileName.isEmpty())
+        return;
+    QString newileName = Utils::getText(tr("New filename"), fileName);
+    if(newileName.isEmpty() ||  newileName == fileName)
         return;
 
-    FileManager::Property(model_->filePath(index.row()));
+    if(model_->rename(fileName, newileName))
+        model_->refresh();
 }
 
-QStringList LocalDirDockWidget::selectedileNames(QString const& prefix)
+void LocalDirDockWidget::createShortcut()
+{
+
+}
+
+void LocalDirDockWidget::newFolder()
+{
+    QString path = Utils::getText("New folder");
+    if(path.isEmpty())
+        return;
+    if(model_->mkdir(path))
+        model_->refresh();
+}
+
+void LocalDirDockWidget::newTxtFile()
+{
+    QString fileName = Utils::getText("New File", "*.txt");
+    if(fileName.isEmpty())
+        return;
+    QFile file(model_->filePath(fileName));
+    if(file.open(QIODevice::WriteOnly))
+    {
+        file.close();
+        model_->refresh();
+    }
+}
+
+bool LocalDirDockWidget::isMultiSelected()
+{
+    return ui->treeView->selectionModel()->selectedRows(0).size() > 1;
+}
+
+QStringList LocalDirDockWidget::selectedileNames(QString const& prefix, bool isParent)
 {
     QModelIndexList indexs = ui->treeView->selectionModel()->selectedRows(0);
     QStringList names;
     for(int i = 0; i < indexs.size(); i++)
         names << prefix + model_->filePath(indexs[i].row());
+    if(isParent && names.isEmpty())
+        names << prefix + model_->dir();
     return names;
 }
 
-QString LocalDirDockWidget::selectFileName()
+QString LocalDirDockWidget::selectFileName(bool isOnlyFilename)
 {
     QModelIndex index = ui->treeView->currentIndex();
     if(!index.isValid())
         return QString();
+    if(isOnlyFilename)
+        return model_->fileName(index.row());
     return model_->filePath(index.row());
 }
 
@@ -370,15 +462,15 @@ FileNames LocalDirDockWidget::getFileNames(QStringList const& fileNames, QString
     }
     return newFileNames;
 }
-void LocalDirDockWidget::copyFilels(QStringList const& fileNames)
+void LocalDirDockWidget::copyFilels(QStringList const& fileNames, QString const& dstFilePath)
 {
-    FileNames  newFileNames = getFileNames(fileNames, model_->dir());
+    FileNames  newFileNames = getFileNames(fileNames, dstFilePath);
     fileTransfer(newFileNames, false);
 }
 
-void LocalDirDockWidget::cutFiles(QStringList const& fileNames)
+void LocalDirDockWidget::cutFiles(QStringList const& fileNames, QString const& dstFilePath)
 {
-    FileNames  newFileNames = getFileNames(fileNames, model_->dir());
+    FileNames  newFileNames = getFileNames(fileNames, dstFilePath);
     fileTransfer(newFileNames, true);
 }
 

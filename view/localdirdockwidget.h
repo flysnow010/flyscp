@@ -21,6 +21,8 @@ public:
     void setDir(QString const& dir) override;
     QString dir() const override;
     void cd(QString const& dir) override;
+    QString home() const override;
+    QString root() const override;
 
     void resizeSection(int logicalIndex, int size);
     void saveSettings(QString const& name);
@@ -44,13 +46,18 @@ private slots:
     void paste();
     void delfile();
     void rename();
-    void properties();
+
+    void createShortcut();
+    void newFolder();
+    void newTxtFile();
 private:
-    QStringList selectedileNames(QString const& prefix = QString());
-    QString selectFileName();
+    bool isMultiSelected();
+    QStringList selectedileNames(QString const& prefix = QString(), bool isParent = false);
+    QString selectFileName(bool isOnlyFilename = false);
+
     FileNames getFileNames(QStringList const& fileNames, QString const& filePath);
-    void copyFilels(QStringList const& fileNames);
-    void cutFiles(QStringList const& fileNames);
+    void copyFilels(QStringList const& fileNames, QString const& dstFilePath);
+    void cutFiles(QStringList const& fileNames, QString const& dstFilePath);
     void fileTransfer(FileNames const& fileNames, bool isMove);
 private:
     Ui::LocalDirDockWidget *ui;
