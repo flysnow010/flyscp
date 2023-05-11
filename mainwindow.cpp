@@ -79,6 +79,12 @@ void MainWindow::createConnects()
     connect(rightDirView, &LocalDirDockWidget::sectionResized, this, [&](int index, int, int newSize){
         leftDirView->resizeSection(index, newSize);
     });
+    connect(leftPanelWidget, &PanelWidget::tabCountChanged, this, [&](int count){
+        rightPanelWidget->setTabBarAutoHide(count);
+    });
+    connect(rightPanelWidget, &PanelWidget::tabCountChanged, this, [&](int count){
+        leftPanelWidget->setTabBarAutoHide(count);
+    });
 }
 
 void MainWindow::save()
