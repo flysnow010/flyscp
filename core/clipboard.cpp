@@ -20,6 +20,11 @@ bool ClipBoard::canPaste()
     return false;
 }
 
+void ClipBoard::clear()
+{
+    QApplication::clipboard()->clear();
+}
+
 void ClipBoard::cut(QStringList const& fileNames)
 {
     QString text = fileNames.join("\n");

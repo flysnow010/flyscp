@@ -11,6 +11,7 @@ public:
     ClipBoard();
 
     static bool canPaste();
+    static void clear();
     static void cut(QStringList const& fileNames);
     static void copy(QStringList const& fileNames);
     static QMimeData* copyMimeData(QStringList const& fileNames);
