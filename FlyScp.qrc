@@ -8,5 +8,6 @@
         <file>image/disconnect.png</file>
         <file>image/paste.png</file>
         <file>image/app.png</file>
+        <file>image/home.png</file>
     </qresource>
 </RCC>
