@@ -29,6 +29,7 @@ public:
     static QString formatFileSizeMB(qint64 byte);
 
     static QString permissionsText(quint32 permissions, bool isDir);
+    static QString getText(QString const& label, QString const& value = QString());
 };
 
 #endif // UTILS_H

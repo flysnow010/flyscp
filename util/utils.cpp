@@ -5,13 +5,15 @@
 #include <QApplication>
 #include <QFileIconProvider>
 #include <QFileInfo>
+#include <QInputDialog>
 #include <QTemporaryFile>
 #include <QDateTime>
 #include <QDir>
-#include <cstring>
-#include <windows.h>
 #include <QtWin>
 #include <QDebug>
+
+#include <cstring>
+#include <windows.h>
 
 QString Utils::currentPath()
 {
@@ -217,4 +219,17 @@ QString Utils::permissionsText(quint32 permissions, bool isDir)
     p += (permissions & ssh::FileInfo::Other_Exe)   ? "x" : "-";
 
     return p;
+}
+
+QString Utils::getText(QString const& label, QString const& value)
+{
+    QInputDialog dialog;
+    dialog.setInputMode(QInputDialog::TextInput);
+    dialog.setWindowTitle(QApplication::applicationName());
+    dialog.setLabelText(label);
+    dialog.setTextValue(value);
+    dialog.setWindowFlags(dialog.windowFlags() & ~Qt::WindowContextHelpButtonHint);
+    if(dialog.exec() == QDialog::Accepted)
+        return dialog.textValue();
+    return QString();
 }
