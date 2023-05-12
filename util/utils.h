@@ -9,6 +9,7 @@ class Utils
 public:
     static QString currentPath();
     static QDir tempPath();
+    static QByteArray readFile(QString const& filename);
 
     static QString formatTime(int time_ms);
     static QString formatDateTime(long long time_ms);

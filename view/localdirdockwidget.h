@@ -9,6 +9,7 @@ class LocalDirDockWidget;
 }
 class LocalDirModel;
 class QMimeData;
+class TitleBarWidget;
 class LocalDirDockWidget : public QDockWidget, public BaseDir
 {
     Q_OBJECT
@@ -27,8 +28,14 @@ public:
     void resizeSection(int logicalIndex, int size);
     void saveSettings(QString const& name);
     void loadSettings(QString const& name);
+    void setActived(bool isActived);
+
 signals:
     void sectionResized(int logicalIndex, int oldSize, int newSize);
+    void dirChanged(QString const& dir, bool isRemote);
+    void libDirContextMenuRequested();
+    void favoritesDirContextMenuRequested();
+    void historyDirContextMenuRequested();
 
 protected:
      bool eventFilter(QObject *obj, QEvent *event) override;
@@ -59,9 +66,11 @@ private:
     void copyFilels(QStringList const& fileNames, QString const& dstFilePath);
     void cutFiles(QStringList const& fileNames, QString const& dstFilePath);
     void fileTransfer(FileNames const& fileNames, bool isMove);
+    void updateCurrentDir(QString const& dir);
 private:
     Ui::LocalDirDockWidget *ui;
     LocalDirModel* model_;
+    TitleBarWidget* titleBarWidget;
 };
 
 #endif // LOCALDIRDOCKWIDGET_H

@@ -46,6 +46,9 @@ void RemoteDockWidget::setDir(QString const& dir)
 {
     model_->setDir(sftp->dir(dir.toStdString()));
     setWindowTitle(model_->dirName());
+    QString dirName = model_->dirName();
+    setWindowTitle(dirName);
+    emit dirChanged(dirName, true);
 }
 
 QString RemoteDockWidget::dir() const
@@ -198,7 +201,9 @@ void RemoteDockWidget::connected()
         model_->setDir(sftp->home());
     else
         model_->setDir(sftp->dir(homeDir));
-    setWindowTitle(model_->dirName());
+    QString dir = model_->dirName();
+    setWindowTitle(dir);
+    emit dirChanged(dir, true);
 }
 
 void RemoteDockWidget::unconnected()
@@ -291,9 +296,7 @@ void RemoteDockWidget::download()
     if(!fileInfo)
         return;
 
-    QString fileName = download(fileInfo, QDir(filePath));
-    if(!fileName.isEmpty())
-        ;
+    download(fileInfo, QDir(filePath));
 }
 
 void RemoteDockWidget::deleteDir()
@@ -385,7 +388,9 @@ void RemoteDockWidget::openDir(ssh::FileInfoPtr const& fileInfo)
     else
         filePath = model_->filePath(fileInfo->name());
     model_->setDir(sftp->dir(filePath));
-    setWindowTitle(model_->dirName());
+    QString dir = model_->dirName();
+    setWindowTitle(dir);
+    emit dirChanged(dir, true);
 }
 
 QString RemoteDockWidget::download(ssh::FileInfoPtr const& fileInfo, QDir const& dstDir)

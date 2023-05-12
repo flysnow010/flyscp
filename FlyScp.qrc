@@ -9,5 +9,7 @@
         <file>image/paste.png</file>
         <file>image/app.png</file>
         <file>image/home.png</file>
+        <file>image/close.png</file>
+        <file>image/close-hover.png</file>
     </qresource>
 </RCC>

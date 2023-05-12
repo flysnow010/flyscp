@@ -10,6 +10,7 @@ class PanelWidget;
 class QButtonGroup;
 class QAbstractButton;
 class QIcon;
+class DirHistory;
 class PanelWidget : public QWidget
 {
     Q_OBJECT
@@ -21,10 +22,16 @@ public:
     void addDirTab(QWidget* widget, QIcon const& icon, QString const& text);
     void updateTexts(QWidget* widget);
 
+    void saveSettings(QString const& name);
+    void loadSettings(QString const& name);
 signals:
     void tabCountChanged(int count);
 public slots:
     void setTabBarAutoHide(int count);
+    void addDirToHistory(QString const& dir, bool isRemote);
+    void libDirContextMenu();
+    void favoritesDirContextMenu();
+    void historyDirContextMenu();
 
 private slots:
     void dirverChanged(QAbstractButton* button, bool checked);
@@ -32,13 +39,14 @@ private slots:
     void backToRoot();
     void backToPrePath();
     void currentChanged(int index);
+    void tabCloseRequested(int index);
 private:
-    void updateLocalDrivers();
-    void remoteDirvers();
+    void updateDrivers();
     void updateDir(QString const& driver);
 private:
     Ui::PanelWidget *ui;
     QButtonGroup* buttonGroup;
+    DirHistory* dirHistory;
     bool isChecked  = false;
 };
 

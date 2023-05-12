@@ -21,6 +21,7 @@ private:
     void load();
     void saveSettings();
     void loadSettings();
+    void loadStyleSheet();
 
     void createConnects();
 private:

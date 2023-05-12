@@ -14,6 +14,7 @@ SOURCES += \
     core/basedir.cpp \
     core/clipboard.cpp \
     core/contextmenu.cpp \
+    core/dirhistory.cpp \
     core/filemanager.cpp \
     core/filetransfer.cpp \
     dialog/aboutdialog.cpp \
@@ -38,6 +39,7 @@ SOURCES += \
     view/localdirdockwidget.cpp \
     view/panelwidget.cpp \
     view/remotedockwidget.cpp \
+    view/titlebarwidget.cpp \
     view/treeview.cpp
 
 HEADERS += \
@@ -45,6 +47,7 @@ HEADERS += \
     core/clipboard.h \
     core/connecttype.h \
     core/contextmenu.h \
+    core/dirhistory.h \
     core/filemanager.h \
     core/filename.h \
     core/filetransfer.h \
@@ -71,6 +74,7 @@ HEADERS += \
     view/localdirdockwidget.h \
     view/panelwidget.h \
     view/remotedockwidget.h \
+    view/titlebarwidget.h \
     view/treeview.h
 
 FORMS += \
@@ -82,7 +86,8 @@ FORMS += \
     mainwindow.ui \
     view/localdirdockwidget.ui \
     view/panelwidget.ui \
-    view/remotedockwidget.ui
+    view/remotedockwidget.ui \
+    view/titlebarwidget.ui
 
 RC_ICONS = FlyScp.ico
 # Default rules for deployment.
