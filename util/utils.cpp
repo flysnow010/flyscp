@@ -1,7 +1,6 @@
 #include "utils.h"
 #include "ssh/fileinfo.h"
 
-
 #include <QApplication>
 #include <QFileIconProvider>
 #include <QFileInfo>
@@ -27,6 +26,14 @@ QDir Utils::tempPath()
     dir.mkdir(appName);
     dir.cd(appName);
     return dir;
+}
+
+QByteArray Utils::readFile(QString const& filename)
+{
+    QFile file(filename);
+    if(file.open(QIODevice::ReadOnly))
+        return file.readAll();
+    return QByteArray();
 }
 
 QString Utils::formatTime(int time_ms)
