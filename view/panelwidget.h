@@ -34,8 +34,7 @@ private slots:
     void currentChanged(int index);
     void tabCloseRequested(int index);
 private:
-    void updateLocalDrivers();
-    void remoteDirvers();
+    void updateDrivers();
     void updateDir(QString const& driver);
 private:
     Ui::PanelWidget *ui;

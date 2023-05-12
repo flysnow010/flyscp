@@ -15,10 +15,7 @@ PanelWidget::PanelWidget(QWidget *parent)
 {
     ui->setupUi(this);
     ui->tabWidget->setTabBarAutoHide(true);
-    ui->localDrivers->hide();
-    ui->remoteDrivers->hide();
-    updateLocalDrivers();
-    remoteDirvers();
+    updateDrivers();
     connect(buttonGroup, SIGNAL(buttonToggled(QAbstractButton*,bool)),
             this, SLOT(dirverChanged(QAbstractButton*,bool)));
     connect(ui->tabWidget, &QTabWidget::currentChanged, this, &PanelWidget::currentChanged);
@@ -61,7 +58,7 @@ void PanelWidget::updateTexts(QWidget* widget)
     }
 }
 
-void PanelWidget::updateLocalDrivers()
+void PanelWidget::updateDrivers()
 {
     QFileInfoList drivers = QDir::drives();
     QHBoxLayout* layout = new QHBoxLayout();
@@ -80,43 +77,23 @@ void PanelWidget::updateLocalDrivers()
         buttonGroup->addButton(button);
     }
 
-    QToolButton* rootButton = new QToolButton();
-    rootButton->setText("/");
-    layout->addWidget(rootButton);
-
-    QToolButton *topButton = new QToolButton();
-    topButton->setText("..");
-    layout->addWidget(topButton);
-
-    connect(rootButton, SIGNAL(clicked()), this, SLOT(backToRoot()));
-    connect(topButton, SIGNAL(clicked()), this, SLOT(backToPrePath()));
-    layout->addStretch();
-    ui->localDrivers->setLayout(layout);
-}
-
-void PanelWidget::remoteDirvers()
-{
-    QHBoxLayout* layout = new QHBoxLayout();
-    layout->setMargin(3);
-    layout->setSpacing(5);
-
     QToolButton* homeButton = new QToolButton();
     homeButton->setIcon(QIcon(":/image/home.png"));
     layout->addWidget(homeButton);
 
     QToolButton* rootButton = new QToolButton();
-    rootButton->setText("/");
+    rootButton->setText("\\");
     layout->addWidget(rootButton);
 
     QToolButton *topButton = new QToolButton();
     topButton->setText("..");
     layout->addWidget(topButton);
+    layout->addStretch();
 
     connect(homeButton, SIGNAL(clicked()), this, SLOT(backToHome()));
     connect(rootButton, SIGNAL(clicked()), this, SLOT(backToRoot()));
     connect(topButton, SIGNAL(clicked()), this, SLOT(backToPrePath()));
-    layout->addStretch();
-    ui->remoteDrivers->setLayout(layout);
+    ui->driverWidget->setLayout(layout);
 }
 
 void PanelWidget::dirverChanged(QAbstractButton* button, bool checked)
@@ -163,9 +140,11 @@ void PanelWidget::currentChanged(int index)
     BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(index));
     if(!dir)
         return;
-
-    ui->localDrivers->setVisible(!dir->isRemote());
-    ui->remoteDrivers->setVisible(dir->isRemote());
+     QList<QAbstractButton*> buttons = buttonGroup->buttons();
+     foreach(auto button, buttons)
+     {
+         button->setEnabled(!dir->isRemote());
+     }
 }
 
 void PanelWidget::tabCloseRequested(int index)

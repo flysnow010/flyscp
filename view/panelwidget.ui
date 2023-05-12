@@ -47,17 +47,7 @@ QToolButton:checked {
     <number>0</number>
    </property>
    <item>
-    <widget class="QFrame" name="localDrivers">
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QFrame" name="remoteDrivers">
+    <widget class="QFrame" name="driverWidget">
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
