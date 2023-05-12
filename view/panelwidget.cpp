@@ -22,6 +22,7 @@ PanelWidget::PanelWidget(QWidget *parent)
     connect(buttonGroup, SIGNAL(buttonToggled(QAbstractButton*,bool)),
             this, SLOT(dirverChanged(QAbstractButton*,bool)));
     connect(ui->tabWidget, &QTabWidget::currentChanged, this, &PanelWidget::currentChanged);
+    connect(ui->tabWidget, &QTabWidget::tabCloseRequested, this, &PanelWidget::tabCloseRequested);
 }
 
 PanelWidget::~PanelWidget()
@@ -165,5 +166,15 @@ void PanelWidget::currentChanged(int index)
 
     ui->localDrivers->setVisible(!dir->isRemote());
     ui->remoteDrivers->setVisible(dir->isRemote());
+}
 
+void PanelWidget::tabCloseRequested(int index)
+{
+    QWidget* w = ui->tabWidget->widget(index);
+    BaseDir* dir = dynamic_cast<BaseDir *>(w);
+    if(!dir || !dir->isRemote())
+        return;
+    w->deleteLater();
+    ui->tabWidget->removeTab(index);
+    emit tabCountChanged(ui->tabWidget->count());
 }

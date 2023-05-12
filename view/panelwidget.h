@@ -32,6 +32,7 @@ private slots:
     void backToRoot();
     void backToPrePath();
     void currentChanged(int index);
+    void tabCloseRequested(int index);
 private:
     void updateLocalDrivers();
     void remoteDirvers();
