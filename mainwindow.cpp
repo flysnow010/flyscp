@@ -39,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->menubar->setCornerWidget(bar);
 
     load();
+    loadStyleSheet();
     createConnects();
 }
 
@@ -141,5 +142,11 @@ void MainWindow::loadSettings()
     ui->actionStatusBar->setChecked(statusBarIsVisible);
     ui->toolBar->setVisible(toolBarIsVisible);
     ui->statusbar->setVisible(statusBarIsVisible);
+}
+
+void MainWindow::loadStyleSheet()
+{
+    QString fileName = QString("%1/skins/main.css").arg(Utils::currentPath());
+    setStyleSheet(QString::fromUtf8(Utils::readFile(fileName)));
 }
 
