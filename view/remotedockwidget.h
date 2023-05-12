@@ -31,6 +31,9 @@ public:
 
     void start(SSHSettings const& settings);
     QString const& name() const { return name_; }
+
+signals:
+    void dirChanged(QString const& dir, bool isRemote);
 private slots:
     void viewClick(QModelIndex const& index);
     void customContextMenuRequested(const QPoint &pos);

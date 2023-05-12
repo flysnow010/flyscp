@@ -1,5 +1,6 @@
 #include "localdirdockwidget.h"
 #include "ui_localdirdockwidget.h"
+#include "titlebarwidget.h"
 #include "model/localdirmodel.h"
 #include "core/filemanager.h"
 #include "core/filetransfer.h"
@@ -18,10 +19,12 @@ LocalDirDockWidget::LocalDirDockWidget(QWidget *parent)
     : QDockWidget(parent)
     , ui(new Ui::LocalDirDockWidget)
     , model_(new LocalDirModel(this))
+    , titleBarWidget(new TitleBarWidget())
 {
     ui->setupUi(this);
     ui->treeView->setModel(model_);
     ui->treeView->installEventFilter(this);
+    setTitleBarWidget(titleBarWidget);
 
     connect(ui->treeView, SIGNAL(doubleClicked(QModelIndex)),
                     this, SLOT(viewClick(QModelIndex)));
@@ -39,6 +42,13 @@ LocalDirDockWidget::LocalDirDockWidget(QWidget *parent)
             this, SLOT(sortIndicatorChanged(int,Qt::SortOrder)));
     connect(ui->treeView->header(), SIGNAL(sectionResized(int,int,int)),
             this, SIGNAL(sectionResized(int,int,int)));
+
+    connect(titleBarWidget, SIGNAL(libDirButtonClicked()),
+                    this, SIGNAL(libDirContextMenuRequested()));
+    connect(titleBarWidget, SIGNAL(favoritesDirButtonCLicked()),
+                    this, SIGNAL(favoritesDirContextMenuRequested()));
+    connect(titleBarWidget, SIGNAL(historyDirButtonClicked()),
+                    this, SIGNAL(historyDirContextMenuRequested()));
 }
 
 LocalDirDockWidget::~LocalDirDockWidget()
@@ -49,7 +59,7 @@ LocalDirDockWidget::~LocalDirDockWidget()
 void LocalDirDockWidget::setDir(QString const& dir)
 {
     model_->setDir(dir);
-    setWindowTitle(dir);
+    updateCurrentDir(dir);
 }
 
 QString LocalDirDockWidget::dir() const
@@ -74,10 +84,18 @@ QString LocalDirDockWidget::root() const
     return QString();
 }
 
+void LocalDirDockWidget::setActived(bool isActived)
+{
+    titleBarWidget->setActived(isActived);
+}
+
 void LocalDirDockWidget::cd(QString const& dir)
 {
     if(model_->cd(dir))
-        setWindowTitle(model_->dir());
+    {
+        QString dirName = model_->dir();
+        updateCurrentDir(dirName);
+    }
 }
 
 void LocalDirDockWidget::resizeSection(int logicalIndex, int size)
@@ -92,7 +110,7 @@ void LocalDirDockWidget::saveSettings(QString const& name)
                        QCoreApplication::applicationVersion());
     settings.beginGroup(name);
     QHeaderView *headerView = ui->treeView->header();
-    settings.setValue("DirName", windowTitle());
+    settings.setValue("DirName", model_->dir());
     settings.beginWriteArray("sectionSizes", headerView->count());
     for(int i = 0; i < headerView->count(); i++)
     {
@@ -114,7 +132,6 @@ void LocalDirDockWidget::loadSettings(QString const& name)
     for(int i = 0; i < size && i < headerView->count(); i++)
     {
         settings.setArrayIndex(i);
-        settings.value("sectionSize").toInt();
         headerView->resizeSection(i, settings.value("sectionSize").toInt());
     }
     settings.endArray();
@@ -147,6 +164,14 @@ bool LocalDirDockWidget::eventFilter(QObject *obj, QEvent *event)
              return true;
          }
     }
+    else if(event->type() == QEvent::FocusIn)
+    {
+        setActived(true);
+    }
+    else if(event->type() == QEvent::FocusOut)
+    {
+        setActived(false);
+    }
     return QDockWidget::eventFilter(obj, event);
 }
 
@@ -154,12 +179,9 @@ void LocalDirDockWidget::viewClick(QModelIndex const& index)
 {
     QString fileName = model_->fileName(index.row());
     if(model_->cd(fileName))
-        setWindowTitle(model_->dir());
+        updateCurrentDir(model_->dir());
     else
-    {
-        QString filePath = model_->filePath(index.row());
-        FileManager::Open(filePath);
-    }
+        FileManager::Open(model_->filePath(index.row()));
 }
 
 void LocalDirDockWidget::sortIndicatorChanged(int logicalIndex, Qt::SortOrder order)
@@ -221,7 +243,7 @@ void LocalDirDockWidget::customContextMenuRequested(const QPoint & pos)
             QAction* action = menu.addAction(name, this, [=]()
             {
                 if(model_->cd(name))
-                    setWindowTitle(model_->dir());
+                    updateCurrentDir(model_->dir());
             });
             QFont font = action->font();
             font.setBold(true);
@@ -508,3 +530,8 @@ void LocalDirDockWidget::fileTransfer(FileNames const& fileNames, bool isMove)
     }
 }
 
+void LocalDirDockWidget::updateCurrentDir(QString const& dir)
+{
+    titleBarWidget->setTitle(dir);
+    emit dirChanged(dir, false);
+}

@@ -2,16 +2,20 @@
 #include "ui_panelwidget.h"
 #include "view/localdirdockwidget.h"
 #include "util/utils.h"
+#include "core/dirhistory.h"
 #include <QDir>
 #include <QHBoxLayout>
 #include <QToolButton>
 #include <QFileIconProvider>
 #include <QButtonGroup>
+#include <QSettings>
+#include <QMenu>
 
 PanelWidget::PanelWidget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::PanelWidget)
     , buttonGroup(new QButtonGroup(this))
+    , dirHistory(new DirHistory())
 {
     ui->setupUi(this);
     ui->tabWidget->setTabBarAutoHide(true);
@@ -24,6 +28,7 @@ PanelWidget::PanelWidget(QWidget *parent)
 
 PanelWidget::~PanelWidget()
 {
+    delete dirHistory;
     delete ui;
 }
 
@@ -37,6 +42,82 @@ void PanelWidget::addDirTab(QWidget* widget, QIcon const& icon, QString const& t
 void PanelWidget::setTabBarAutoHide(int count)
 {
     ui->tabWidget->setTabBarAutoHide(count > 1 ? false : true);
+}
+
+void PanelWidget::saveSettings(QString const& name)
+{
+    QSettings settings(QCoreApplication::applicationName(),
+                       QCoreApplication::applicationVersion());
+    settings.beginGroup(name);
+    QStringList const& dirNames = dirHistory->dirs();
+    settings.beginWriteArray("dirNames", dirNames.size());
+    for(int i = 0; i < dirNames.size(); i++)
+    {
+        settings.setArrayIndex(i);
+        settings.setValue("dirName", dirNames[i]);
+    }
+    settings.endArray();
+    settings.endGroup();
+}
+
+void PanelWidget::loadSettings(QString const& name)
+{
+    QSettings settings(QCoreApplication::applicationName(),
+                       QCoreApplication::applicationVersion());
+    settings.beginGroup(name);
+    QStringList dirNames;
+    int size = settings.beginReadArray("dirNames");
+    for(int i = 0; i < size; i++)
+    {
+        settings.setArrayIndex(i);
+        dirNames << settings.value("dirName").toString();
+    }
+    settings.endArray();
+    settings.endGroup();
+    dirHistory->setDirs(dirNames);
+}
+
+void PanelWidget::addDirToHistory(QString const& dir, bool isRemote)
+{
+    Q_UNUSED(isRemote)
+    dirHistory->add(dir);
+}
+
+void PanelWidget::libDirContextMenu()
+{
+    QMenu menu;
+    menu.exec(QCursor::pos());
+}
+
+void PanelWidget::favoritesDirContextMenu()
+{
+    QMenu menu;
+    menu.exec(QCursor::pos());
+}
+
+void PanelWidget::historyDirContextMenu()
+{
+    BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
+    QStringList const& dirNames = dirHistory->dirs();
+    if(!dir || dirNames.isEmpty())
+        return;
+
+    QMenu menu;
+    QString currentDir = dir->dir();
+
+    foreach(auto const& dirName, dirNames)
+    {
+        QAction* action = menu.addAction(dirName, this, [&](bool){
+            dir->setDir(dirName);
+        });
+
+        if(dirName == currentDir)
+        {
+            action->setCheckable(true);
+            action->setChecked(true);
+        }
+    }
+    menu.exec(QCursor::pos());
 }
 
 void PanelWidget::updateTexts(QWidget* widget)
@@ -132,7 +213,7 @@ void PanelWidget::updateDir(QString const& driver)
 {
     BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
     if(dir)
-        dir->setDir(driver + ":/");
+        dir->setDir(dirHistory->find(driver));
 }
 
 void PanelWidget::currentChanged(int index)

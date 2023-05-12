@@ -92,6 +92,32 @@ void MainWindow::createConnects()
     connect(rightPanelWidget, &PanelWidget::tabCountChanged, this, [&](int count){
         leftPanelWidget->setTabBarAutoHide(count);
     });
+    connect(leftDirView, &LocalDirDockWidget::dirChanged, this, [&](QString const& dir, bool isRemote){
+        leftPanelWidget->addDirToHistory(dir, isRemote);
+    });
+    connect(rightDirView, &LocalDirDockWidget::dirChanged, this, [&](QString const& dir, bool isRemote){
+        rightPanelWidget->addDirToHistory(dir, isRemote);
+    });
+
+    connect(leftDirView, &LocalDirDockWidget::libDirContextMenuRequested, this, [&](){
+        leftPanelWidget->libDirContextMenu();
+    });
+    connect(leftDirView, &LocalDirDockWidget::favoritesDirContextMenuRequested, this, [&](){
+        leftPanelWidget->favoritesDirContextMenu();
+    });
+    connect(leftDirView, &LocalDirDockWidget::historyDirContextMenuRequested, this, [&](){
+        leftPanelWidget->historyDirContextMenu();
+    });
+
+    connect(rightDirView, &LocalDirDockWidget::libDirContextMenuRequested, this, [&](){
+        rightPanelWidget->libDirContextMenu();
+    });
+    connect(rightDirView, &LocalDirDockWidget::favoritesDirContextMenuRequested, this, [&](){
+        rightPanelWidget->favoritesDirContextMenu();
+    });
+    connect(rightDirView, &LocalDirDockWidget::historyDirContextMenuRequested, this, [&](){
+        rightPanelWidget->historyDirContextMenu();
+    });
 }
 
 void MainWindow::save()
@@ -99,6 +125,8 @@ void MainWindow::save()
     saveSettings();
     leftDirView->saveSettings("LeftDirView");
     rightDirView->saveSettings("RightDirView");
+    leftPanelWidget->saveSettings("LeftPanel");
+    rightPanelWidget->saveSettings("RightPane");
 }
 
 void MainWindow::load()
@@ -106,8 +134,11 @@ void MainWindow::load()
     loadSettings();
     leftDirView->loadSettings("LeftDirView");
     rightDirView->loadSettings("RightDirView");
+    leftPanelWidget->loadSettings("LeftPanel");
+    rightPanelWidget->loadSettings("RightPane");
     leftPanelWidget->updateTexts(leftDirView);
     rightPanelWidget->updateTexts(rightDirView);
+    leftDirView->setActived(true);
 }
 
 void MainWindow::saveSettings()
