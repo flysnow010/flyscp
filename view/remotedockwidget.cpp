@@ -291,9 +291,7 @@ void RemoteDockWidget::download()
     if(!fileInfo)
         return;
 
-    QString fileName = download(fileInfo, QDir(filePath));
-    if(!fileName.isEmpty())
-        ;
+    download(fileInfo, QDir(filePath));
 }
 
 void RemoteDockWidget::deleteDir()
