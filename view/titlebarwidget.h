@@ -17,6 +17,7 @@ public:
 
     void setTitle(QString const& title);
     void setActived(bool isActived);
+    bool isActived() const { return actived_; }
 signals:
     void libDirButtonClicked();
     void favoritesDirButtonCLicked();
@@ -25,6 +26,7 @@ private slots:
     void linkHovered(const QString &link);
 private:
     Ui::TitleBarWidget *ui;
+    bool actived_;
 };
 
 #endif // TITLEBARWIDGET_H

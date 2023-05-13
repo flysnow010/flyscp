@@ -40,6 +40,7 @@ SOURCES += \
     view/panelwidget.cpp \
     view/remotedockwidget.cpp \
     view/titlebarwidget.cpp \
+    view/toolbuttons.cpp \
     view/treeview.cpp
 
 HEADERS += \
@@ -75,6 +76,7 @@ HEADERS += \
     view/panelwidget.h \
     view/remotedockwidget.h \
     view/titlebarwidget.h \
+    view/toolbuttons.h \
     view/treeview.h
 
 FORMS += \
@@ -87,7 +89,8 @@ FORMS += \
     view/localdirdockwidget.ui \
     view/panelwidget.ui \
     view/remotedockwidget.ui \
-    view/titlebarwidget.ui
+    view/titlebarwidget.ui \
+    view/toolbuttons.ui
 
 RC_ICONS = FlyScp.ico
 # Default rules for deployment.

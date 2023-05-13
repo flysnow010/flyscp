@@ -20,17 +20,26 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>File</string>
     </property>
+    <widget class="QMenu" name="menuNew">
+     <property name="title">
+      <string>New</string>
+     </property>
+     <addaction name="actionFileFolder"/>
+     <addaction name="separator"/>
+     <addaction name="actionTextFile"/>
+    </widget>
+    <addaction name="menuNew"/>
+    <addaction name="separator"/>
     <addaction name="actionConnect"/>
     <addaction name="actionDisconnect"/>
     <addaction name="separator"/>
-    <addaction name="actionPrint"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
@@ -38,9 +47,13 @@
     <property name="title">
      <string>Edit</string>
     </property>
+    <addaction name="actionViewIt"/>
     <addaction name="actionCopy"/>
-    <addaction name="actionCut"/>
-    <addaction name="actionPaste"/>
+    <addaction name="actionMove"/>
+    <addaction name="actionDelete"/>
+    <addaction name="separator"/>
+    <addaction name="separator"/>
+    <addaction name="actionSelectAll"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
@@ -63,6 +76,12 @@
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
     <string>toolBar</string>
+   </property>
+   <property name="toolTip">
+    <string/>
+   </property>
+   <property name="statusTip">
+    <string>Connect a tftp</string>
    </property>
    <property name="iconSize">
     <size>
@@ -115,6 +134,9 @@
    <property name="text">
     <string>Exit</string>
    </property>
+   <property name="shortcut">
+    <string>Alt+X</string>
+   </property>
   </action>
   <action name="actionCopy">
    <property name="icon">
@@ -123,6 +145,9 @@
    </property>
    <property name="text">
     <string>Copy</string>
+   </property>
+   <property name="shortcut">
+    <string>F5</string>
    </property>
   </action>
   <action name="actionCut">
@@ -172,6 +197,51 @@
    </property>
    <property name="text">
     <string>Status bar</string>
+   </property>
+  </action>
+  <action name="actionFileFolder">
+   <property name="text">
+    <string>File Folder</string>
+   </property>
+   <property name="shortcut">
+    <string>F7</string>
+   </property>
+  </action>
+  <action name="actionTextFile">
+   <property name="text">
+    <string>Text File</string>
+   </property>
+  </action>
+  <action name="actionMove">
+   <property name="text">
+    <string>Move</string>
+   </property>
+   <property name="shortcut">
+    <string>F6</string>
+   </property>
+  </action>
+  <action name="actionDelete">
+   <property name="text">
+    <string>Delete</string>
+   </property>
+   <property name="shortcut">
+    <string>F8</string>
+   </property>
+  </action>
+  <action name="actionSelectAll">
+   <property name="text">
+    <string>Select all</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
+   </property>
+  </action>
+  <action name="actionViewIt">
+   <property name="text">
+    <string>View</string>
+   </property>
+   <property name="shortcut">
+    <string>F3</string>
    </property>
   </action>
  </widget>

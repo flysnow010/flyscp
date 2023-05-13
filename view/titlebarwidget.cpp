@@ -1,10 +1,12 @@
 #include "titlebarwidget.h"
 #include "ui_titlebarwidget.h"
 #include <QDebug>
+#include <QScreen>
 
-TitleBarWidget::TitleBarWidget(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::TitleBarWidget)
+TitleBarWidget::TitleBarWidget(QWidget *parent)
+    : QWidget(parent)
+    , ui(new Ui::TitleBarWidget)
+    , actived_(false)
 {
     ui->setupUi(this);
 
@@ -22,19 +24,37 @@ TitleBarWidget::~TitleBarWidget()
 
 void TitleBarWidget::setTitle(QString const& title)
 {
-    ui->labelTitle->setText(title);
+    QString newTitle = title.split("/").join("\\");
+    ui->labelTitle->setText(newTitle);
 }
 
 void TitleBarWidget::setActived(bool isActived)
 {
+    actived_ = isActived;
     if(isActived)
-    {
-        setStyleSheet("QLabel{background-color: #BFCDDB}\nQToolButton{margin: 0px}");
-    }
+        setStyleSheet("QLabel{"
+                      "background-color: #FFBFCDDB;"
+                      "margin: 0px;"
+                      "padding-left: 2px;"
+                      "border-width: 0px;"
+                      "border-radius: 2px;}\n"
+                      "QToolButton{"
+                      "margin: 0px;"
+                      "padding: 0px;"
+                      "border-width: 0px;"
+                      "border-radius: 0px;}");
     else
-    {
-        setStyleSheet("QLabel{background-color: #90BFCDDB}\nQToolButton{margin: 0px}");
-    }
+        setStyleSheet("QLabel{"
+                      "background-color: #90BFCDDB;"
+                      "margin: 0px;"
+                      "padding-left: 2px;"
+                      "border-width: 0px;"
+                      "border-radius: 2px;}\n"
+                      "QToolButton{"
+                      "margin: 0px;"
+                      "padding: 0px;"
+                      "border-width: 0px;"
+                      "border-radius: 0px;}");
 }
 
 void TitleBarWidget::linkHovered(const QString &link)

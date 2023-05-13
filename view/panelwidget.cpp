@@ -129,7 +129,7 @@ void PanelWidget::updateTexts(QWidget* widget)
         QString filePath = dir->dir().toUpper();
         for(int i = 0; i < buttons.size(); i++)
         {
-            if(filePath.startsWith(buttons[i]->text()))
+            if(filePath.startsWith(buttons[i]->text().toUpper()))
             {
                 isChecked = false;
                 buttons[i]->setChecked(true);
@@ -152,7 +152,8 @@ void PanelWidget::updateDrivers()
         QToolButton* button = new QToolButton();
         button->setCheckable(true);
         button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-        button->setText(drivers[i].path().at(0));
+        button->setText(drivers[i].path().at(0).toLower());
+        button->setIconSize(QSize(10, 10));
         button->setIcon(fip.icon(drivers[i]));
         layout->addWidget(button);
         buttonGroup->addButton(button);
@@ -182,7 +183,7 @@ void PanelWidget::dirverChanged(QAbstractButton* button, bool checked)
     if(checked)
     {
         if(isChecked)
-            updateDir(button->text());
+            updateDir(button->text().toUpper());
         else
             isChecked = true;
     }

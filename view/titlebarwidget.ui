@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>24</height>
+    <height>27</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -31,11 +31,23 @@
    </property>
    <item>
     <widget class="QToolButton" name="btnLibDir">
+     <property name="font">
+      <font>
+       <family>Webdings</family>
+      </font>
+     </property>
      <property name="text">
-      <string>v</string>
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../FlyScp.qrc">
+       <normaloff>:/image/downarrow.png</normaloff>:/image/downarrow.png</iconset>
      </property>
      <property name="toolButtonStyle">
-      <enum>Qt::ToolButtonTextOnly</enum>
+      <enum>Qt::ToolButtonIconOnly</enum>
+     </property>
+     <property name="autoRaise">
+      <bool>true</bool>
      </property>
      <property name="arrowType">
       <enum>Qt::NoArrow</enum>
@@ -44,6 +56,12 @@
    </item>
    <item>
     <widget class="QLabel" name="labelTitle">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
@@ -57,7 +75,7 @@
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
      </property>
      <property name="margin">
-      <number>5</number>
+      <number>0</number>
      </property>
      <property name="openExternalLinks">
       <bool>true</bool>
@@ -69,11 +87,24 @@
    </item>
    <item>
     <widget class="QToolButton" name="btnFavoritesDir">
+     <property name="font">
+      <font>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
      <property name="text">
-      <string>*</string>
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../FlyScp.qrc">
+       <normaloff>:/image/fav.png</normaloff>:/image/fav.png</iconset>
      </property>
      <property name="toolButtonStyle">
-      <enum>Qt::ToolButtonTextOnly</enum>
+      <enum>Qt::ToolButtonIconOnly</enum>
+     </property>
+     <property name="autoRaise">
+      <bool>true</bool>
      </property>
      <property name="arrowType">
       <enum>Qt::NoArrow</enum>
@@ -82,14 +113,26 @@
    </item>
    <item>
     <widget class="QToolButton" name="btnHistoryDir">
+     <property name="font">
+      <font>
+       <family>Webdings</family>
+      </font>
+     </property>
      <property name="text">
-      <string>v</string>
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../FlyScp.qrc">
+       <normaloff>:/image/downarrow.png</normaloff>:/image/downarrow.png</iconset>
      </property>
      <property name="popupMode">
       <enum>QToolButton::DelayedPopup</enum>
      </property>
      <property name="toolButtonStyle">
-      <enum>Qt::ToolButtonTextOnly</enum>
+      <enum>Qt::ToolButtonIconOnly</enum>
+     </property>
+     <property name="autoRaise">
+      <bool>true</bool>
      </property>
      <property name="arrowType">
       <enum>Qt::NoArrow</enum>
@@ -98,6 +141,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../FlyScp.qrc"/>
+ </resources>
  <connections/>
 </ui>

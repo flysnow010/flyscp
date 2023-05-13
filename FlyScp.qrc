@@ -11,5 +11,7 @@
         <file>image/home.png</file>
         <file>image/close.png</file>
         <file>image/close-hover.png</file>
+        <file>image/downarrow.png</file>
+        <file>image/fav.png</file>
     </qresource>
 </RCC>

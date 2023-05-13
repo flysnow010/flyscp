@@ -86,9 +86,11 @@ QVariant LocalDirModel::headerTextAlignment(int column) const
 
 bool LocalDirModel::editable(const QModelIndex &index) const
 {
-    if(index.column() != 0 || fileInfos_[index.row()].fileName() == "..")
-        return false;
-    return true;
+//    if(index.column() != 0 || fileInfos_[index.row()].fileName() == "..")
+//        return false;
+//    return true;
+    Q_UNUSED(index)
+    return false;
 }
 
 void LocalDirModel::setDir(QString const& dir)

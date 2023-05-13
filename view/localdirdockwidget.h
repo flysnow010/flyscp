@@ -29,6 +29,18 @@ public:
     void saveSettings(QString const& name);
     void loadSettings(QString const& name);
     void setActived(bool isActived);
+    bool isActived() const;
+
+    void viewFile();
+    void editFile();
+    void copyFiles(QString const& dstFilePath);
+    void moveFiles(QString const& dstFilePath);
+    void refresh();
+    void selectAll();
+public slots:
+    void newFolder();
+    void delFiles();
+    void newTxtFile();
 
 signals:
     void sectionResized(int logicalIndex, int oldSize, int newSize);
@@ -36,6 +48,7 @@ signals:
     void libDirContextMenuRequested();
     void favoritesDirContextMenuRequested();
     void historyDirContextMenuRequested();
+    void actived();
 
 protected:
      bool eventFilter(QObject *obj, QEvent *event) override;
@@ -51,12 +64,10 @@ private slots:
     void cut();
     void copy();
     void paste();
-    void delfile();
+
     void rename();
 
     void createShortcut();
-    void newFolder();
-    void newTxtFile();
 private:
     bool isMultiSelected();
     QStringList selectedileNames(QString const& prefix = QString(), bool isParent = false);

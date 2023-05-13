@@ -4,6 +4,7 @@
 #include "view/panelwidget.h"
 #include "view/localdirdockwidget.h"
 #include "view/remotedockwidget.h"
+#include "view/toolbuttons.h"
 #include "dialog/connectdialog.h"
 #include "dialog/aboutdialog.h"
 #include "util/utils.h"
@@ -11,6 +12,8 @@
 #include <QTabWidget>
 #include <QSettings>
 #include <QDesktopWidget>
+#include <QDebug>
+#include <QScreen>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -19,6 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
     , rightPanelWidget(new PanelWidget(this))
     , leftDirView(new LocalDirDockWidget(this))
     , rightDirView(new LocalDirDockWidget(this))
+    , toolButtons(new ToolButtons(this))
 {
     ui->setupUi(this);
     QSplitter *spliter = new QSplitter(this);
@@ -37,7 +41,7 @@ MainWindow::MainWindow(QWidget *parent)
     menuHelp->addAction(ui->actionAbout);
 
     ui->menubar->setCornerWidget(bar);
-
+    ui->statusbar->addWidget(toolButtons, 1);
     load();
     loadStyleSheet();
     createConnects();
@@ -69,6 +73,16 @@ void MainWindow::createConnects()
             rightPanelWidget->addDirTab(rightDirView, Utils::networkIcon(), rightDirView->name());
         }
     });
+    connect(ui->actionExit, &QAction::triggered, this, [&](bool) {
+        close();
+    });
+
+    connect(ui->actionFileFolder, SIGNAL(triggered(bool)), this, SLOT(newFolder()));
+    connect(ui->actionViewIt, SIGNAL(triggered(bool)), this, SLOT(viewFile()));
+    connect(ui->actionCopy, SIGNAL(triggered(bool)), this, SLOT(copyFiles()));
+    connect(ui->actionMove, SIGNAL(triggered(bool)), this, SLOT(moveFiles()));
+    connect(ui->actionDelete, SIGNAL(triggered(bool)), this, SLOT(delFiles()));
+
     connect(ui->actionToolBar,  &QAction::triggered, this, [&](bool on){
         ui->toolBar->setVisible(on);
     });
@@ -118,6 +132,20 @@ void MainWindow::createConnects()
     connect(rightDirView, &LocalDirDockWidget::historyDirContextMenuRequested, this, [&](){
         rightPanelWidget->historyDirContextMenu();
     });
+
+    connect(rightDirView, &LocalDirDockWidget::actived, this, [&](){
+        leftDirView->setActived(false);
+    });
+    connect(leftDirView, &LocalDirDockWidget::actived, this, [&](){
+        rightDirView->setActived(false);
+    });
+    connect(toolButtons, &ToolButtons::newClicked, this, &MainWindow::newFolder);
+    connect(toolButtons, &ToolButtons::viewClicked, this, &MainWindow::viewFile);
+    connect(toolButtons, &ToolButtons::editClicked, this, &MainWindow::editFile);
+    connect(toolButtons, &ToolButtons::copyClicked, this, &MainWindow::copyFiles);
+    connect(toolButtons, &ToolButtons::moveClicked, this, &MainWindow::moveFiles);
+    connect(toolButtons, &ToolButtons::deleteClicked, this, &MainWindow::delFiles);
+    connect(toolButtons, &ToolButtons::exitClicked, this, [=](){ close(); });
 }
 
 void MainWindow::save()
@@ -181,3 +209,70 @@ void MainWindow::loadStyleSheet()
     setStyleSheet(QString::fromUtf8(Utils::readFile(fileName)));
 }
 
+void MainWindow::newFolder()
+{
+    if(leftDirView->isActived())
+        leftDirView->newFolder();
+    else
+        rightDirView->newFolder();
+}
+
+void MainWindow::viewFile()
+{
+    if(leftDirView->isActived())
+        leftDirView->viewFile();
+    else
+        rightDirView->viewFile();
+}
+
+void MainWindow::editFile()
+{
+    if(leftDirView->isActived())
+        leftDirView->viewFile();
+    else
+        rightDirView->viewFile();
+}
+
+void MainWindow::copyFiles()
+{
+    if(leftDirView->isActived())
+    {
+        leftDirView->copyFiles(rightDirView->dir());
+        rightDirView->refresh();
+    }
+    else
+    {
+        rightDirView->copyFiles(leftDirView->dir());
+        leftDirView->refresh();
+    }
+}
+
+void MainWindow::moveFiles()
+{
+    if(leftDirView->isActived())
+    {
+        leftDirView->moveFiles(rightDirView->dir());
+        rightDirView->refresh();
+    }
+    else
+    {
+        rightDirView->moveFiles(leftDirView->dir());
+        leftDirView->refresh();
+    }
+}
+
+void MainWindow::delFiles()
+{
+    if(leftDirView->isActived())
+        leftDirView->delFiles();
+    else
+        rightDirView->delFiles();
+}
+
+void MainWindow::selectAll()
+{
+    if(leftDirView->isActived())
+        leftDirView->selectAll();
+    else
+        rightDirView->selectAll();
+}
