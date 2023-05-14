@@ -31,6 +31,7 @@ public:
 
     static QString permissionsText(quint32 permissions, bool isDir);
     static QString getText(QString const& label, QString const& value = QString());
+    static bool question(QString const& text);
 };
 
 #endif // UTILS_H

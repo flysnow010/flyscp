@@ -36,10 +36,10 @@ public:
     void copyFiles(QString const& dstFilePath);
     void moveFiles(QString const& dstFilePath);
     void refresh();
+    void delFilesWithConfirm();
     void selectAll();
 public slots:
     void newFolder();
-    void delFiles();
     void newTxtFile();
 
 signals:
@@ -64,14 +64,15 @@ private slots:
     void cut();
     void copy();
     void paste();
-
+    void delFiles();
     void rename();
 
     void createShortcut();
 private:
     bool isMultiSelected();
-    QStringList selectedileNames(QString const& prefix = QString(), bool isParent = false);
-    QString selectFileName(bool isOnlyFilename = false);
+    QStringList selectedileNames(QString const& prefix = QString(),
+                                 bool isOnlyFilename = false, bool isParent = false);
+    QString selectedFileName(bool isOnlyFilename = false);
 
     FileNames getFileNames(QStringList const& fileNames, QString const& filePath);
     void copyFilels(QStringList const& fileNames, QString const& dstFilePath);

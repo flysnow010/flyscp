@@ -38,7 +38,6 @@
     <addaction name="menuNew"/>
     <addaction name="separator"/>
     <addaction name="actionConnect"/>
-    <addaction name="actionDisconnect"/>
     <addaction name="separator"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
@@ -96,11 +95,6 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionConnect"/>
-   <addaction name="actionDisconnect"/>
-   <addaction name="separator"/>
-   <addaction name="actionCopy"/>
-   <addaction name="actionCut"/>
-   <addaction name="actionPaste"/>
    <addaction name="separator"/>
    <addaction name="actionAbout"/>
   </widget>

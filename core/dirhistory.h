@@ -6,14 +6,18 @@ class DirHistory
 {
 public:
     DirHistory();
-
+    enum { MAX_SIZE = 25 };
     inline void add(QString const& dir)//???const
     {
         int index = dirs_.indexOf(dir);
         if(index >= 0)
             dirs_ << dirs_.takeAt(index);
         else
+        {
+            if(dirs_.size() >= MAX_SIZE)
+                dirs_.takeFirst();
             dirs_ << dir;
+        }
     }
 
     inline QString find(QString const& prefix)

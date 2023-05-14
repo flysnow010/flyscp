@@ -177,7 +177,8 @@ void FileManager::OpenWith(QString const& fileName)
 
 void FileManager::Open(QString const& fileName)
 {
-    ShellExecute(0, L"open", fileName.toStdWString().c_str(), 0, 0, SW_SHOWNORMAL);
+    ShellExecute(0, L"open", fileName.toStdWString().c_str(), 0,
+                 QFileInfo(fileName).path().toStdWString().c_str(), SW_SHOWNORMAL);
 }
 
 void FileManager::OpenByExplorer(QString const& fileName)

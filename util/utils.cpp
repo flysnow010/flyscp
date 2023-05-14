@@ -5,6 +5,7 @@
 #include <QFileIconProvider>
 #include <QFileInfo>
 #include <QInputDialog>
+#include <QMessageBox>
 #include <QTemporaryFile>
 #include <QDateTime>
 #include <QDir>
@@ -239,4 +240,11 @@ QString Utils::getText(QString const& label, QString const& value)
     if(dialog.exec() == QDialog::Accepted)
         return dialog.textValue();
     return QString();
+}
+
+bool Utils::question(QString const& text)
+{
+    if(QMessageBox::question(0, QApplication::applicationName(), text) == QMessageBox::Yes)
+        return true;
+    return false;
 }

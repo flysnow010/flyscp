@@ -196,7 +196,7 @@ void LocalDirModel::setupModelData(TreeItem *parent)
         else if(fileInfos_[i].isDir())
             rowData << fileInfos_[i].fileName();
         else
-            rowData << fileInfos_[i].baseName();
+            rowData << fileInfos_[i].completeBaseName();
         if(fileInfos_[i].isFile())
         {
             QString suffix = fileInfos_[i].suffix();

@@ -22,8 +22,13 @@ signals:
     void libDirButtonClicked();
     void favoritesDirButtonCLicked();
     void historyDirButtonClicked();
+    void dirSelected(QString const& dir);
+protected:
+     bool eventFilter(QObject *obj, QEvent *event) override;
 private slots:
     void linkHovered(const QString &link);
+private:
+    void selectDir(int x);
 private:
     Ui::TitleBarWidget *ui;
     bool actived_;

@@ -2,6 +2,8 @@
 #include "ui_titlebarwidget.h"
 #include <QDebug>
 #include <QScreen>
+#include <QMouseEvent>
+#include <QFontMetrics>
 
 TitleBarWidget::TitleBarWidget(QWidget *parent)
     : QWidget(parent)
@@ -15,6 +17,7 @@ TitleBarWidget::TitleBarWidget(QWidget *parent)
     connect(ui->btnHistoryDir, SIGNAL(clicked()), this, SIGNAL(historyDirButtonClicked()));
     connect(ui->labelTitle, SIGNAL(linkHovered(QString)), this, SLOT(linkHovered(QString)));
     setActived(false);
+    ui->labelTitle->installEventFilter(this);
 }
 
 TitleBarWidget::~TitleBarWidget()
@@ -61,3 +64,42 @@ void TitleBarWidget::linkHovered(const QString &link)
 {
     qDebug() << link;
 }
+
+bool TitleBarWidget::eventFilter(QObject *obj, QEvent *event)
+{
+    if (event->type() == QEvent::MouseButtonPress)
+    {
+        QMouseEvent *mounseEvent = static_cast<QMouseEvent *>(event);
+        if(mounseEvent->x() > 6)
+            selectDir(mounseEvent->x() - 6);
+    }
+    return QWidget::eventFilter(obj, event);
+}
+
+void TitleBarWidget::selectDir(int x)
+{
+    QFontMetricsF fontmetrics(ui->labelTitle->font());
+    QString text = ui->labelTitle->text();
+    int width = 0,i;
+    for(i= 0; i < text.size(); i++)
+    {
+        width += fontmetrics.width(text[i]);
+        if(width > x)
+            break;
+    }
+    if(text[i] == QChar('\\') || text[i] == QChar(':'))
+        return;
+    for(; i < text.size(); i++)
+    {
+        if(text[i] == QChar('\\') || text[i] == QChar(':'))
+            break;
+    }
+    if(width > x)
+    {
+        if(i == 1)
+            emit dirSelected(QString("%1:/").arg(text.left(i)));
+        else
+            emit dirSelected(text.left(i));
+    }
+}
+

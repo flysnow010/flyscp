@@ -264,9 +264,9 @@ void MainWindow::moveFiles()
 void MainWindow::delFiles()
 {
     if(leftDirView->isActived())
-        leftDirView->delFiles();
+        leftDirView->delFilesWithConfirm();
     else
-        rightDirView->delFiles();
+        rightDirView->delFilesWithConfirm();
 }
 
 void MainWindow::selectAll()

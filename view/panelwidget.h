@@ -10,6 +10,7 @@ class PanelWidget;
 class QButtonGroup;
 class QAbstractButton;
 class QIcon;
+class DirFavorite;
 class DirHistory;
 class PanelWidget : public QWidget
 {
@@ -46,6 +47,7 @@ private:
 private:
     Ui::PanelWidget *ui;
     QButtonGroup* buttonGroup;
+    DirFavorite* dirFavorite;
     DirHistory* dirHistory;
     bool isChecked  = false;
 };

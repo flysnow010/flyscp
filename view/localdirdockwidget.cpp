@@ -8,12 +8,12 @@
 #include "core/contextmenu.h"
 #include "util/utils.h"
 #include "dialog/fileprogressdialog.h"
+#include "dialog/fileoperateconfirmdialog.h"
 
 #include <QMenu>
 #include <QSettings>
 #include <QDrag>
 #include <QMimeData>
-
 
 LocalDirDockWidget::LocalDirDockWidget(QWidget *parent)
     : QDockWidget(parent)
@@ -49,6 +49,10 @@ LocalDirDockWidget::LocalDirDockWidget(QWidget *parent)
                     this, SIGNAL(favoritesDirContextMenuRequested()));
     connect(titleBarWidget, SIGNAL(historyDirButtonClicked()),
                     this, SIGNAL(historyDirContextMenuRequested()));
+    connect(titleBarWidget, &TitleBarWidget::dirSelected, this, [&](QString const& dir)
+    {
+        setDir(dir);
+    });
 }
 
 LocalDirDockWidget::~LocalDirDockWidget()
@@ -224,7 +228,7 @@ void LocalDirDockWidget::customContextMenuRequested(const QPoint & pos)
     }
     else
     {
-        fileName = selectFileName();
+        fileName = selectedFileName();
         fileName = model_->filePath(index.row());
         fileInfo.setFile(fileName);
 
@@ -257,7 +261,7 @@ void LocalDirDockWidget::customContextMenuRequested(const QPoint & pos)
     foreach(auto const& item, items)
     {
         menu.addAction(item.icon, item.name, [=](bool){
-            QStringList fileNames = selectedileNames(QString(), true);
+            QStringList fileNames = selectedileNames(QString(), false, true);
             item.exec(fileNames);
         });
     }
@@ -294,7 +298,7 @@ void LocalDirDockWidget::customContextMenuRequested(const QPoint & pos)
     }
     menu.addSeparator();
     menu.addAction("Properties", this, [&](bool) {
-        QStringList fileNames = selectedileNames(QString(), true);
+        QStringList fileNames = selectedileNames(QString(), false, true);
         if(fileNames.size() > 1)
             FileManager::Property(fileNames);
         else
@@ -370,13 +374,13 @@ void LocalDirDockWidget::drop(QDropEvent * event)
 
 void LocalDirDockWidget::cut()
 {
-    QStringList fileNames = selectedileNames("file:///", true);
+    QStringList fileNames = selectedileNames("file:///", false, true);
     ClipBoard::cut(fileNames);
 }
 
 void LocalDirDockWidget::copy()
 {
-    QStringList fileNames = selectedileNames("file:///", true);
+    QStringList fileNames = selectedileNames("file:///", false, true);
     ClipBoard::copy(fileNames);
 }
 
@@ -390,6 +394,28 @@ void LocalDirDockWidget::paste()
     model_->refresh();
 }
 
+void LocalDirDockWidget::delFilesWithConfirm()
+{
+    QStringList fileNames = selectedileNames(QString(), true);
+    QString tipText;
+    if(fileNames.size() > 1)
+        tipText = QString("Are you sure you want to delete %1 files or folders?\n\n%2").arg(fileNames.size())
+                .arg(fileNames.join("\n"));
+    else
+    {
+        QFileInfo fileInfo(selectedFileName());
+        QString type;
+        if(fileInfo.isDir())
+            type = "folder";
+        else
+            type = "file";
+        tipText = QString("Are you sure you want to delete the %1 %2?").arg(type, fileNames.first());
+    }
+
+    if(Utils::question(tipText))
+        delFiles();
+}
+
 void LocalDirDockWidget::delFiles()
 {
     QStringList fileNames = selectedileNames();
@@ -400,7 +426,7 @@ void LocalDirDockWidget::delFiles()
 
 void LocalDirDockWidget::rename()
 {
-    QString fileName = selectFileName(true);
+    QString fileName = selectedFileName(true);
     if(fileName.isEmpty())
         return;
     QString newileName = Utils::getText(tr("New filename"), fileName);
@@ -427,14 +453,14 @@ void LocalDirDockWidget::newFolder()
 
 void LocalDirDockWidget::viewFile()
 {
-    QString fileName = selectFileName();
+    QString fileName = selectedFileName();
     QFileInfo fileInfo(fileName);
     if(fileInfo.isFile())
         FileManager::Open(fileName);
 }
 void LocalDirDockWidget::editFile()
 {
-    QString fileName = selectFileName();
+    QString fileName = selectedFileName();
     QFileInfo fileInfo(fileName);
     if(fileInfo.isFile())
         FileManager::Open(fileName);
@@ -442,15 +468,47 @@ void LocalDirDockWidget::editFile()
 
 void LocalDirDockWidget::copyFiles(QString const& dstFilePath)
 {
-    QStringList fileNames = selectedileNames("file:///", false);
-    copyFilels(fileNames, dstFilePath);
+    QStringList fileNames = selectedileNames(QString(), true);
+    FileOperateConfirmDialog dialog;
+    if(fileNames.size() > 1)
+        dialog.setLabel(QString("Copy %1 files or folders to:").arg(fileNames.size()));
+    else
+    {
+        QFileInfo fileInfo(selectedFileName());
+        QString type;
+        if(fileInfo.isDir())
+            type = tr("folder");
+        else
+            type = tr("file");
+        dialog.setLabel(QString("Copy the %1 %2 to:").arg(type, fileNames.first()));
+    }
+    dialog.setPath(dstFilePath);
+    if(dialog.exec() == QDialog::Accepted)
+        copyFilels(selectedileNames("file:///"), dstFilePath);
 }
 
 void LocalDirDockWidget::moveFiles(QString const& dstFilePath)
 {
-    QStringList fileNames = selectedileNames("file:///", false);
-    cutFiles(fileNames, dstFilePath);
-    model_->refresh();
+    QStringList fileNames = selectedileNames(QString(), true);
+    FileOperateConfirmDialog dialog;
+    if(fileNames.size() > 1)
+        dialog.setLabel(QString("Copy %1 files or folders to:").arg(fileNames.size()));
+    else
+    {
+        QFileInfo fileInfo(selectedFileName());
+        QString type;
+        if(fileInfo.isDir())
+            type = tr("folder");
+        else
+            type = tr("file");
+        dialog.setLabel(QString("Copy the %1 %2 to:").arg(type, fileNames.first()));
+    }
+    dialog.setPath(dstFilePath);
+    if(dialog.exec() == QDialog::Accepted)
+    {
+        cutFiles(selectedileNames("file:///"), dstFilePath);
+        model_->refresh();
+    }
 }
 
 void LocalDirDockWidget::refresh()
@@ -481,18 +539,23 @@ bool LocalDirDockWidget::isMultiSelected()
     return ui->treeView->selectionModel()->selectedRows(0).size() > 1;
 }
 
-QStringList LocalDirDockWidget::selectedileNames(QString const& prefix, bool isParent)
+QStringList LocalDirDockWidget::selectedileNames(QString const& prefix, bool isOnlyFilename, bool isParent)
 {
     QModelIndexList indexs = ui->treeView->selectionModel()->selectedRows(0);
     QStringList names;
     for(int i = 0; i < indexs.size(); i++)
-        names << prefix + model_->filePath(indexs[i].row());
+    {
+        if(isOnlyFilename)
+            names << prefix + model_->fileName(indexs[i].row());
+        else
+            names << prefix + model_->filePath(indexs[i].row());
+    }
     if(isParent && names.isEmpty())
         names << prefix + model_->dir();
     return names;
 }
 
-QString LocalDirDockWidget::selectFileName(bool isOnlyFilename)
+QString LocalDirDockWidget::selectedFileName(bool isOnlyFilename)
 {
     QModelIndex index = ui->treeView->currentIndex();
     if(!index.isValid())
@@ -516,8 +579,16 @@ FileNames LocalDirDockWidget::getFileNames(QStringList const& fileNames, QString
         FileName fileName;
         fileName.src = fileInfo.filePath();
         fileName.dst = dir.filePath(fileInfo.fileName());
-        if(fileName.src != fileName.dst)//??
-            newFileNames << fileName;
+        if(fileName.src == fileName.dst)
+        {
+            QString filename ;
+            if(fileInfo.isDir())
+                filename = QString("%1_copy").arg(fileInfo.completeBaseName());
+            else
+                filename = QString("%1_copy.%2").arg(fileInfo.completeBaseName(), fileInfo.suffix());
+            fileName.dst = dir.filePath(filename);
+        }
+        newFileNames << fileName;
     }
     return newFileNames;
 }
