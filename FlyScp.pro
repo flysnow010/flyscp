@@ -14,11 +14,13 @@ SOURCES += \
     core/basedir.cpp \
     core/clipboard.cpp \
     core/contextmenu.cpp \
+    core/dirfavorite.cpp \
     core/dirhistory.cpp \
     core/filemanager.cpp \
     core/filetransfer.cpp \
     dialog/aboutdialog.cpp \
     dialog/connectdialog.cpp \
+    dialog/fileoperateconfirmdialog.cpp \
     dialog/fileprogressdialog.cpp \
     dialog/permissionsdialog.cpp \
     dialog/propertydialog.cpp \
@@ -48,6 +50,7 @@ HEADERS += \
     core/clipboard.h \
     core/connecttype.h \
     core/contextmenu.h \
+    core/dirfavorite.h \
     core/dirhistory.h \
     core/filemanager.h \
     core/filename.h \
@@ -55,6 +58,7 @@ HEADERS += \
     core/sshsettings.h \
     dialog/aboutdialog.h \
     dialog/connectdialog.h \
+    dialog/fileoperateconfirmdialog.h \
     dialog/fileprogressdialog.h \
     dialog/permissionsdialog.h \
     dialog/propertydialog.h \
@@ -82,6 +86,7 @@ HEADERS += \
 FORMS += \
     dialog/aboutdialog.ui \
     dialog/connectdialog.ui \
+    dialog/fileoperateconfirmdialog.ui \
     dialog/fileprogressdialog.ui \
     dialog/permissionsdialog.ui \
     dialog/propertydialog.ui \
