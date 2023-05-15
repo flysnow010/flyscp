@@ -107,6 +107,7 @@ void PanelWidget::addDirToHistory(QString const& dir, bool isRemote)
 {
     Q_UNUSED(isRemote)
     dirHistory->add(dir);
+    updateTexts(ui->tabWidget->currentWidget());
 }
 
 void PanelWidget::libDirContextMenu()
