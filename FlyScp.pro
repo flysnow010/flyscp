@@ -35,6 +35,7 @@ SOURCES += \
     ssh/dir.cpp \
     ssh/file.cpp \
     ssh/fileinfo.cpp \
+    ssh/scp.cpp \
     ssh/session.cpp \
     ssh/sftp.cpp \
     util/utils.cpp \
@@ -72,6 +73,7 @@ HEADERS += \
     ssh/dir.h \
     ssh/file.h \
     ssh/fileinfo.h \
+    ssh/scp.h \
     ssh/session.h \
     ssh/sftp.h \
     ssh/sshprivate.h \

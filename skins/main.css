@@ -1,0 +1,6 @@
+QTabBar::close-button {
+	image: url(:/image/close.png);
+}
+QTabBar::close-button:hover {
+	image: url(:/image/close-hover.png);
+}
