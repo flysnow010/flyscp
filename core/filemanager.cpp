@@ -187,6 +187,41 @@ void FileManager::OpenByExplorer(QString const& fileName)
     ShellExecute(0, L"open", L"explorer", filePath.toStdWString().c_str(), 0, SW_SHOWNORMAL);
 }
 
+QList<LibDir> FileManager::libDirs()
+{
+//    IKnownFolderManager *pManager;
+//    HRESULT hr = CoCreateInstance(CLSID_KnownFolderManager, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pManager));
+//    if (SUCCEEDED(hr))
+//    {
+//        UINT cCount;
+//        KNOWNFOLDERID *pkfid;
+
+//        hr = pManager->GetFolderIds(&pkfid, &cCount);
+//        if (SUCCEEDED(hr))
+//        {
+//            for (UINT i = 0; i < cCount; i++)
+//            {
+//                IKnownFolder *pKnownFolder;
+//                hr = pManager->GetFolder(pkfid[i], &pKnownFolder);
+//                if (SUCCEEDED(hr))
+//                {
+//                    IShellItem *psi;
+//                    hr = pKnownFolder->GetShellItem(0, IID_PPV_ARGS(&psi));
+//                    if (SUCCEEDED(hr))
+//                    {
+//                        hr = prf->AddItem(psi);
+//                        psi->Release();
+//                    }
+//                    pKnownFolder->Release();
+//                }
+//            }
+//            CoTaskMemFree(pkfid);
+//        }
+//        pManager->Release();
+//    }
+    return QList<LibDir>();
+}
+
 void FileManager::delereFiles(QStringList const& fileNames)
 {
     QStringList newFileNames;

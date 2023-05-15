@@ -205,8 +205,10 @@ void MainWindow::loadSettings()
 
 void MainWindow::loadStyleSheet()
 {
-    QString fileName = QString("%1/skins/main.css").arg(Utils::currentPath());
-    setStyleSheet(QString::fromUtf8(Utils::readFile(fileName)));
+    setStyleSheet("QTabBar::close-button {"
+                  "image: url(:/image/close.png);}"
+                  "QTabBar::close-button:hover {"
+                  "image: url(:/image/close-hover.png);}");
 }
 
 void MainWindow::newFolder()

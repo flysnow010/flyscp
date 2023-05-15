@@ -5,10 +5,11 @@
 #include <QMouseEvent>
 #include <QFontMetrics>
 
-TitleBarWidget::TitleBarWidget(QWidget *parent)
+TitleBarWidget::TitleBarWidget(bool isWindows, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::TitleBarWidget)
     , actived_(false)
+    , isWindows_(isWindows)
 {
     ui->setupUi(this);
 
@@ -27,8 +28,10 @@ TitleBarWidget::~TitleBarWidget()
 
 void TitleBarWidget::setTitle(QString const& title)
 {
-    QString newTitle = title.split("/").join("\\");
-    ui->labelTitle->setText(newTitle);
+    if(isWindows_)
+        ui->labelTitle->setText(title.split("/").join("\\"));
+    else
+        ui->labelTitle->setText(title);
 }
 
 void TitleBarWidget::setActived(bool isActived)
@@ -87,19 +90,39 @@ void TitleBarWidget::selectDir(int x)
         if(width > x)
             break;
     }
-    if(text[i] == QChar('\\') || text[i] == QChar(':'))
-        return;
-    for(; i < text.size(); i++)
+    if(isWindows_)
     {
         if(text[i] == QChar('\\') || text[i] == QChar(':'))
-            break;
+            return;
+        for(; i < text.size(); i++)
+        {
+            if(text[i] == QChar('\\') || text[i] == QChar(':'))
+                break;
+        }
+        if(width > x)
+        {
+            if(i == 1)
+                emit dirSelected(QString("%1:/").arg(text.left(i)));
+            else
+                emit dirSelected(text.left(i));
+        }
     }
-    if(width > x)
+    else
     {
-        if(i == 1)
-            emit dirSelected(QString("%1:/").arg(text.left(i)));
-        else
-            emit dirSelected(text.left(i));
+        if(i == 0 && text[i] != QChar('/'))
+            return;
+        for(; i < text.size(); i++)
+        {
+            if(text[i] == QChar('/'))
+                break;
+        }
+        if(width > x)
+        {
+            if(i == 0)
+                emit dirSelected(text.left(i+1));
+            else
+                emit dirSelected(text.left(i));
+        }
     }
 }
 

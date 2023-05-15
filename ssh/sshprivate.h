@@ -26,6 +26,21 @@ public:
     bool isOpened;
 };
 
+class ScpPrivate
+{
+public:
+    ScpPrivate(ssh_session s)
+        : session(s)
+        , scp(0)
+        , isOpened(false)
+    {}
+
+   ssh_session session;
+   ssh_scp scp;
+    bool isOpened;
+};
+
+
 class SFtpPrivate
 {
 public:

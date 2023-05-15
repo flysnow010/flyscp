@@ -24,6 +24,7 @@ public:
     const char* error();
 private:
     friend class Channel;
+    friend class Scp;
     friend class SFtp;
     Session(Session const&);
     Session & operator == (Session const&);

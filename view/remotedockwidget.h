@@ -9,6 +9,9 @@ class RemoteDockWidget;
 }
 class RemoteDirModel;
 class SFtpSession;
+class TitleBarWidget;
+class DirFavorite;
+class DirHistory;
 class QDir;
 namespace ssh {
 class FileInfoPtr;
@@ -31,7 +34,10 @@ public:
 
     void start(SSHSettings const& settings);
     QString const& name() const { return name_; }
-
+public slots:
+    void libDirContextMenu();
+    void favoritesDirContextMenu();
+    void historyDirContextMenu();
 signals:
     void dirChanged(QString const& dir, bool isRemote);
 private slots:
@@ -64,10 +70,14 @@ private:
     void openDir(ssh::FileInfoPtr const& fileInfo);
     QString download(ssh::FileInfoPtr const& fileInfo, QDir const& dstDir);
     bool upload(QString const& fileName);
+    void updateCurrentDir(QString const& dir);
 private:
     Ui::RemoteDockWidget *ui;
     RemoteDirModel* model_;
+    TitleBarWidget* titleBarWidget;
     SFtpSession* sftp;
+    DirFavorite* dirFavorite;
+    DirHistory* dirHistory;
     QString name_;
 };
 

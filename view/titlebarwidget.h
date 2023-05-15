@@ -12,7 +12,7 @@ class TitleBarWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit TitleBarWidget(QWidget *parent = nullptr);
+    explicit TitleBarWidget(bool isWindows = true, QWidget *parent = nullptr);
     ~TitleBarWidget();
 
     void setTitle(QString const& title);
@@ -32,6 +32,7 @@ private:
 private:
     Ui::TitleBarWidget *ui;
     bool actived_;
+    bool isWindows_;
 };
 
 #endif // TITLEBARWIDGET_H
