@@ -19,7 +19,7 @@ public:
     ~LocalDirDockWidget();
 
     bool isRemote() const override { return false; }
-    void setDir(QString const& dir) override;
+    void setDir(QString const& dir, QString const& caption = "") override;
     QString dir() const override;
     void cd(QString const& dir) override;
     QString home() const override;
@@ -78,7 +78,7 @@ private:
     void copyFilels(QStringList const& fileNames, QString const& dstFilePath);
     void cutFiles(QStringList const& fileNames, QString const& dstFilePath);
     void fileTransfer(FileNames const& fileNames, bool isMove);
-    void updateCurrentDir(QString const& dir);
+    void updateCurrentDir(QString const& dir, QString const& caption = "");
 private:
     Ui::LocalDirDockWidget *ui;
     LocalDirModel* model_;

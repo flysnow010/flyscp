@@ -4,6 +4,7 @@
 #include "util/utils.h"
 #include "core/dirhistory.h"
 #include "core/dirfavorite.h"
+#include "core/filemanager.h"
 #include <QDir>
 #include <QHBoxLayout>
 #include <QToolButton>
@@ -22,8 +23,8 @@ PanelWidget::PanelWidget(QWidget *parent)
     ui->setupUi(this);
     ui->tabWidget->setTabBarAutoHide(true);
     updateDrivers();
-    connect(buttonGroup, SIGNAL(buttonToggled(QAbstractButton*,bool)),
-            this, SLOT(dirverChanged(QAbstractButton*,bool)));
+    connect(buttonGroup, SIGNAL(buttonClicked(QAbstractButton*)),
+            this, SLOT(buttonClicked(QAbstractButton*)));
     connect(ui->tabWidget, &QTabWidget::currentChanged, this, &PanelWidget::currentChanged);
     connect(ui->tabWidget, &QTabWidget::tabCloseRequested, this, &PanelWidget::tabCloseRequested);
 }
@@ -113,6 +114,16 @@ void PanelWidget::addDirToHistory(QString const& dir, bool isRemote)
 void PanelWidget::libDirContextMenu()
 {
     QMenu menu;
+    BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
+    if(!dir)
+        return;
+    QList<LibDir> libDirs = FileManager::libDirs();
+    foreach(auto const& libDir, libDirs)
+    {
+        menu.addAction(libDir.icon(), libDir.caption, this, [&](bool){
+            dir->setDir(libDir.filePath, libDir.showPath());
+        });
+    }
     menu.exec(QCursor::pos());
 }
 
@@ -196,7 +207,6 @@ void PanelWidget::updateTexts(QWidget* widget)
         {
             if(filePath.startsWith(buttons[i]->text().toUpper()))
             {
-                isChecked = false;
                 buttons[i]->setChecked(true);
                 break;
             }
@@ -243,15 +253,9 @@ void PanelWidget::updateDrivers()
     ui->driverWidget->setLayout(layout);
 }
 
-void PanelWidget::dirverChanged(QAbstractButton* button, bool checked)
+void PanelWidget::buttonClicked(QAbstractButton* button)
 {
-    if(checked)
-    {
-        if(isChecked)
-            updateDir(button->text().toUpper());
-        else
-            isChecked = true;
-    }
+    updateDir(button->text().toUpper());
 }
 
 void PanelWidget::backToHome()

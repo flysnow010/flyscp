@@ -81,8 +81,11 @@ bool TitleBarWidget::eventFilter(QObject *obj, QEvent *event)
 
 void TitleBarWidget::selectDir(int x)
 {
-    QFontMetricsF fontmetrics(ui->labelTitle->font());
     QString text = ui->labelTitle->text();
+    if(text.startsWith("\\\\")) // \\桌面
+        return;
+
+    QFontMetricsF fontmetrics(ui->labelTitle->font());
     int width = 0,i;
     for(i= 0; i < text.size(); i++)
     {

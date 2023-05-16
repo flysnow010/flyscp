@@ -62,10 +62,10 @@ RemoteDockWidget::~RemoteDockWidget()
     delete ui;
 }
 
-void RemoteDockWidget::setDir(QString const& dir)
+void RemoteDockWidget::setDir(QString const& dir, QString const& caption)
 {
     model_->setDir(sftp->dir(dir.toStdString()));
-    updateCurrentDir(model_->dirName());
+    updateCurrentDir(model_->dirName(), caption);
 }
 
 QString RemoteDockWidget::dir() const
@@ -529,9 +529,12 @@ bool RemoteDockWidget::upload(QString const& fileName)
     return true;
 }
 
-void RemoteDockWidget::updateCurrentDir(QString const& dir)
+void RemoteDockWidget::updateCurrentDir(QString const& dir, QString const& caption)
 {
-    titleBarWidget->setTitle(dir);
+    if(caption.isEmpty())
+        titleBarWidget->setTitle(dir);
+    else
+        titleBarWidget->setTitle(caption);
     //emit dirChanged(dir, true);
     dirHistory->add(dir);
 }

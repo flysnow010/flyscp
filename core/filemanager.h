@@ -7,9 +7,11 @@
 class QFileInfo;
 class LibDir
 {
+public:
     QString caption;
     QString filePath;
-    QIcon   icon;
+    QString showPath() const;
+    QIcon   icon() const;
 };
 
 class FileManager : public QObject

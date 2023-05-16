@@ -26,7 +26,7 @@ public:
     ~RemoteDockWidget();
 
     bool isRemote() const override { return true; }
-    void setDir(QString const& dir) override;
+    void setDir(QString const& dir, QString const& caption = "") override;
     QString dir() const override;
     void cd(QString const& dir) override;
     QString home() const override;
@@ -70,7 +70,7 @@ private:
     void openDir(ssh::FileInfoPtr const& fileInfo);
     QString download(ssh::FileInfoPtr const& fileInfo, QDir const& dstDir);
     bool upload(QString const& fileName);
-    void updateCurrentDir(QString const& dir);
+    void updateCurrentDir(QString const& dir, QString const& caption = "");
 private:
     Ui::RemoteDockWidget *ui;
     RemoteDirModel* model_;

@@ -1,9 +1,16 @@
 #include "filemanager.h"
 #include <windows.h>
 #include <oleidl.h>
+
+#ifdef NTDDI_VERSION
+#undef NTDDI_VERSION
+#define NTDDI_VERSION  NTDDI_WIN7 //WIN7
+#endif
 #include <Shlobj.h>
+#include <knownfolders.h>
 #include <QDebug>
 #include <QFileInfo>
+#include <QFileIconProvider>
 #include <QDir>
 
 static DWORD ProgressCallback(
@@ -187,39 +194,47 @@ void FileManager::OpenByExplorer(QString const& fileName)
     ShellExecute(0, L"open", L"explorer", filePath.toStdWString().c_str(), 0, SW_SHOWNORMAL);
 }
 
+QString LibDir::showPath() const
+{
+    return QString("\\\\%1\\").arg(caption);
+}
+
+QIcon LibDir::icon() const
+{
+    QFileIconProvider fip;
+    return fip.icon(QFileInfo(filePath));
+}
+
 QList<LibDir> FileManager::libDirs()
 {
-//    IKnownFolderManager *pManager;
-//    HRESULT hr = CoCreateInstance(CLSID_KnownFolderManager, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pManager));
-//    if (SUCCEEDED(hr))
-//    {
-//        UINT cCount;
-//        KNOWNFOLDERID *pkfid;
-
-//        hr = pManager->GetFolderIds(&pkfid, &cCount);
-//        if (SUCCEEDED(hr))
-//        {
-//            for (UINT i = 0; i < cCount; i++)
-//            {
-//                IKnownFolder *pKnownFolder;
-//                hr = pManager->GetFolder(pkfid[i], &pKnownFolder);
-//                if (SUCCEEDED(hr))
-//                {
-//                    IShellItem *psi;
-//                    hr = pKnownFolder->GetShellItem(0, IID_PPV_ARGS(&psi));
-//                    if (SUCCEEDED(hr))
-//                    {
-//                        hr = prf->AddItem(psi);
-//                        psi->Release();
-//                    }
-//                    pKnownFolder->Release();
-//                }
-//            }
-//            CoTaskMemFree(pkfid);
-//        }
-//        pManager->Release();
-//    }
-    return QList<LibDir>();
+     QList<LibDir> dirs;
+    KNOWNFOLDERID folders[] = {
+        FOLDERID_Desktop,
+        FOLDERID_Downloads,
+        FOLDERID_Documents,
+        FOLDERID_Pictures,
+        FOLDERID_Music,
+        FOLDERID_Videos
+    };
+    for(unsigned int i = 0; i < sizeof(folders) / sizeof(folders[0]); i++)
+    {
+        LPWSTR pszName;
+        IShellItem *psi;
+        LibDir dir;
+        HRESULT hr = SHGetKnownFolderItem(folders[i], KF_FLAG_DEFAULT, 0,  IID_PPV_ARGS(&psi));
+        if (SUCCEEDED(hr))
+        {
+            hr = psi->GetDisplayName(SIGDN_NORMALDISPLAY, &pszName);
+            if (SUCCEEDED(hr))
+                dir.caption = QString::fromStdWString(pszName);
+            hr = psi->GetDisplayName(SIGDN_FILESYSPATH, &pszName);
+            if (SUCCEEDED(hr))
+                dir.filePath = QString::fromStdWString(pszName);
+            dirs <<  dir;
+            psi->Release();
+        }
+    }
+    return dirs;
 }
 
 void FileManager::delereFiles(QStringList const& fileNames)

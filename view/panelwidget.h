@@ -35,7 +35,7 @@ public slots:
     void historyDirContextMenu();
 
 private slots:
-    void dirverChanged(QAbstractButton* button, bool checked);
+    void buttonClicked(QAbstractButton* button);
     void backToHome();
     void backToRoot();
     void backToPrePath();
@@ -49,7 +49,6 @@ private:
     QButtonGroup* buttonGroup;
     DirFavorite* dirFavorite;
     DirHistory* dirHistory;
-    bool isChecked  = false;
 };
 
 #endif // PANELWIDGET_H
