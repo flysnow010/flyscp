@@ -3,6 +3,7 @@
 #include <libssh/sftp.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 
 namespace ssh {
 FileInfo::FileInfo()
@@ -35,8 +36,8 @@ FileInfo::FileInfo(const char* longname)
     while(*s == ' ') \
         NEXT_CHAR(s)
 
-#define SKIP_TEXT(s) \
-    while(*s != ' ') \
+#define SKIP_TEXT(s, c) \
+    while(*s != c) \
         LAST_CHAR(s)
 
 char *strndup(const char *s, const char *e)
@@ -94,35 +95,63 @@ void FileInfoPrivate::parse()
     NEXT_CHAR(s);
 
     SKIP_SPACES(s);
-    SKIP_TEXT(s);
+    SKIP_TEXT(s, ' ');
 
     SKIP_SPACES(s);
     const char* p = s;
-    SKIP_TEXT(s);
+    SKIP_TEXT(s, ' ');
     info->owner = strndup(p, s);
 
     SKIP_SPACES(s);
     p = s;
-    SKIP_TEXT(s);
+    SKIP_TEXT(s, ' ');
     info->group = strndup(p, s);
 
     SKIP_SPACES(s);
     p = s;
-    SKIP_TEXT(s);
+    SKIP_TEXT(s, ' ');
     info->size = strtoull(p, 0, 10);
 
-    SKIP_SPACES(s); //970-01-01
-    SKIP_TEXT(s);
+    struct tm  t;
+
+    SKIP_SPACES(s); //1970-01-01
+    p = s;
+    t.tm_year = strtoull(p, 0, 10) - 1900;
+    SKIP_TEXT(s, '-');
+    NEXT_CHAR(s);
+    p = s;
+    t.tm_mon = strtoull(p, 0, 10) - 1;
+    SKIP_TEXT(s, '-');
+    NEXT_CHAR(s);
+    p = s;
+    t.tm_mday = strtoull(p, 0, 10);
+    SKIP_TEXT(s, ' ');
+
 
     SKIP_SPACES(s); //00:00:33
-    SKIP_TEXT(s);
+    p = s;
+    t.tm_hour = strtoull(p, 0, 10);
+    SKIP_TEXT(s, ':');
+    NEXT_CHAR(s);
+    p = s;
+    t.tm_min = strtoull(p, 0, 10);
+    SKIP_TEXT(s, ':');
+    NEXT_CHAR(s);
+    p = s;
+    t.tm_sec = strtoull(p, 0, 10);
+    SKIP_TEXT(s, ' ');
+
+    t.tm_isdst = 0;
+    t.tm_wday = 0;
+    t.tm_yday = 0;
+    info->mtime = mktime(&t);
 
     SKIP_SPACES(s); //+0000
-    SKIP_TEXT(s);
+    SKIP_TEXT(s, ' ');
 
     SKIP_SPACES(s); //log
     p = s;
-    SKIP_TEXT(s);
+    SKIP_TEXT(s, ' ');
     info->name = strndup(p, s);
 }
 //drwxr-xr-x    2 root     root           160 1970-01-01 00:00:33 +0000 log
