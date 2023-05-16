@@ -1,12 +1,131 @@
 #include "fileinfo.h"
 #include "sshprivate.h"
 #include <libssh/sftp.h>
+#include <string.h>
+#include <stdlib.h>
 
 namespace ssh {
 FileInfo::FileInfo()
     : d(new FileInfoPrivate())
 {
 }
+
+FileInfo::FileInfo(const char* longname)
+    : d(new FileInfoPrivate(longname))
+{
+    d->parse();
+}
+
+
+#define NEXT_CHAR(s) \
+    do {             \
+        s++;         \
+        if(*s == 0)  \
+            return;  \
+    }while(0)
+
+#define LAST_CHAR(s) \
+    do {             \
+        s++;         \
+        if(*s == 0)  \
+            break;  \
+    }while(0)
+
+#define SKIP_SPACES(s) \
+    while(*s == ' ') \
+        NEXT_CHAR(s)
+
+#define SKIP_TEXT(s) \
+    while(*s != ' ') \
+        LAST_CHAR(s)
+
+char *strndup(const char *s, const char *e)
+{
+    char* str = (char*)calloc(1, e - s + 1);
+    char* d = str;
+    while(s != e)
+        *d++ = *s++;
+    return str;
+}
+
+void FileInfoPrivate::parse()
+{
+    const char* s = info->longname;
+    if(!s || !s[0])
+        return;
+
+    if(*s == 'd')
+        info->type = FileType_Dir;
+    else if(*s == 'l')
+        info->type = FileType_SymLink;
+    else if(*s == '-')
+        info->type = FileType_File;
+
+    NEXT_CHAR(s);
+    if(*s == 'r')
+        info->permissions |= FileInfo::User_Read;
+    NEXT_CHAR(s);
+    if(*s == 'w')
+        info->permissions |= FileInfo::User_Write;
+    NEXT_CHAR(s);
+    if(*s == 'x')
+        info->permissions |= FileInfo::User_Exe;
+
+    NEXT_CHAR(s);
+    if(*s == 'r')
+        info->permissions |= FileInfo::Group_Read;
+    NEXT_CHAR(s);
+    if(*s == 'w')
+        info->permissions |= FileInfo::Group_Write;
+    NEXT_CHAR(s);
+    if(*s == 'x')
+        info->permissions |= FileInfo::Group_Exe;
+
+    NEXT_CHAR(s);
+    if(*s == 'r')
+        info->permissions |= FileInfo::Other_Read;
+    NEXT_CHAR(s);
+    if(*s == 'w')
+        info->permissions |= FileInfo::Other_Write;
+    NEXT_CHAR(s);
+    if(*s == 'x')
+        info->permissions |= FileInfo::Other_Exe;
+
+    NEXT_CHAR(s);
+
+    SKIP_SPACES(s);
+    SKIP_TEXT(s);
+
+    SKIP_SPACES(s);
+    const char* p = s;
+    SKIP_TEXT(s);
+    info->owner = strndup(p, s);
+
+    SKIP_SPACES(s);
+    p = s;
+    SKIP_TEXT(s);
+    info->group = strndup(p, s);
+
+    SKIP_SPACES(s);
+    p = s;
+    SKIP_TEXT(s);
+    info->size = strtoull(p, 0, 10);
+
+    SKIP_SPACES(s); //970-01-01
+    SKIP_TEXT(s);
+
+    SKIP_SPACES(s); //00:00:33
+    SKIP_TEXT(s);
+
+    SKIP_SPACES(s); //+0000
+    SKIP_TEXT(s);
+
+    SKIP_SPACES(s); //log
+    p = s;
+    SKIP_TEXT(s);
+    info->name = strndup(p, s);
+}
+//drwxr-xr-x    2 root     root           160 1970-01-01 00:00:33 +0000 log
 
 FileInfo::~FileInfo()
 {

@@ -71,11 +71,20 @@ public:
     DirPrivate(sftp_session s, const char * p)
         : sftp(s)
         , dir(0)
+        , channel(0)
+        , path(p)
+    {}
+
+    DirPrivate(ssh_channel c, const char * p)
+        : sftp(0)
+        , dir(0)
+        , channel(c)
         , path(p)
     {}
 
     sftp_session sftp;
     sftp_dir dir;
+    ssh_channel channel;
     std::string path;
 };
 class FilePrivate
@@ -97,11 +106,18 @@ public:
         : info(0)
         , isParent(false)
     {}
+
+    FileInfoPrivate(const char* longname)
+        : info((sftp_attributes)calloc(1, sizeof(*info)))
+        , isParent(false)
+    {
+        info->longname = strdup(longname);
+    }
+    void parse();
     sftp_attributes info;
     bool isParent;
     std::string basename;
     std::string suffix;
-
 };
 
 int const FileType_File    = 1;

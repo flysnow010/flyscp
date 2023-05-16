@@ -23,7 +23,7 @@ public:
     const char* get_filename();
     int get_permissions();
     const char* get_warning();
-    bool accpt_req();
+    bool accept_req();
     bool deny_req(const char* reason);
 
     ssize_t read(void *buf, size_t count);

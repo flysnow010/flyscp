@@ -66,7 +66,7 @@ const char* Scp::get_warning()
     return ssh_scp_request_get_warning(d->scp);
 }
 
-bool Scp::accpt_req()
+bool Scp::accept_req()
 {
     if(ssh_scp_accept_request(d->scp) != SSH_OK)
         return false;

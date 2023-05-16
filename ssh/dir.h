@@ -5,6 +5,7 @@
 namespace ssh {
 class DirPrivate;
 class SFtp;
+class Channel;
 class FileInfoPtr;
 class FileInfos;
 class Dir
@@ -53,6 +54,7 @@ public:
     };
 
     Dir(SFtp const& sftp, const char* path);
+    Dir(Channel const& channel, const char* path);
     ~Dir();
 
     bool isRoot() const;

@@ -1,6 +1,7 @@
 #include "dir.h"
 #include "sftp.h"
 #include "fileinfo.h"
+#include "channel.h"
 #include "sshprivate.h"
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -30,6 +31,12 @@ namespace  {
 Dir::Dir(SFtp const& sftp, const char* path)
     : d(new DirPrivate(sftp.d->sftp, path))
 {
+}
+
+Dir::Dir(Channel const& channel, const char* path)
+    : d(new DirPrivate(channel.d->channel, path))
+{
+    ;
 }
 
 Dir::~Dir()
