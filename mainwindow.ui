@@ -94,6 +94,10 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionPrevious"/>
+   <addaction name="actionNext"/>
+   <addaction name="actionRefresh"/>
+   <addaction name="separator"/>
    <addaction name="actionConnect"/>
    <addaction name="separator"/>
    <addaction name="actionAbout"/>
@@ -236,6 +240,33 @@
    </property>
    <property name="shortcut">
     <string>F3</string>
+   </property>
+  </action>
+  <action name="actionRefresh">
+   <property name="icon">
+    <iconset resource="FlyScp.qrc">
+     <normaloff>:/image/refresh.png</normaloff>:/image/refresh.png</iconset>
+   </property>
+   <property name="text">
+    <string>Refresh</string>
+   </property>
+  </action>
+  <action name="actionNext">
+   <property name="icon">
+    <iconset resource="FlyScp.qrc">
+     <normaloff>:/image/next.png</normaloff>:/image/next.png</iconset>
+   </property>
+   <property name="text">
+    <string>Next</string>
+   </property>
+  </action>
+  <action name="actionPrevious">
+   <property name="icon">
+    <iconset resource="FlyScp.qrc">
+     <normaloff>:/image/previous.png</normaloff>:/image/previous.png</iconset>
+   </property>
+   <property name="text">
+    <string>Previous</string>
    </property>
   </action>
  </widget>

@@ -13,5 +13,10 @@
         <file>image/close-hover.png</file>
         <file>image/downarrow.png</file>
         <file>image/fav.png</file>
+        <file>image/download.png</file>
+        <file>image/next.png</file>
+        <file>image/previous.png</file>
+        <file>image/refresh.png</file>
+        <file>image/upload.png</file>
     </qresource>
 </RCC>
