@@ -6,6 +6,7 @@
 TreeView::TreeView(QWidget *parent)
     : QTreeView(parent)
     , mousePress(false)
+    , isDrag(false)
 {
     setMouseTracking(true);
     setAcceptDrops(true);
@@ -33,15 +34,18 @@ void TreeView::mouseMoveEvent(QMouseEvent *event)
         {
             mousePress = false;
             emit prepareDrag(pressPoint);
-
         }
+        isDrag = true;
     }
+    if(isDrag)
+        return;
     QTreeView::mouseMoveEvent(event);
 }
 
 void TreeView::mouseReleaseEvent(QMouseEvent *event)
 {
     mousePress = false;
+    isDrag = false;
     QTreeView::mouseReleaseEvent(event);
 }
 

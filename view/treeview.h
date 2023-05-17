@@ -26,6 +26,7 @@ protected:
 private:
     QPoint pressPoint;
     bool mousePress;
+    bool isDrag;
 };
 
 #endif // TREEVIEW_H
