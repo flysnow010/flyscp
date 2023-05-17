@@ -33,7 +33,7 @@ void SFtpSession::start(SSHSettings const& settings)
         return;
     }
     if(!sftp)
-        sftp =ssh::SFtp::Ptr(new ssh::SFtp(*sessioin));
+        sftp = ssh::SFtp::Ptr(new ssh::SFtp(*sessioin));
     sftp->init();
     emit connected();
 }
