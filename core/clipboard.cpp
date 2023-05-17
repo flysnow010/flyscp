@@ -24,6 +24,26 @@ void ClipBoard::clear()
 {
     QApplication::clipboard()->clear();
 }
+#include <QDebug>
+void ClipBoard::test()
+{
+    const QClipboard *clipboard = QApplication::clipboard();
+    const QMimeData* mimeData = clipboard->mimeData();
+    //qDebug() << mimeData->formats();
+
+    qDebug() << "Shell IDList Array: " << mimeData->data("Shell IDList Array");
+    qDebug() << "DataObjectAttributes: " << mimeData->data("DataObjectAttributes");
+    qDebug() << "DataObjectAttributesRequiringElevation: "
+        << mimeData->data("DataObjectAttributesRequiringElevation");
+    qDebug() << "UIDisplayed: " << mimeData->data("UIDisplayed");
+    qDebug() << "DropDescription: " << mimeData->data("DropDescription");
+    qDebug() << "FileName: " << mimeData->data("FileName");
+    qDebug() << "FileNameW: " << mimeData->data("FileNameW");
+    qDebug() << "Shell Object Offsets: " << mimeData->data("Shell Object Offsets");
+    qDebug() << "Preferred DropEffect: " << mimeData->data("Preferred DropEffect");
+    qDebug() << "AsyncFlag: " << mimeData->data("AsyncFlag");
+
+}
 
 void ClipBoard::cut(QStringList const& fileNames)
 {

@@ -386,6 +386,7 @@ void LocalDirDockWidget::copy()
 
 void LocalDirDockWidget::paste()
 {
+    ClipBoard::test();
     uint32_t dropMask = ClipBoard::dropEffect();
     if(ClipBoard::isCut(dropMask))
         cutFiles(ClipBoard::fileNames(), model_->dir());

@@ -47,17 +47,17 @@ qDebug() << mimeData->formats();
 ```cpp
 const QClipboard *clipboard = QApplication::clipboard();
 const QMimeData* mimeData = clipboard->mimeData();
-qDebug() << "Shell IDList Array: " << mimeData()->data("Shell IDList Array");
-qDebug() << "DataObjectAttributes: " << mimeData()->data("DataObjectAttributes");
+qDebug() << "Shell IDList Array: " << mimeData->data("Shell IDList Array");
+qDebug() << "DataObjectAttributes: " << mimeData->data("DataObjectAttributes");
 qDebug() << "DataObjectAttributesRequiringElevation: " 
-    << mimeData()->data("DataObjectAttributesRequiringElevation");
-qDebug() << "UIDisplayed: " << mimeData()->data("UIDisplayed");
-qDebug() << "DropDescription: " << mimeData()->data("DropDescription");
-qDebug() << "FileName: " << mimeData()->data("FileName");
-qDebug() << "FileNameW: " << mimeData()->data("FileNameW");
-qDebug() << "Shell Object Offsets: " << mimeData()->data("Shell Object Offsets");
-qDebug() << "Preferred DropEffect: " << mimeData()->data("Preferred DropEffect");
-qDebug() << "AsyncFlag: " << mimeData()->data("AsyncFlag");
+    << mimeData->data("DataObjectAttributesRequiringElevation");
+qDebug() << "UIDisplayed: " << mimeData->data("UIDisplayed");
+qDebug() << "DropDescription: " << mimeData->data("DropDescription");
+qDebug() << "FileName: " << mimeData->data("FileName");
+qDebug() << "FileNameW: " << mimeData->data("FileNameW");
+qDebug() << "Shell Object Offsets: " << mimeData->data("Shell Object Offsets");
+qDebug() << "Preferred DropEffect: " << mimeData->data("Preferred DropEffect");
+qDebug() << "AsyncFlag: " << mimeData->data("AsyncFlag");
 ```
 
 通过以上代码比较剪切和复制时剪切板中内容发现类型Preferred DropEffect和Shell Object Offsets的数据内容不同:
