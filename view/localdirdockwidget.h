@@ -19,7 +19,7 @@ public:
     ~LocalDirDockWidget();
 
     bool isRemote() const override { return false; }
-    void setDir(QString const& dir, QString const& caption = "") override;
+    void setDir(QString const& dir, QString const& caption = QString(), bool isNavigation  = false) override;
     QString dir() const override;
     void cd(QString const& dir) override;
     QString home() const override;
@@ -44,7 +44,7 @@ public slots:
 
 signals:
     void sectionResized(int logicalIndex, int oldSize, int newSize);
-    void dirChanged(QString const& dir, bool isRemote);
+    void dirChanged(QString const& dir, bool isNavigation);
     void libDirContextMenuRequested();
     void favoritesDirContextMenuRequested();
     void historyDirContextMenuRequested();
@@ -78,7 +78,7 @@ private:
     void copyFilels(QStringList const& fileNames, QString const& dstFilePath);
     void cutFiles(QStringList const& fileNames, QString const& dstFilePath);
     void fileTransfer(FileNames const& fileNames, bool isMove);
-    void updateCurrentDir(QString const& dir, QString const& caption = "");
+    void updateCurrentDir(QString const& dir, QString const& caption = QString(), bool isNavigation = false);
 private:
     Ui::LocalDirDockWidget *ui;
     LocalDirModel* model_;

@@ -24,8 +24,12 @@ private:
     void loadSettings();
     void loadStyleSheet();
     void createConnects();
+    void createMenuConnect();
+    void createViewConnect();
+    void createButtonsConnect();
 private slots:
     void newFolder();
+    void newFile();
     void viewFile();
     void editFile();
     void copyFiles();

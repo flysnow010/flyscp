@@ -7,6 +7,7 @@ class DirHistory
 public:
     DirHistory();
     enum { MAX_SIZE = 25 };
+
     inline void add(QString const& dir)//???const
     {
         int index = dirs_.indexOf(dir);
@@ -28,6 +29,22 @@ public:
                 return *dir;
         }
         return QString("%1:/").arg(prefix);
+    }
+
+    QString next(QString const& dir)
+    {
+        int index = dirs_.indexOf(dir);
+        if(index < 0 || index  + 1 >= dirs_.size())
+            return QString();
+        return dirs_.at(index + 1);
+    }
+
+    QString pre(QString const& dir)
+    {
+        int index = dirs_.indexOf(dir);
+        if(index <= 0)
+            return QString();
+        return dirs_.at(index - 1);
     }
 
     inline QStringList const& dirs() const { return dirs_; }

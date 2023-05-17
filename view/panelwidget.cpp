@@ -104,10 +104,30 @@ void PanelWidget::loadSettings(QString const& name)
     dirHistory->setDirs(dirNames);
 }
 
-void PanelWidget::addDirToHistory(QString const& dir, bool isRemote)
+void PanelWidget::preDir()
 {
-    Q_UNUSED(isRemote)
-    dirHistory->add(dir);
+    BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
+    if(!dir)
+        return;
+    QString newDir = dirHistory->pre(dir->dir());
+    if(!newDir.isEmpty())
+        dir->setDir(newDir, QString(), true);
+}
+
+void PanelWidget::nextDir()
+{
+    BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
+    if(!dir)
+        return;
+    QString newDir = dirHistory->next(dir->dir());
+    if(!newDir.isEmpty())
+        dir->setDir(newDir, QString(), true);
+}
+
+void PanelWidget::addDirToHistory(QString const& dir, bool isNavigation)
+{
+    if(!isNavigation)
+        dirHistory->add(dir);
     updateTexts(ui->tabWidget->currentWidget());
 }
 

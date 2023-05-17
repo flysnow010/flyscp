@@ -25,11 +25,13 @@ public:
 
     void saveSettings(QString const& name);
     void loadSettings(QString const& name);
+    void preDir();
+    void nextDir();
 signals:
     void tabCountChanged(int count);
 public slots:
     void setTabBarAutoHide(int count);
-    void addDirToHistory(QString const& dir, bool isRemote);
+    void addDirToHistory(QString const& dir, bool isNavigation);
     void libDirContextMenu();
     void favoritesDirContextMenu();
     void historyDirContextMenu();

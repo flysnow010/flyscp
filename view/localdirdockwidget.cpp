@@ -60,10 +60,10 @@ LocalDirDockWidget::~LocalDirDockWidget()
     delete ui;
 }
 
-void LocalDirDockWidget::setDir(QString const& dir, QString const& caption)
+void LocalDirDockWidget::setDir(QString const& dir, QString const& caption, bool isNavigation)
 {
     model_->setDir(dir);
-    updateCurrentDir(dir, caption);
+    updateCurrentDir(dir, caption, isNavigation);
 }
 
 QString LocalDirDockWidget::dir() const
@@ -638,11 +638,11 @@ void LocalDirDockWidget::fileTransfer(FileNames const& fileNames, bool isMove)
     }
 }
 
-void LocalDirDockWidget::updateCurrentDir(QString const& dir, QString const& caption)
+void LocalDirDockWidget::updateCurrentDir(QString const& dir, QString const& caption, bool isNavigation)
 {
     if(caption.isEmpty())
         titleBarWidget->setTitle(dir);
     else
         titleBarWidget->setTitle(caption);
-    emit dirChanged(dir, false);
+    emit dirChanged(dir, isNavigation);
 }

@@ -52,36 +52,70 @@ MainWindow::~MainWindow()
     save();
     delete ui;
 }
-
+//#define SCP
 void MainWindow::createConnects()
+{
+    createMenuConnect();
+    createViewConnect();
+    createButtonsConnect();
+}
+
+void MainWindow::createMenuConnect()
 {
     connect(ui->actionConnect, &QAction::triggered, this, [=](bool){
         ConnectDialog dialog;
         SSHSettings settings;
-        //settings.hostName = "192.168.40.80";
+#ifdef SCP
+        settings.hostName = "192.168.40.80";
+        settings.userName = "root";
+#else
         settings.hostName = "13.13.13.159";
-
         settings.userName = "james";
+#endif
         dialog.setType(ConnectType::SSH);
         dialog.setSshSettings(settings);
         if(dialog.exec() == QDialog::Accepted)
         {
             RemoteDockWidget* rightDirView = new RemoteDockWidget(this);
             settings = dialog.sshSettings();
+#ifdef SCP
+            settings.passWord = "123456";
+#else
             settings.passWord = "james010";
+#endif
             rightDirView->start(settings);
             rightPanelWidget->addDirTab(rightDirView, Utils::networkIcon(), rightDirView->name());
         }
     });
+
     connect(ui->actionExit, &QAction::triggered, this, [&](bool) {
         close();
     });
 
     connect(ui->actionFileFolder, SIGNAL(triggered(bool)), this, SLOT(newFolder()));
+    connect(ui->actionTextFile, SIGNAL(triggered(bool)), this, SLOT(newFile()));
     connect(ui->actionViewIt, SIGNAL(triggered(bool)), this, SLOT(viewFile()));
     connect(ui->actionCopy, SIGNAL(triggered(bool)), this, SLOT(copyFiles()));
     connect(ui->actionMove, SIGNAL(triggered(bool)), this, SLOT(moveFiles()));
     connect(ui->actionDelete, SIGNAL(triggered(bool)), this, SLOT(delFiles()));
+    connect(ui->actionRefresh, &QAction::triggered, this, [&](){
+        if(leftDirView->isActived())
+            leftDirView->refresh();
+        else
+            rightDirView->refresh();
+    });
+    connect(ui->actionPrevious, &QAction::triggered, this, [&](){
+        if(leftDirView->isActived())
+            leftPanelWidget->preDir();
+        else
+            rightPanelWidget->preDir();
+    });
+    connect(ui->actionNext, &QAction::triggered, this, [&](){
+        if(leftDirView->isActived())
+            leftPanelWidget->nextDir();
+        else
+            rightPanelWidget->nextDir();
+    });
 
     connect(ui->actionToolBar,  &QAction::triggered, this, [&](bool on){
         ui->toolBar->setVisible(on);
@@ -94,6 +128,10 @@ void MainWindow::createConnects()
         AboutDialog dialog;
         dialog.exec();
     });
+}
+
+void MainWindow::createViewConnect()
+{
     connect(leftDirView, &LocalDirDockWidget::sectionResized, this, [&](int index, int, int newSize){
         rightDirView->resizeSection(index, newSize);
     });
@@ -106,11 +144,11 @@ void MainWindow::createConnects()
     connect(rightPanelWidget, &PanelWidget::tabCountChanged, this, [&](int count){
         leftPanelWidget->setTabBarAutoHide(count);
     });
-    connect(leftDirView, &LocalDirDockWidget::dirChanged, this, [&](QString const& dir, bool isRemote){
-        leftPanelWidget->addDirToHistory(dir, isRemote);
+    connect(leftDirView, &LocalDirDockWidget::dirChanged, this, [&](QString const& dir, bool isNavigation){
+        leftPanelWidget->addDirToHistory(dir, isNavigation);
     });
-    connect(rightDirView, &LocalDirDockWidget::dirChanged, this, [&](QString const& dir, bool isRemote){
-        rightPanelWidget->addDirToHistory(dir, isRemote);
+    connect(rightDirView, &LocalDirDockWidget::dirChanged, this, [&](QString const& dir, bool isNavigation){
+        rightPanelWidget->addDirToHistory(dir, isNavigation);
     });
 
     connect(leftDirView, &LocalDirDockWidget::libDirContextMenuRequested, this, [&](){
@@ -139,7 +177,12 @@ void MainWindow::createConnects()
     connect(leftDirView, &LocalDirDockWidget::actived, this, [&](){
         rightDirView->setActived(false);
     });
-    connect(toolButtons, &ToolButtons::newClicked, this, &MainWindow::newFolder);
+}
+
+void MainWindow::createButtonsConnect()
+{
+    connect(toolButtons, &ToolButtons::newFolderClicked, this, &MainWindow::newFolder);
+    connect(toolButtons, &ToolButtons::newFileClicked, this, &MainWindow::newFile);
     connect(toolButtons, &ToolButtons::viewClicked, this, &MainWindow::viewFile);
     connect(toolButtons, &ToolButtons::editClicked, this, &MainWindow::editFile);
     connect(toolButtons, &ToolButtons::copyClicked, this, &MainWindow::copyFiles);
@@ -217,6 +260,14 @@ void MainWindow::newFolder()
         leftDirView->newFolder();
     else
         rightDirView->newFolder();
+}
+
+void MainWindow::newFile()
+{
+    if(leftDirView->isActived())
+        leftDirView->newTxtFile();
+    else
+        rightDirView->newTxtFile();
 }
 
 void MainWindow::viewFile()

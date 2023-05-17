@@ -26,7 +26,7 @@ public:
     ~RemoteDockWidget();
 
     bool isRemote() const override { return true; }
-    void setDir(QString const& dir, QString const& caption = "") override;
+    void setDir(QString const& dir, QString const& caption = QString(), bool  isNavigation = false) override;
     QString dir() const override;
     void cd(QString const& dir) override;
     QString home() const override;
@@ -38,8 +38,7 @@ public slots:
     void libDirContextMenu();
     void favoritesDirContextMenu();
     void historyDirContextMenu();
-signals:
-    void dirChanged(QString const& dir, bool isRemote);
+
 private slots:
     void viewClick(QModelIndex const& index);
     void customContextMenuRequested(const QPoint &pos);
@@ -70,7 +69,7 @@ private:
     void openDir(ssh::FileInfoPtr const& fileInfo);
     QString download(ssh::FileInfoPtr const& fileInfo, QDir const& dstDir);
     bool upload(QString const& fileName);
-    void updateCurrentDir(QString const& dir, QString const& caption = "");
+    void updateCurrentDir(QString const& dir, QString const& caption = QString(), bool  isNavigation = false);
 private:
     Ui::RemoteDockWidget *ui;
     RemoteDirModel* model_;

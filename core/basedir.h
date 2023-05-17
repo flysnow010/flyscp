@@ -7,7 +7,7 @@ public:
     BaseDir();
 
     virtual bool isRemote() const = 0;
-    virtual void setDir(QString const& dir, QString const& caption = "") = 0;
+    virtual void setDir(QString const& dir, QString const& caption = QString(), bool isNavigation = false) = 0;
     virtual QString dir() const = 0;
     virtual void cd(QString const& dir) = 0;
     virtual QString home() const = 0;
