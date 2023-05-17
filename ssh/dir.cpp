@@ -7,6 +7,36 @@
 #include <fcntl.h>
 
 #include <algorithm>
+#include <iostream>
+#include <string.h>
+#include <stdio.h>
+#include <time.h>
+
+#define NEXT_CHAR(s) \
+    do {             \
+        s++;         \
+        if(*s == 0)  \
+            return;  \
+    }while(0)
+
+#define LAST_CHAR(s) \
+    do {             \
+        s++;         \
+        if(*s == 0)  \
+            break;  \
+    }while(0)
+
+#define SKIP_SPACES(s) \
+    while(*s == ' ') \
+        NEXT_CHAR(s)
+
+#define SKIP_TEXT(s, c) \
+    while(*s != c) \
+        LAST_CHAR(s)
+
+#define SKIP_TOKEN(s, c) \
+    while(*s != c) \
+        LAST_CHAR(s)
 
 namespace ssh {
 namespace  {
@@ -27,14 +57,284 @@ namespace  {
             }
         }
     }
+
+    char *strndup(const char *s, const char *e)
+    {
+        char* str = (char*)calloc(1, e - s + 1);
+        char* d = str;
+        while(s != e)
+            *d++ = *s++;
+        return str;
+    }
+
+    void parseFileSttributes(sftp_attributes info)
+    {
+        const char* s = info->longname;
+        if(!s || !s[0])
+            return;
+
+        if(*s == 'd')
+            info->type = FileType_Dir;
+        else if(*s == 'l')
+            info->type = FileType_SymLink;
+        else if(*s == '-')
+            info->type = FileType_File;
+
+        NEXT_CHAR(s);
+        if(*s == 'r')
+            info->permissions |= FileInfo::User_Read;
+        NEXT_CHAR(s);
+        if(*s == 'w')
+            info->permissions |= FileInfo::User_Write;
+        NEXT_CHAR(s);
+        if(*s == 'x')
+            info->permissions |= FileInfo::User_Exe;
+
+        NEXT_CHAR(s);
+        if(*s == 'r')
+            info->permissions |= FileInfo::Group_Read;
+        NEXT_CHAR(s);
+        if(*s == 'w')
+            info->permissions |= FileInfo::Group_Write;
+        NEXT_CHAR(s);
+        if(*s == 'x')
+            info->permissions |= FileInfo::Group_Exe;
+
+        NEXT_CHAR(s);
+        if(*s == 'r')
+            info->permissions |= FileInfo::Other_Read;
+        NEXT_CHAR(s);
+        if(*s == 'w')
+            info->permissions |= FileInfo::Other_Write;
+        NEXT_CHAR(s);
+        if(*s == 'x')
+            info->permissions |= FileInfo::Other_Exe;
+
+        NEXT_CHAR(s);
+
+        SKIP_SPACES(s);
+        SKIP_TEXT(s, ' ');
+
+        SKIP_SPACES(s);
+        const char* p = s;
+        SKIP_TEXT(s, ' ');
+        info->owner = strndup(p, s);
+
+        SKIP_SPACES(s);
+        p = s;
+        SKIP_TEXT(s, ' ');
+        info->group = strndup(p, s);
+
+        SKIP_SPACES(s);
+        p = s;
+        SKIP_TEXT(s, ' ');
+        info->size = strtoull(p, 0, 10);
+
+        struct tm  t;
+
+        SKIP_SPACES(s); //1970-01-01
+        p = s;
+        t.tm_year = strtoull(p, 0, 10) - 1900;
+        SKIP_TEXT(s, '-');
+        NEXT_CHAR(s);
+        p = s;
+        t.tm_mon = strtoull(p, 0, 10) - 1;
+        SKIP_TEXT(s, '-');
+        NEXT_CHAR(s);
+        p = s;
+        t.tm_mday = strtoull(p, 0, 10);
+        SKIP_TEXT(s, ' ');
+
+
+        SKIP_SPACES(s); //00:00:33
+        p = s;
+        t.tm_hour = strtoull(p, 0, 10);
+        SKIP_TEXT(s, ':');
+        NEXT_CHAR(s);
+        p = s;
+        t.tm_min = strtoull(p, 0, 10);
+        SKIP_TEXT(s, ':');
+        NEXT_CHAR(s);
+        p = s;
+        t.tm_sec = strtoull(p, 0, 10);
+        SKIP_TEXT(s, ' ');
+
+        SKIP_SPACES(s); //+0000
+        p = s;
+        int timetone = strtoull(p, 0, 10);
+        if(timetone == 0)
+            t.tm_hour += 8;
+        SKIP_TEXT(s, ' ');
+
+        t.tm_isdst = 0;
+        t.tm_wday = 0;
+        t.tm_yday = 0;
+        info->mtime = mktime(&t);
+
+        SKIP_SPACES(s); //log
+        p = s;
+        SKIP_TEXT(s, ' ');
+        info->name = strndup(p, s);
+    }
 }
+
+bool SftpDirPrivate::opendir()
+{
+    dir = sftp_opendir(sftp, path.c_str());
+    if(dir)
+        return true;
+    return false;
+}
+
+sftp_attributes SftpDirPrivate::readdir()
+{
+    return sftp_readdir(sftp, dir);
+}
+
+void SftpDirPrivate::closedir()
+{
+    sftp_closedir(dir);
+}
+
+bool SftpDirPrivate::mkdir(const char* path)
+{
+    if(sftp_mkdir(sftp, path, S_IRWXU) != SSH_OK)
+        return false;
+    return true;
+}
+
+bool SftpDirPrivate::rmdir(const char* path)
+{
+    if(sftp_rmdir(sftp, path) != SSH_OK)
+        return false;
+    return true;
+}
+
+bool SftpDirPrivate::mkfile(const char* filename)
+{
+    sftp_file file = sftp_open(sftp, filename, O_CREAT | O_EXCL, 0644);
+    if(!file)
+        return false;
+    sftp_close(file);
+    return true;
+}
+
+bool SftpDirPrivate::rmfile(const char* filename)
+{
+    if(sftp_unlink(sftp, filename) != SSH_OK)
+        return false;
+    return true;
+}
+
+bool SftpDirPrivate::rename(const char *original, const  char *newname)
+{
+    if(sftp_rename(sftp, original, newname) != SSH_OK)
+        return false;
+    return true;
+}
+
+bool SftpDirPrivate::chmod(const char* filename, uint16_t mode)
+{
+    if(sftp_chmod(sftp, filename, mode) != SSH_OK)
+        return false;
+    return true;
+}
+
+bool ChannelDirPrivate::opendir()
+{
+    std::string command = std::string("ls -la --full-time ")  + path;
+    if(ssh_channel_request_exec(channel, command.c_str()) != SSH_OK)
+        return false;
+
+    while(true)
+    {
+        char buffer[256];
+        int bytes = ssh_channel_read(channel, buffer, sizeof(buffer), 0);
+        if(bytes <= 0)
+            break;
+        lstext += std::string(buffer, bytes);
+    }
+    dirline = strtok((char *)lstext.c_str(), "\n");
+    return true;
+}
+
+sftp_attributes ChannelDirPrivate::readdir()
+{
+    dirline = strtok(0, "\n");
+    if(!dirline)
+        return 0;
+
+    sftp_attributes info = (sftp_attributes)calloc(1, sizeof(*info));
+    info->longname = strdup(dirline);
+    parseFileSttributes(info);
+    return info;
+}
+
+void ChannelDirPrivate::closedir()
+{
+    dirline = 0;
+    lstext.clear();
+}
+
+bool ChannelDirPrivate::mkdir(const char* path)
+{
+    std::string command = std::string("mkdir ") + path;
+    if(ssh_channel_request_exec(channel, command.c_str()) != SSH_OK)
+        return false;
+    return true;
+}
+
+bool ChannelDirPrivate::rmdir(const char* path)
+{
+    std::string command = std::string("rm -r ") + path;
+    if(ssh_channel_request_exec(channel, command.c_str()) != SSH_OK)
+        return false;
+    return true;
+}
+
+bool ChannelDirPrivate::mkfile(const char* filename)
+{
+    std::string command = std::string("touch ") + filename;
+    if(ssh_channel_request_exec(channel, command.c_str()) != SSH_OK)
+        return false;
+    return true;
+}
+
+bool ChannelDirPrivate::rmfile(const char* filename)
+{
+    std::string command = std::string("rm ") + filename;
+    if(ssh_channel_request_exec(channel, command.c_str()) != SSH_OK)
+        return false;
+    return true;
+}
+
+bool ChannelDirPrivate::rename(const char *original, const  char *newname)
+{
+    std::string command = std::string("mv ") + original
+            + std::string(" ") + newname;
+    if(ssh_channel_request_exec(channel, command.c_str()) != SSH_OK)
+        return false;
+    return true;
+}
+
+bool ChannelDirPrivate::chmod(const char* filename, uint16_t mode)
+{
+    char strMode[64];
+    snprintf(strMode, sizeof(strMode), "%O", mode);
+    std::string command = std::string("chmod  ") + std::to_string(mode)
+            + std::string(" ") + filename;
+    if(ssh_channel_request_exec(channel, command.c_str()) != SSH_OK)
+        return false;
+    return true;
+}
+
 Dir::Dir(SFtp const& sftp, const char* path)
-    : d(new DirPrivate(sftp.d->sftp, path))
+    : d(new SftpDirPrivate(path, sftp.d->sftp))
 {
 }
 
 Dir::Dir(Channel const& channel, const char* path)
-    : d(new DirPrivate(channel.d->channel, path))
+    : d(new ChannelDirPrivate( path, channel.d->channel))
 {
     ;
 }
@@ -57,12 +357,11 @@ const char* Dir::dirName() const
 FileInfos Dir::fileInfoList(Filter filter, SortFlag sortFlag)
 {
     FileInfos fileInfos;
-    sftp_dir dir = sftp_opendir(d->sftp, d->path.c_str());
-    if(!dir)
+    if(!d->opendir())
         return fileInfos;
 
     sftp_attributes info;
-    while((info = sftp_readdir(d->sftp, dir)))
+    while((info = d->readdir()))
     {
         uint32_t typeMask = filter & TypeMask;
         if(info->type == FileType_File)
@@ -111,7 +410,7 @@ FileInfos Dir::fileInfoList(Filter filter, SortFlag sortFlag)
         splitBasenameAndSuffix(fileInfo->d);
         fileInfos.push_back(fileInfo);
     }
-    sftp_closedir(dir);
+    d->closedir();
     sort(fileInfos, sortFlag);
     return fileInfos;
 }
@@ -190,47 +489,33 @@ void Dir::sort(FileInfos &fileInfos, SortFlag sortFlag)
 
 bool Dir::mkdir(const char*path)
 {
-    if(sftp_mkdir(d->sftp, path, S_IRWXU) != SSH_OK)
-        return false;
-    return true;
+    return d->mkdir(path);
 }
 
 bool Dir::rmdir(const char* path)
 {
-    if(sftp_rmdir(d->sftp, path) != SSH_OK)
-        return false;
-    return true;
+    return d->rmdir(path);
 }
 
 
-bool Dir::mkFile(const char* filename)
+bool Dir::mkfile(const char* filename)
 {
-    sftp_file file = sftp_open(d->sftp, filename, O_CREAT | O_EXCL, 0644);
-    if(!file)
-        return false;
-    sftp_close(file);
-    return true;
+    return d->mkfile(filename);
 }
 
-bool Dir::rmFile(const char* filename)
+bool Dir::rmfile(const char* filename)
 {
-    if(sftp_unlink(d->sftp, filename) != SSH_OK)
-        return false;
-    return true;
+    return d->rmfile(filename);
 }
 
 bool Dir::rename(const char *original, const  char *newname)
 {
-     if(sftp_rename(d->sftp, original, newname) != SSH_OK)
-         return false;
-     return true;
+     return d->rename(original, newname);
 }
 
 bool Dir::chmod(const char* filename, uint16_t mode)
 {
-    if(sftp_chmod(d->sftp, filename, mode) != SSH_OK)
-        return false;
-    return true;
+    return d->chmod(filename, mode);
 }
 
 }

@@ -68,24 +68,73 @@ public:
 class DirPrivate
 {
 public:
-    DirPrivate(sftp_session s, const char * p)
-        : sftp(s)
-        , dir(0)
-        , channel(0)
-        , path(p)
+    DirPrivate(const char * p)
+        : path(p)
     {}
 
-    DirPrivate(ssh_channel c, const char * p)
-        : sftp(0)
+    virtual ~DirPrivate() {}
+
+    virtual bool opendir() = 0;
+    virtual sftp_attributes readdir() = 0;
+    virtual void closedir() = 0;
+
+    virtual bool mkdir(const char* path) = 0;
+    virtual bool rmdir(const char* path) = 0;
+    virtual bool mkfile(const char* filename) = 0;
+    virtual bool rmfile(const char* filename) = 0;
+    virtual bool rename(const char *original, const  char *newname) = 0;
+    virtual bool chmod(const char* filename, uint16_t mode) = 0;
+
+    std::string path;
+};
+
+class SftpDirPrivate : public DirPrivate
+{
+public:
+    SftpDirPrivate(const char * p, sftp_session s)
+        : DirPrivate(p)
+        , sftp(s)
         , dir(0)
-        , channel(c)
-        , path(p)
     {}
+
+    bool opendir() override;
+    sftp_attributes readdir() override;
+    void closedir() override;
+
+    bool mkdir(const char* path) override;
+    bool rmdir(const char* path) override;
+    bool mkfile(const char* filename) override;
+    bool rmfile(const char* filename) override;
+    bool rename(const char *original, const  char *newname) override;
+    bool chmod(const char* filename, uint16_t mode) override;
 
     sftp_session sftp;
     sftp_dir dir;
+};
+
+class ChannelDirPrivate : public DirPrivate
+{
+public:
+    ChannelDirPrivate(const char * p, ssh_channel c)
+        : DirPrivate(p)
+        , channel(c)
+        , dirline(0)
+    {}
+
+    bool opendir() override;
+    sftp_attributes readdir() override;
+    void closedir() override;
+
+    bool mkdir(const char* path) override;
+    bool rmdir(const char* path) override;
+    bool mkfile(const char* filename) override;
+    bool rmfile(const char* filename) override;
+    bool rename(const char *original, const  char *newname) override;
+    bool chmod(const char* filename, uint16_t mode) override;
+
     ssh_channel channel;
-    std::string path;
+    std::string lstext;
+    char* dirline;
 };
 class FilePrivate
 {
@@ -107,13 +156,6 @@ public:
         , isParent(false)
     {}
 
-    FileInfoPrivate(const char* longname)
-        : info((sftp_attributes)calloc(1, sizeof(*info)))
-        , isParent(false)
-    {
-        info->longname = strdup(longname);
-    }
-    void parse();
     sftp_attributes info;
     bool isParent;
     std::string basename;

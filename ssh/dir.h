@@ -63,8 +63,8 @@ public:
 
     bool mkdir(const char* path);
     bool rmdir(const char* path);
-    bool mkFile(const char* filename);
-    bool rmFile(const char* filename);
+    bool mkfile(const char* filename);
+    bool rmfile(const char* filename);
     bool rename(const char *original, const  char *newname);
     bool chmod(const char* filename, uint16_t mode);
 private:

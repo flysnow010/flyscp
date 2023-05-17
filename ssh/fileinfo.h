@@ -22,7 +22,6 @@ public:
         Other_Exe   = (0x1 << 0),
         ALlMask     = 0x1FF
     };
-    FileInfo(const char* longname);
     ~FileInfo();
 
     bool isNull() const;
