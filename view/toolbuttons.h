@@ -20,7 +20,8 @@ signals:
     void editClicked();
     void copyClicked();
     void moveClicked();
-    void newClicked();
+    void newFolderClicked();
+    void newFileClicked();
     void deleteClicked();
     void exitClicked();
 private:

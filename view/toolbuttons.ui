@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>775</width>
-    <height>44</height>
+    <height>19</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -134,7 +134,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QToolButton" name="btnNew">
+    <widget class="QToolButton" name="btnNewFolder">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -142,7 +142,7 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string>F7 New</string>
+      <string>F7 New Folder</string>
      </property>
      <property name="toolButtonStyle">
       <enum>Qt::ToolButtonTextOnly</enum>
@@ -180,6 +180,32 @@
    </item>
    <item>
     <widget class="Line" name="line_6">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QToolButton" name="btnNewFile">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string>F9 New File</string>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextOnly</enum>
+     </property>
+     <property name="autoRaise">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="Line" name="line_7">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
