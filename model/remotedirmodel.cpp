@@ -140,7 +140,7 @@ bool RemoteDirModel::mkFile(std::string const& filename)
     if(dir_)
     {
         std::string filepath = filePath(filename.c_str());
-        return dir_->mkFile(filepath.c_str());
+        return dir_->mkfile(filepath.c_str());
     }
     return false;
 }
@@ -150,7 +150,7 @@ bool RemoteDirModel::rmFile(std::string const& filename)
     if(dir_)
     {
         std::string filepath = filePath(filename.c_str());
-        return dir_->rmFile(filepath.c_str());
+        return dir_->rmfile(filepath.c_str());
     }
     return false;
 }
