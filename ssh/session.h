@@ -26,6 +26,7 @@ private:
     friend class Channel;
     friend class Scp;
     friend class SFtp;
+    friend class Dir;
     Session(Session const&);
     Session & operator == (Session const&);
 

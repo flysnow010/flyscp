@@ -1,5 +1,6 @@
 #include "dir.h"
 #include "sftp.h"
+#include "session.h"
 #include "fileinfo.h"
 #include "channel.h"
 #include "sshprivate.h"
@@ -240,11 +241,34 @@ bool SftpDirPrivate::chmod(const char* filename, uint16_t mode)
     return true;
 }
 
+#define EXEC_COMMAND(command) \
+    ssh_channel channel = ssh_channel_new(session); \
+    if(!channel) \
+        return false;\
+    if(ssh_channel_open_session(channel) != SSH_OK)\
+    {\
+        ssh_channel_free(channel);\
+        return false;\
+    }\
+    if(ssh_channel_request_exec(channel, command.c_str()) != SSH_OK)\
+    {\
+        ssh_channel_close(channel);\
+        ssh_channel_free(channel);\
+        return false;\
+    }
+
+#define END_COMMAND \
+    do {\
+        ssh_channel_send_eof(channel); \
+        ssh_channel_close(channel); \
+        ssh_channel_free(channel);\
+    }while(false)
+
+
 bool ChannelDirPrivate::opendir()
 {
     std::string command = std::string("ls -la --full-time ")  + path;
-    if(ssh_channel_request_exec(channel, command.c_str()) != SSH_OK)
-        return false;
+    EXEC_COMMAND(command)
 
     while(true)
     {
@@ -255,6 +279,7 @@ bool ChannelDirPrivate::opendir()
         lstext += std::string(buffer, bytes);
     }
     dirline = strtok((char *)lstext.c_str(), "\n");
+    END_COMMAND;
     return true;
 }
 
@@ -278,43 +303,29 @@ void ChannelDirPrivate::closedir()
 
 bool ChannelDirPrivate::mkdir(const char* path)
 {
-    std::string command = std::string("mkdir ") + path;
-    if(ssh_channel_request_exec(channel, command.c_str()) != SSH_OK)
-        return false;
-    return true;
+    return exec(std::string("mkdir ") + path);
 }
 
 bool ChannelDirPrivate::rmdir(const char* path)
 {
-    std::string command = std::string("rm -r ") + path;
-    if(ssh_channel_request_exec(channel, command.c_str()) != SSH_OK)
-        return false;
-    return true;
+    return exec(std::string("rm -r ") + path);
 }
 
 bool ChannelDirPrivate::mkfile(const char* filename)
 {
-    std::string command = std::string("touch ") + filename;
-    if(ssh_channel_request_exec(channel, command.c_str()) != SSH_OK)
-        return false;
-    return true;
+    return exec(std::string("touch ") + filename);
 }
 
 bool ChannelDirPrivate::rmfile(const char* filename)
 {
-    std::string command = std::string("rm ") + filename;
-    if(ssh_channel_request_exec(channel, command.c_str()) != SSH_OK)
-        return false;
-    return true;
+    return exec(std::string("rm ") + filename);
 }
 
 bool ChannelDirPrivate::rename(const char *original, const  char *newname)
 {
     std::string command = std::string("mv ") + original
             + std::string(" ") + newname;
-    if(ssh_channel_request_exec(channel, command.c_str()) != SSH_OK)
-        return false;
-    return true;
+    return exec(command);
 }
 
 bool ChannelDirPrivate::chmod(const char* filename, uint16_t mode)
@@ -323,8 +334,13 @@ bool ChannelDirPrivate::chmod(const char* filename, uint16_t mode)
     snprintf(strMode, sizeof(strMode), "%O", mode);
     std::string command = std::string("chmod  ") + std::to_string(mode)
             + std::string(" ") + filename;
-    if(ssh_channel_request_exec(channel, command.c_str()) != SSH_OK)
-        return false;
+    return exec(command);
+}
+
+bool ChannelDirPrivate::exec(std::string const& command)
+{
+    EXEC_COMMAND(command)
+    END_COMMAND;
     return true;
 }
 
@@ -333,10 +349,9 @@ Dir::Dir(SFtp const& sftp, const char* path)
 {
 }
 
-Dir::Dir(Channel const& channel, const char* path)
-    : d(new ChannelDirPrivate( path, channel.d->channel))
+Dir::Dir(Session const& session, const char* path)
+    : d(new ChannelDirPrivate(path, session.d->session))
 {
-    ;
 }
 
 Dir::~Dir()

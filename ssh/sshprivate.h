@@ -115,9 +115,10 @@ public:
 class ChannelDirPrivate : public DirPrivate
 {
 public:
-    ChannelDirPrivate(const char * p, ssh_channel c)
+    ChannelDirPrivate(const char * p, ssh_session s)
         : DirPrivate(p)
-        , channel(c)
+        , session(s)
+        , channel(0)
         , dirline(0)
     {}
 
@@ -132,6 +133,8 @@ public:
     bool rename(const char *original, const  char *newname) override;
     bool chmod(const char* filename, uint16_t mode) override;
 
+    bool exec(std::string const& command);
+    ssh_session session;
     ssh_channel channel;
     std::string lstext;
     char* dirline;

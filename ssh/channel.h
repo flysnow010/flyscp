@@ -29,7 +29,6 @@ public:
 
 private:
     friend class SFtp;
-    friend class Dir;
     Channel(Channel const&);
     Channel & operator == (Channel const&);
 
