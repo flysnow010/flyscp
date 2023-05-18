@@ -315,7 +315,7 @@ void LocalDirDockWidget::beginDragFile(QPoint const& point)
         return;
     QDrag *drag = new QDrag(ui->treeView);
     QStringList fileNames = selectedileNames("file:///");
-    QMimeData* mimeData = ClipBoard::copyMimeData(fileNames);
+    QMimeData* mimeData = FileManager::dropMimeData(fileNames);
     drag->setMimeData(mimeData);
     drag->setPixmap(QPixmap(":/image/copy.png"));
     drag->exec();
@@ -374,21 +374,20 @@ void LocalDirDockWidget::drop(QDropEvent * event)
 
 void LocalDirDockWidget::cut()
 {
-    QStringList fileNames = selectedileNames("file:///", false, true);
-    ClipBoard::cut(fileNames);
+    QStringList fileNames = selectedileNames(QString(), false, true);
+    FileManager::Copy(fileNames, true);
 }
 
 void LocalDirDockWidget::copy()
 {
-    QStringList fileNames = selectedileNames("file:///", false, true);
-    ClipBoard::copy(fileNames);
+    QStringList fileNames = selectedileNames(QString(), false, true);
+    FileManager::Copy(fileNames, false);
 }
 
 void LocalDirDockWidget::paste()
 {
-    ClipBoard::test();
     uint32_t dropMask = ClipBoard::dropEffect();
-    if(ClipBoard::isCut(dropMask))
+    if(ClipBoard::isCut(dropMask))//判断ClipBoard::fileNames()是否为空
         cutFiles(ClipBoard::fileNames(), model_->dir());
     else if(ClipBoard::isCopy(dropMask))
         copyFilels(ClipBoard::fileNames(), model_->dir());

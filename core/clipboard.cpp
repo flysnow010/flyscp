@@ -24,68 +24,6 @@ void ClipBoard::clear()
 {
     QApplication::clipboard()->clear();
 }
-#include <QDebug>
-void ClipBoard::test()
-{
-    const QClipboard *clipboard = QApplication::clipboard();
-    const QMimeData* mimeData = clipboard->mimeData();
-    //qDebug() << mimeData->formats();
-
-    qDebug() << "Shell IDList Array: " << mimeData->data("Shell IDList Array");
-    qDebug() << "DataObjectAttributes: " << mimeData->data("DataObjectAttributes");
-    qDebug() << "DataObjectAttributesRequiringElevation: "
-        << mimeData->data("DataObjectAttributesRequiringElevation");
-    qDebug() << "UIDisplayed: " << mimeData->data("UIDisplayed");
-    qDebug() << "DropDescription: " << mimeData->data("DropDescription");
-    qDebug() << "FileName: " << mimeData->data("FileName");
-    qDebug() << "FileNameW: " << mimeData->data("FileNameW");
-    qDebug() << "Shell Object Offsets: " << mimeData->data("Shell Object Offsets");
-    qDebug() << "Preferred DropEffect: " << mimeData->data("Preferred DropEffect");
-    qDebug() << "AsyncFlag: " << mimeData->data("AsyncFlag");
-
-}
-
-void ClipBoard::cut(QStringList const& fileNames)
-{
-    QString text = fileNames.join("\n");
-    if(fileNames.size() > 1)
-        text += "\n";
-
-    QMimeData* mineData = new QMimeData();
-    mineData->setText(text);
-    QByteArray data(4, 0);
-    data[0] = 2;
-    mineData->setData("Preferred DropEffect", data);
-    QApplication::clipboard()->setMimeData(mineData);
-}
-
-void ClipBoard::copy(QStringList const& fileNames)
-{
-    QString text = fileNames.join("\n");
-    if(fileNames.size() > 1)
-        text += "\n";
-
-    QMimeData* mimeData = new QMimeData();
-    mimeData->setText(text);
-    QByteArray data(4, 0);
-    data[0] = 5;
-    mimeData->setData("Preferred DropEffect", data);
-    QApplication::clipboard()->setMimeData(mimeData);
-}
-
-QMimeData* ClipBoard::copyMimeData(QStringList const& fileNames)
-{
-    QString text = fileNames.join("\n");
-    if(fileNames.size() > 1)
-        text += "\n";
-
-    QMimeData* mineData = new QMimeData();
-    mineData->setText(text);
-    QByteArray data(4, 0);
-    data[0] = 5;
-    mineData->setData("Preferred DropEffect", data);
-    return mineData;
-}
 
 void ClipBoard::copy(QString const& text)
 {

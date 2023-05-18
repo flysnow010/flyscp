@@ -12,10 +12,6 @@ public:
 
     static bool canPaste();
     static void clear();
-    static void test();
-    static void cut(QStringList const& fileNames);
-    static void copy(QStringList const& fileNames);
-    static QMimeData* copyMimeData(QStringList const& fileNames);
     static void copy(QString const& text);
     static uint32_t dropEffect();
     static bool isCut(uint32_t dropEffect);

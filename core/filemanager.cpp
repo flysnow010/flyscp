@@ -28,6 +28,48 @@ static DWORD ProgressCallback(
     return FileManager::Progress(lpData, TotalFileSize.QuadPart, TotalBytesTransferred.QuadPart);
 }
 
+static HRESULT SetBlob(IDataObject *pdtobj, CLIPFORMAT cf, const void *pvBlob, UINT cbBlob)
+{
+    void *pv = GlobalAlloc(GPTR, cbBlob);
+    HRESULT hr = pv ? S_OK : E_OUTOFMEMORY;
+    if (SUCCEEDED(hr))
+    {
+        CopyMemory(pv, pvBlob, cbBlob);
+
+        FORMATETC fmte = {cf, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
+        STGMEDIUM medium = {};
+        medium.tymed = TYMED_HGLOBAL;
+        medium.hGlobal = pv;
+
+        hr = pdtobj->SetData(&fmte, &medium, TRUE);
+        if (FAILED(hr))
+        {
+            GlobalFree(pv);
+        }
+    }
+    return hr;
+}
+#include <QByteArray>
+static QByteArray GetBlob(IDataObject *pdtobj, CLIPFORMAT cf)
+{
+    FORMATETC fmte = {cf, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
+    STGMEDIUM medium = {};
+    QByteArray bytes;
+    HRESULT hr = pdtobj->GetData(&fmte, &medium);
+    if (SUCCEEDED(hr))
+    {
+        size_t size = GlobalSize(medium.hGlobal);
+        bytes.resize(size);
+        CopyMemory(bytes.data(), medium.hGlobal, size);
+    }
+    return bytes;
+}
+
+static CLIPFORMAT GetClipboardFormat(PCWSTR pszForamt)
+{
+    return (CLIPFORMAT)RegisterClipboardFormat(pszForamt);
+}
+
 FileManager::FileManager(QObject *parent)
     : QObject(parent)
     , signal_(false)
@@ -165,6 +207,95 @@ void FileManager::Property(QStringList const& fileNames)
     for(int i = 0; i < fileNames.size(); i++)
         ILFree(pidlDrives[i]);
     free(pidlDrives);
+}
+
+void FileManager::Copy(QStringList const& fileNames, bool isMove)
+{
+    IShellFolder* psfDesktop;
+    HRESULT hr = SHGetDesktopFolder(&psfDesktop);
+    if(FAILED(hr))
+        return;
+
+    LPITEMIDLIST *pidlDrives = (LPITEMIDLIST *)malloc(sizeof(LPITEMIDLIST)*fileNames.size());
+    bool isFailed = false;
+    for(int i = 0; i < fileNames.size(); i++)
+    {
+        QString fileName = fileNames[i].split("/").join("\\");
+        hr = psfDesktop->ParseDisplayName(0, 0, (LPWSTR)(fileName.toStdWString().c_str()),
+                                     0, (LPITEMIDLIST*)&pidlDrives[i], 0);
+        if(FAILED(hr))
+        {
+            isFailed = true;
+            break;
+        }
+    }
+
+    if(!isFailed)
+    {
+        IDataObject* pData;
+        hr = psfDesktop->GetUIObjectOf(0, fileNames.size(), (PCUITEMID_CHILD_ARRAY)pidlDrives,
+                                       IID_IDataObject, 0, (void **)&pData);
+        if(SUCCEEDED(hr))
+        {
+            DWORD data = isMove ? DROPEFFECT_MOVE : DROPEFFECT_COPY;
+            SetBlob(pData, GetClipboardFormat(CFSTR_PREFERREDDROPEFFECT), &data, sizeof(DWORD));
+            OleSetClipboard(pData);
+            pData->Release();
+        }
+    }
+    psfDesktop->Release();
+    for(int i = 0; i < fileNames.size(); i++)
+        ILFree(pidlDrives[i]);
+    free(pidlDrives);
+}
+#include <QMimeData>
+QMimeData* FileManager::dropMimeData(QStringList const& fileNames)
+{
+    IShellFolder* psfDesktop;
+    HRESULT hr = SHGetDesktopFolder(&psfDesktop);
+    if(FAILED(hr))
+        return 0;
+    QString text = fileNames.join("\n");
+    if(fileNames.size() > 1)
+        text += "\n";
+    QMimeData* mineData = new QMimeData();
+
+
+    LPITEMIDLIST *pidlDrives = (LPITEMIDLIST *)malloc(sizeof(LPITEMIDLIST)*fileNames.size());
+    bool isFailed = false;
+    for(int i = 0; i < fileNames.size(); i++)
+    {
+        QString fileName = fileNames[i].split("/").join("\\");
+        hr = psfDesktop->ParseDisplayName(0, 0, (LPWSTR)(fileName.toStdWString().c_str()),
+                                     0, (LPITEMIDLIST*)&pidlDrives[i], 0);
+        if(FAILED(hr))
+        {
+            isFailed = true;
+            break;
+        }
+    }
+
+    if(!isFailed)
+    {
+        IDataObject* pData;
+        hr = psfDesktop->GetUIObjectOf(0, fileNames.size(), (PCUITEMID_CHILD_ARRAY)pidlDrives,
+                                       IID_IDataObject, 0, (void **)&pData);
+        if(SUCCEEDED(hr))
+        {
+            mineData->setData("Shell IDList Array", GetBlob(pData, GetClipboardFormat(CFSTR_SHELLIDLIST)));
+            mineData->setText(text);
+            mineData->setData("FileName", GetBlob(pData, GetClipboardFormat(CFSTR_FILENAMEA)));
+            mineData->setData("FileContents", GetBlob(pData, GetClipboardFormat(CFSTR_FILECONTENTS)));
+            mineData->setData("FileNameW", GetBlob(pData, GetClipboardFormat(CFSTR_FILENAMEW)));
+            mineData->setData("FileGroupDescriptorW", GetBlob(pData, GetClipboardFormat(CFSTR_FILEDESCRIPTORW)));
+            pData->Release();
+        }
+    }
+    psfDesktop->Release();
+    for(int i = 0; i < fileNames.size(); i++)
+        ILFree(pidlDrives[i]);
+    free(pidlDrives);
+    return mineData;
 }
 
 void FileManager::OpenWith(QString const& fileName)

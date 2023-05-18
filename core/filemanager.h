@@ -24,6 +24,8 @@ public:
 
     static void Property(QString const& fileName);
     static void Property(QStringList const& fileNames);
+    static void Copy(QStringList const& fileNames, bool isMove);
+    static QMimeData* dropMimeData(QStringList const& fileNames);
     static void Open(QString const& fileName);
     static void OpenWith(QString const& fileName);
     static void OpenByExplorer(QString const& fileName);
