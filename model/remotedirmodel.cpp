@@ -29,16 +29,16 @@ void RemoteDirModel::refresh()
 {
     uint32_t filter = ssh::Dir::AllEntries | ssh::Dir::NoSymLinks | ssh::Dir::NoDot;
     ssh::Dir::SortFlag sortFlag = ssh::Dir::DirsFirst;
-    if(dir_->isRoot())
+    if(dir_->is_root())
         filter |= ssh::Dir::NoDotDot;
-    fileInfos_ = dir_->fileInfoList(static_cast<ssh::Dir::Filter>(filter), sortFlag);
+    fileInfos_ = dir_->fileinfos(static_cast<ssh::Dir::Filter>(filter), sortFlag);
     setupData();
 }
 
 QString RemoteDirModel::dirName()
 {
     if(dir_)
-        return QString::fromStdString(std::string(dir_->dirName()));
+        return QString::fromStdString(std::string(dir_->dirname()));
     return QString();
 }
 
@@ -59,9 +59,9 @@ void RemoteDirModel::sortItems(int index, bool isDescendingOrder)
     if(!isDescendingOrder)
         sortFlag |=  ssh::Dir::Reversed;
     uint32_t filter = ssh::Dir::AllEntries | ssh::Dir::NoSymLinks | ssh::Dir::NoDot;
-    if(dir_->isRoot())
+    if(dir_->is_root())
         filter |= ssh::Dir::NoDotDot;
-    fileInfos_ = dir_->fileInfoList(static_cast<ssh::Dir::Filter>(filter),
+    fileInfos_ = dir_->fileinfos(static_cast<ssh::Dir::Filter>(filter),
                                    static_cast<ssh::Dir::SortFlag>(sortFlag));
     setupData();
 }
@@ -93,8 +93,8 @@ std::string RemoteDirModel::filePath(const char* path) const
 {
     if(dir_)
     {
-        std::string dir(dir_->dirName());
-        if(dir_->isRoot())
+        std::string dir(dir_->dirname());
+        if(dir_->is_root())
             return dir + std::string(path);
         else
             return dir + std::string("/") + std::string(path);
@@ -106,7 +106,7 @@ std::string RemoteDirModel::parentPath() const
 {
     if(dir_)
     {
-        std::string path(dir_->dirName());
+        std::string path(dir_->dirname());
         auto pos = path.find_last_of("/");
         if(pos == 0)
             pos += 1;
@@ -190,13 +190,13 @@ QVariant RemoteDirModel::icon(const QModelIndex &index) const
     if(index.column() != 0)
         return QVariant();
     auto const& fileInfo = fileInfos_[index.row()];
-    if(fileInfo->isDir())
+    if(fileInfo->is_dir())
     {
-        if(fileInfo->isParent())
+        if(fileInfo->is_parent())
             return backIcon;
         return dirIcon;
     }
-    else if(fileInfo->isFile())
+    else if(fileInfo->is_file())
     {
         QString suffix = QString::fromStdString(fileInfo->suffix());
         return iconMap.value(suffix);
@@ -218,7 +218,7 @@ QVariant RemoteDirModel::textAlignment(const QModelIndex &index) const
     else if(index.column() == SIZE_INDEX)
     {
         ssh::FileInfoPtr info = fileInfo(index.row());
-        if(info && info->isFile())
+        if(info && info->is_file())
             return int(Qt::AlignRight | Qt::AlignVCenter);
     }
     return QVariant();
@@ -243,7 +243,7 @@ void RemoteDirModel::setupModelData(TreeItem *parent)
     {
         QList<QVariant> rowData;
         rowData << QString::fromStdString(fileInfo->basename());
-        if(fileInfo->isFile())
+        if(fileInfo->is_file())
         {
             QString suffix = QString::fromStdString(fileInfo->suffix());
             rowData << suffix
@@ -255,7 +255,7 @@ void RemoteDirModel::setupModelData(TreeItem *parent)
                 iconMap.insert(suffix, Utils::fileIcon(suffix));
 
         }
-        else if(fileInfo->isDir())
+        else if(fileInfo->is_dir())
         {
             rowData << QString() << QString("<DIR>")
                     << QDateTime::fromSecsSinceEpoch(fileInfo->time()).toString("yyyy-MM-dd HH:mm:ss")

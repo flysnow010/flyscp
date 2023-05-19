@@ -13,15 +13,17 @@ public:
 
     bool open();
     bool close();
-    bool sendEof();
+    bool send_eof();
 
-    bool runShell(int cols, int rows);
-    bool shellIsOpen();
-    bool shellIsEof();
+    bool run_shell(int cols, int rows);
+    bool is_open();
+    bool is_eof();
 
     bool exec(const char* command);
+
     int poll();
     int poll(int timeout);
+    void set_blocking(bool  enable);
     int read(void *dest, uint32_t count);
     int read_nonblocking(void *dest, uint32_t count);
 

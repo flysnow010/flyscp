@@ -24,12 +24,12 @@ public:
     };
     ~FileInfo();
 
-    bool isNull() const;
-    bool isDir() const;
-    bool isFile() const;
-    bool isSymLink() const;
-    bool isParent() const;
-    bool otherCanRead() const;
+    bool is_null() const;
+    bool is_dir() const;
+    bool is_file() const;
+    bool is_symlink() const;
+    bool is_parent() const;
+    bool other_is_only_read() const;
 
     const char* name() const;
     std::string const& basename() const;

@@ -59,7 +59,7 @@ void MainWindow::createConnects()
     createViewConnect();
     createButtonsConnect();
 }
-
+#define SCP
 void MainWindow::createMenuConnect()
 {
     connect(ui->actionConnect, &QAction::triggered, this, [=](bool){

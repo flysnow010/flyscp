@@ -15,32 +15,32 @@ FileInfo::~FileInfo()
 }
 
 
-bool FileInfo::isNull() const
+bool FileInfo::is_null() const
 {
     return  d->info == 0;
 }
 
-bool FileInfo::isDir() const
+bool FileInfo::is_dir() const
 {
     return d->info->type == FileType_Dir;
 }
 
-bool FileInfo::isFile() const
+bool FileInfo::is_file() const
 {
     return d->info->type == FileType_File;
 }
 
-bool FileInfo::isSymLink() const
+bool FileInfo::is_symlink() const
 {
     return d->info->type == FileType_SymLink;
 }
 
-bool FileInfo::isParent() const
+bool FileInfo::is_parent() const
 {
     return d->isParent;
 }
 
-bool FileInfo::otherCanRead() const
+bool FileInfo::other_is_only_read() const
 {
     return d->info->permissions & Other_Read;
 }

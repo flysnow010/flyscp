@@ -1,18 +1,23 @@
 #ifndef SSH_SCP_H
 #define SSH_SCP_H
+#include <memory>
+
 #include <cstdint>
 #include <sys/types.h>
 
 namespace ssh {
 class ScpPrivate;
 class Session;
+class DirPtr;
 
 class Scp
 {
 public:
     Scp(Session const& session);
     ~Scp();
+
     enum Req { MewDir = 1, NewFile, Eof, EmdDir, Warning };
+    typedef std::shared_ptr<Scp> Ptr;
 
     bool open(const char* filepath, bool isRead);
     void close();
@@ -34,7 +39,11 @@ public:
     bool mkfile(const char* filename, size_t count);
     ssize_t write(const void *buf, size_t count);
 
+    DirPtr home() const;
+    DirPtr root() const;
+    DirPtr dir(const char* path) const;
 private:
+    friend class Dir;
     Scp(Scp const&);
     Scp & operator == (Scp const&);
 

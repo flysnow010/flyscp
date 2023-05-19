@@ -35,8 +35,8 @@ public:
         , isOpened(false)
     {}
 
-   ssh_session session;
-   ssh_scp scp;
+    ssh_session session;
+    ssh_scp scp;
     bool isOpened;
 };
 
@@ -118,7 +118,6 @@ public:
     ChannelDirPrivate(const char * p, ssh_session s)
         : DirPrivate(p)
         , session(s)
-        , channel(0)
         , dirline(0)
     {}
 
@@ -135,7 +134,6 @@ public:
 
     bool exec(std::string const& command);
     ssh_session session;
-    ssh_channel channel;
     std::string lstext;
     char* dirline;
 };

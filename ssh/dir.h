@@ -5,7 +5,7 @@
 namespace ssh {
 class DirPrivate;
 class SFtp;
-class Session;
+class Scp;
 class FileInfoPtr;
 class FileInfos;
 class Dir
@@ -54,12 +54,12 @@ public:
     };
 
     Dir(SFtp const& sftp, const char* path);
-    Dir(Session const& session, const char* path);
+    Dir(Scp const& scp, const char* path);
     ~Dir();
 
-    bool isRoot() const;
-    const char* dirName() const;
-    FileInfos fileInfoList(Filter filter = NoFilter, SortFlag sortFlag = NoSort);
+    bool is_root() const;
+    const char* dirname() const;
+    FileInfos fileinfos(Filter filter = NoFilter, SortFlag sortFlag = NoSort);
 
     bool mkdir(const char* path);
     bool rmdir(const char* path);

@@ -18,16 +18,18 @@ PropertyDialog::~PropertyDialog()
 
 void PropertyDialog::setFileInfo(ssh::FileInfoPtr const& fileInfo)
 {
-    if(fileInfo->isDir())
+    if(fileInfo->is_dir())
+    {
         ui->labelName->setText(QString("Folder name: %1").arg(QString::fromStdString(fileInfo->name())));
-    else
-        ui->labelName->setText(QString("File name: %1").arg(QString::fromStdString(fileInfo->name())));
-    if(fileInfo->isDir())
         ui->labelFileSize->hide();
+    }
     else
+    {
+        ui->labelName->setText(QString("File name: %1").arg(QString::fromStdString(fileInfo->name())));
         ui->labelFileSize->setText(QString("%1 %2")
                                .arg(ui->labelFileSize->text(),
                                     Utils::formatFileSize(fileInfo->size())));
+    }
     ui->labelDate->setText(QString("%1 %2")
                            .arg(ui->labelDate->text(),
                                 QDateTime::fromSecsSinceEpoch(fileInfo->time()).toString("yyyy-MM-dd HH:mm:ss")));
@@ -39,5 +41,5 @@ void PropertyDialog::setFileInfo(ssh::FileInfoPtr const& fileInfo)
                                  QString::fromStdString(fileInfo->group())));
     ui->labelPermissions->setText(QString("%1 %2")
                                   .arg(ui->labelPermissions->text(),
-                                       Utils::permissionsText(fileInfo->permissions(), fileInfo->isDir())));
+                                       Utils::permissionsText(fileInfo->permissions(), fileInfo->is_dir())));
 }

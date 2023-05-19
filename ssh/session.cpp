@@ -15,22 +15,22 @@ Session::~Session()
     delete d;
 }
 
-void Session::setHost(const char* host)
+void Session::set_host(const char* host)
 {
      ssh_options_set(d->session, SSH_OPTIONS_HOST, host);
 }
 
-void Session::setPort(int port)
+void Session::set_port(int port)
 {
     ssh_options_set(d->session, SSH_OPTIONS_PORT, &port);
 }
 
-void Session::setPort(const char* port)
+void Session::set_port(const char* port)
 {
     ssh_options_set(d->session, SSH_OPTIONS_PORT_STR, port);
 }
 
-void Session::setUser(const char* user)
+void Session::set_user(const char* user)
 {
     ssh_options_set(d->session, SSH_OPTIONS_USER, user);
 }

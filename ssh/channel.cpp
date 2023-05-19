@@ -38,7 +38,7 @@ bool Channel::close()
     return true;
 }
 
-bool Channel::sendEof()
+bool Channel::send_eof()
 {
     return ssh_channel_send_eof(d->channel) == SSH_OK;
 }
@@ -58,6 +58,11 @@ int Channel::poll(int timeout)
     return ssh_channel_poll_timeout(d->channel, timeout, 0);
 }
 
+void Channel::set_blocking(bool  enable)
+{
+    ssh_channel_set_blocking(d->channel, enable ? 1 : 0);
+}
+
 int Channel::read(void *dest, uint32_t count)
 {
     return ssh_channel_read(d->channel, dest, count, 0);
@@ -73,7 +78,7 @@ int Channel::write(void *dest, uint32_t count)
     return ssh_channel_write(d->channel, dest, count);
 }
 
-bool Channel::runShell(int cols, int rows)
+bool Channel::run_shell(int cols, int rows)
 {
     if (ssh_channel_request_pty(d->channel) != SSH_OK)
         return false;
@@ -87,14 +92,14 @@ bool Channel::runShell(int cols, int rows)
     return true;
 }
 
-bool Channel::shellIsOpen()
+bool Channel::is_open()
 {
     if(ssh_channel_is_open(d->channel))
         return true;
     return false;
 }
 
-bool Channel::shellIsEof()
+bool Channel::is_eof()
 {
     if(ssh_channel_is_eof(d->channel))
         return true;

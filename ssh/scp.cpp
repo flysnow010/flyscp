@@ -1,4 +1,5 @@
 #include "scp.h"
+#include "dir.h"
 #include "session.h"
 #include "sshprivate.h"
 #include<sys/stat.h>
@@ -117,6 +118,19 @@ bool Scp::leave_dir()
     if(ssh_scp_leave_directory(d->scp) != SSH_OK)
         return false;
     return true;
+}
+
+DirPtr Scp::home() const
+{
+    return DirPtr(new Dir(*this, "."));
+}
+DirPtr Scp::root() const
+{
+    return DirPtr(new Dir(*this, "/"));
+}
+DirPtr Scp::dir(const char* path) const
+{
+    return DirPtr(new Dir(*this, path));
 }
 
 }

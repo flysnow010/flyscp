@@ -11,10 +11,10 @@ public:
     ~Session();
 
     typedef std::shared_ptr<Session> Ptr;
-    void setHost(const char* host);
-    void setPort(int port);
-    void setPort(const char* port);
-    void setUser(const char* user);
+    void set_host(const char* host);
+    void set_port(int port);
+    void set_port(const char* port);
+    void set_user(const char* user);
 
     bool connect();
     void disconnect();
@@ -26,7 +26,6 @@ private:
     friend class Channel;
     friend class Scp;
     friend class SFtp;
-    friend class Dir;
     Session(Session const&);
     Session & operator == (Session const&);
 

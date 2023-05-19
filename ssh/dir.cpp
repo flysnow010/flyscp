@@ -1,6 +1,6 @@
 #include "dir.h"
 #include "sftp.h"
-#include "session.h"
+#include "scp.h"
 #include "fileinfo.h"
 #include "channel.h"
 #include "sshprivate.h"
@@ -349,8 +349,8 @@ Dir::Dir(SFtp const& sftp, const char* path)
 {
 }
 
-Dir::Dir(Session const& session, const char* path)
-    : d(new ChannelDirPrivate(path, session.d->session))
+Dir::Dir(Scp const& scp, const char* path)
+    : d(new ChannelDirPrivate(path, scp.d->session))
 {
 }
 
@@ -359,17 +359,17 @@ Dir::~Dir()
     delete d;
 }
 
-bool Dir::isRoot() const
+bool Dir::is_root() const
 {
     return d->path == std::string("/");
 }
 
-const char* Dir::dirName() const
+const char* Dir::dirname() const
 {
     return d->path.c_str();
 }
 
-FileInfos Dir::fileInfoList(Filter filter, SortFlag sortFlag)
+FileInfos Dir::fileinfos(Filter filter, SortFlag sortFlag)
 {
     FileInfos fileInfos;
     if(!d->opendir())
@@ -441,9 +441,9 @@ struct FileInfoCompare
         if(flag == Dir::NoSort)
             return false;
 
-        if(l->isDir())
+        if(l->is_dir())
         {
-            if(r->isFile())
+            if(r->is_file())
             {
                 if(flag & Dir::DirsFirst)
                     return true;
@@ -451,9 +451,9 @@ struct FileInfoCompare
             }
             else
             {
-                if(l->isParent())
+                if(l->is_parent())
                     return true;
-                if(r->isParent())
+                if(r->is_parent())
                     return false;
                 if(flag & Dir::Reversed)
                     return compare(l, r);
@@ -462,7 +462,7 @@ struct FileInfoCompare
         }
         else
         {
-            if(r->isDir())
+            if(r->is_dir())
             {
                 if(flag & Dir::DirsFirst)
                     return false;
