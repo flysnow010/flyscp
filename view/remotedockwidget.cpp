@@ -84,7 +84,7 @@ void RemoteDockWidget::cd(QString const& dir)
         if(!fileInfo)
             return;
 
-        if(fileInfo->isDir())
+        if(fileInfo->is_dir())
             openDir(fileInfo);
     }
 }
@@ -214,9 +214,9 @@ void RemoteDockWidget::viewClick(QModelIndex const& index)
     ssh::FileInfoPtr fileInfo = model_->fileInfo(index.row());
     if(!fileInfo)
         return;
-    if(fileInfo->isDir())
+    if(fileInfo->is_dir())
         openDir(fileInfo);
-    else if(fileInfo->isFile())
+    else if(fileInfo->is_file())
     {
         ;
     }
@@ -241,7 +241,7 @@ void RemoteDockWidget::customContextMenuRequested(const QPoint &pos)
         ssh::FileInfoPtr fileInfo = model_->fileInfo(index.row());
         if(!fileInfo)
             return;
-        if(fileInfo->isDir())
+        if(fileInfo->is_dir())
         {
              menu.addAction(tr("Open"), this, SLOT(open()));
              menu.addAction(tr("Download"), this, SLOT(download()));
@@ -253,7 +253,7 @@ void RemoteDockWidget::customContextMenuRequested(const QPoint &pos)
              menu.addAction(tr("Permissions"), this, SLOT(permissions()));
              menu.addAction(tr("Properties"), this, SLOT(properties()));
         }
-        else if(fileInfo->isFile())
+        else if(fileInfo->is_file())
         {
             menu.addAction(tr("Open"), this, SLOT(open()));
             menu.addAction(tr("Open with..."), this, SLOT(openWith()));
@@ -302,7 +302,7 @@ void RemoteDockWidget::connectionError(QString const& error)
 void RemoteDockWidget::parentDirectory()
 {
     ssh::FileInfoPtr fileInfo = model_->fileInfo(0);
-    if(!fileInfo  || !fileInfo->isParent())
+    if(!fileInfo  || !fileInfo->is_parent())
         return;
 
     std::string filePath = model_->parentPath();
@@ -346,7 +346,7 @@ void RemoteDockWidget::open()
     ssh::FileInfoPtr fileInfo = model_->fileInfo(index.row());
     if(!fileInfo)
         return;
-    if(fileInfo->isDir())
+    if(fileInfo->is_dir())
         openDir(fileInfo);
     else
     {
@@ -448,7 +448,7 @@ void RemoteDockWidget::permissions()
         return;
     PermissionsDialog dialog(this);
     dialog.setFileName(QString::fromStdString(fileInfo->name()));
-    dialog.setPermissions(fileInfo->permissions(), fileInfo->isDir());
+    dialog.setPermissions(fileInfo->permissions(), fileInfo->is_dir());
     if(dialog.exec() == QDialog::Accepted)
     {
         model_->chmod(fileInfo->name(), dialog.permissions());
@@ -459,14 +459,14 @@ void RemoteDockWidget::permissions()
 void RemoteDockWidget::openDir(ssh::FileInfoPtr const& fileInfo)
 {
     if(std::string(fileInfo->owner()) != sftp->userName()
-            && !fileInfo->otherCanRead())
+            && !fileInfo->other_is_only_read())
     {
         QMessageBox::warning(this, QApplication::applicationName(), "Permission denied");
         return;
     }
 
     std::string filePath;
-    if(fileInfo->isParent())
+    if(fileInfo->is_parent())
         filePath = model_->parentPath();
     else
         filePath = model_->filePath(fileInfo->name());

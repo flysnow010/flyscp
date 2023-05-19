@@ -10,10 +10,10 @@ SFtpSession::SFtpSession(QObject *parent)
 
 void SFtpSession::start(SSHSettings const& settings)
 {
-    sessioin->setHost(settings.hostName.toStdString().c_str());
-    sessioin->setPort(settings.port);
+    sessioin->set_host(settings.hostName.toStdString().c_str());
+    sessioin->set_port(settings.port);
     username_ = settings.userName.toStdString();
-    sessioin->setUser(username_.c_str());
+    sessioin->set_user(username_.c_str());
 
     if(!sessioin->connect())
     {
@@ -34,7 +34,11 @@ void SFtpSession::start(SSHSettings const& settings)
     }
     if(!sftp)
         sftp = ssh::SFtp::Ptr(new ssh::SFtp(*sessioin));
-    sftp->init();
+    if(!sftp->init())
+    {
+        sftp.reset();
+        scp = ssh::Scp::Ptr(new ssh::Scp(*sessioin));
+    }
     emit connected();
 }
 
