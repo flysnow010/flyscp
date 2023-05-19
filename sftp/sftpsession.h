@@ -25,7 +25,7 @@ public:
     }
 
     ssh::File::Ptr openForRead(const char* filename);
-    ssh::File::Ptr openForWrite(const char* filename);
+    ssh::File::Ptr openForWrite(const char* filename, uint64_t filesize = 0);
 
     std::string homeDir();
     std::string userName() const { return username_; }
@@ -40,6 +40,8 @@ signals:
     void connected();
     void unconnected();
     void connectionError(QString const& error);
+private:
+    ssh::File::Ptr createFile();
 
 private:
     ssh::Session::Ptr sessioin;

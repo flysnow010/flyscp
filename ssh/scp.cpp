@@ -15,6 +15,7 @@ Scp::Scp(Session const& session)
 Scp::~Scp()
 {
     close();
+    ssh_scp_free(d->scp);
     delete d;
 }
 
@@ -43,7 +44,7 @@ void Scp::close()
     if(d->isOpened)
     {
         ssh_scp_close(d->scp);
-       ssh_scp_free(d->scp);
+        d->isOpened = false;
     }
 }
 

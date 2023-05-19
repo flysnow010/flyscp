@@ -504,7 +504,8 @@ bool RemoteDockWidget::upload(QString const& fileName)
 {
     QFileInfo fileInfo(fileName);
     std::string filename = fileInfo.fileName().toStdString();
-    ssh::File::Ptr remotefile = sftp->openForWrite(model_->filePath(filename.c_str()).c_str());
+    ssh::File::Ptr remotefile = sftp->openForWrite(model_->filePath(filename.c_str()).c_str(),
+                                                   fileInfo.size());
     if(!remotefile)
         return false;
 

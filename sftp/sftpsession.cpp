@@ -50,18 +50,27 @@ void SFtpSession::stop()
 
 ssh::File::Ptr SFtpSession::openForRead(const char* filename)
 {
-    ssh::File::Ptr file(new ssh::File(*sftp));
+    ssh::File::Ptr file = createFile();
     if(file->open(filename, O_RDONLY, 0644))
         return file;
     return ssh::File::Ptr();
 }
 
-ssh::File::Ptr SFtpSession::openForWrite(const char* filename)
+ssh::File::Ptr SFtpSession::openForWrite(const char* filename, uint64_t filesize)
 {
-    ssh::File::Ptr file(new ssh::File(*sftp));
+    ssh::File::Ptr file = createFile();
+    file->set_filesize(filesize);
     if(file->open(filename, O_CREAT | O_WRONLY, 0644))
         return file;
     return ssh::File::Ptr();
+}
+
+ssh::File::Ptr SFtpSession::createFile()
+{
+    if(sftp)
+        return ssh::File::Ptr(new ssh::File(*sftp));
+    else
+        return ssh::File::Ptr(new ssh::File(*sessioin));
 }
 
 std::string SFtpSession::homeDir()

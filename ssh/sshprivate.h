@@ -137,16 +137,67 @@ public:
     std::string lstext;
     char* dirline;
 };
+
 class FilePrivate
 {
 public:
-    FilePrivate(sftp_session s)
+    FilePrivate()
+        : filesize(0)
+    {}
+
+    virtual ~FilePrivate() {}
+
+    virtual bool open(const char *file, int accesstype, mode_t mode) = 0;
+    virtual bool close() = 0;
+    virtual ssize_t read(void *buf, size_t count) = 0;
+    virtual ssize_t write(const void *buf, size_t count) = 0;
+
+    virtual void set_noblocking(bool /*enable*/) {}
+    virtual int seek(uint32_t /*new_offset*/) { return -1; }
+    virtual int seek(uint64_t /*new_offset*/) { return -1; }
+    virtual uint64_t tell() { return -1; }
+    virtual void rewind() {}
+
+    uint64_t filesize;
+};
+
+class SftpFilePrivate : public FilePrivate
+{
+public:
+    SftpFilePrivate(sftp_session s)
         : sftp(s)
         , file(0)
     {}
 
+    bool open(const char *file, int accesstype, mode_t mode) override;
+    bool close() override;
+    void set_noblocking(bool enable) override;
+    ssize_t read(void *buf, size_t count) override;
+    ssize_t write(const void *buf, size_t count) override;
+    int seek(uint32_t new_offset) override;
+    int seek(uint64_t new_offset) override;
+    uint64_t tell() override;
+    void rewind() override;
+
     sftp_session sftp;
     sftp_file file;
+};
+
+class ScpFilePrivate : public FilePrivate
+{
+public:
+    ScpFilePrivate(ssh_session s)
+        : session(s)
+        , scp(0)
+    {}
+
+    bool open(const char *file, int accesstype, mode_t mode) override;
+    bool close() override;
+    ssize_t read(void *buf, size_t count) override;
+    ssize_t write(const void *buf, size_t count) override;
+
+    ssh_session session;
+    ssh_scp scp;
 };
 
 class FileInfoPrivate

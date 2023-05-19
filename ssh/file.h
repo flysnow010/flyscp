@@ -8,15 +8,19 @@
 namespace ssh {
 class FilePrivate;
 class SFtp;
+class Session;
 class File
 {
 public:
     File(SFtp const& sftp);
+    File(Session const& session);
+
     ~File();
 
     typedef std::shared_ptr<File> Ptr;
 
-    bool open(const char *file, int accesstype, mode_t mode);
+    void set_filesize(uint64_t filesize);
+    bool open(const char *filename, int accesstype, mode_t mode);
     bool close();
 
     void set_noblocking(bool enable);
