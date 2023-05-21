@@ -59,7 +59,7 @@ void MainWindow::createConnects()
     createViewConnect();
     createButtonsConnect();
 }
-#define SCP
+#define HOME
 void MainWindow::createMenuConnect()
 {
     connect(ui->actionConnect, &QAction::triggered, this, [=](bool){
@@ -69,8 +69,13 @@ void MainWindow::createMenuConnect()
         settings.hostName = "192.168.40.80";
         settings.userName = "root";
 #else
+#ifdef HOME
+        settings.hostName = "192.168.3.63";
+        settings.userName = "fuwenchao";
+#else
         settings.hostName = "13.13.13.159";
         settings.userName = "james";
+#endif
 #endif
         dialog.setType(ConnectType::SSH);
         dialog.setSshSettings(settings);
@@ -81,7 +86,11 @@ void MainWindow::createMenuConnect()
 #ifdef SCP
             settings.passWord = "123456";
 #else
+#ifdef HOME
+            settings.passWord = "flysnow010";
+#else
             settings.passWord = "james010";
+#endif
 #endif
             rightDirView->start(settings);
             rightPanelWidget->addDirTab(rightDirView, Utils::networkIcon(), rightDirView->name());
