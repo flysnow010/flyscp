@@ -7,6 +7,7 @@
 #include "dialog/permissionsdialog.h"
 #include "core/clipboard.h"
 #include "core/filemanager.h"
+#include "core/winshell.h"
 #include "core/dirhistory.h"
 #include "core/dirfavorite.h"
 #include "util/utils.h"
@@ -352,7 +353,7 @@ void RemoteDockWidget::open()
     {
         QString fileName = download(fileInfo, Utils::tempPath());
         if(!fileName.isEmpty())
-            FileManager::Open(fileName);
+            WinShell::Open(fileName);
     }
 }
 
@@ -365,7 +366,7 @@ void RemoteDockWidget::openWith()
 
     QString fileName = download(fileInfo, Utils::tempPath());
     if(!fileName.isEmpty())
-        FileManager::OpenWith(fileName);
+        WinShell::OpenWith(fileName);
 }
 
 void RemoteDockWidget::download()

@@ -18,6 +18,7 @@ SOURCES += \
     core/dirhistory.cpp \
     core/filemanager.cpp \
     core/filetransfer.cpp \
+    core/winshell.cpp \
     dialog/aboutdialog.cpp \
     dialog/connectdialog.cpp \
     dialog/fileoperateconfirmdialog.cpp \
@@ -57,6 +58,7 @@ HEADERS += \
     core/filename.h \
     core/filetransfer.h \
     core/sshsettings.h \
+    core/winshell.h \
     dialog/aboutdialog.h \
     dialog/connectdialog.h \
     dialog/fileoperateconfirmdialog.h \

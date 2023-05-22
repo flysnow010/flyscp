@@ -4,7 +4,7 @@
 #include "util/utils.h"
 #include "core/dirhistory.h"
 #include "core/dirfavorite.h"
-#include "core/filemanager.h"
+#include "core/winshell.h"
 #include <QDir>
 #include <QHBoxLayout>
 #include <QToolButton>
@@ -137,7 +137,7 @@ void PanelWidget::libDirContextMenu()
     BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
     if(!dir)
         return;
-    QList<LibDir> libDirs = FileManager::libDirs();
+    QList<WinLibDir> libDirs = WinShell::winLibDirs();
     foreach(auto const& libDir, libDirs)
     {
         menu.addAction(libDir.icon(), libDir.caption, this, [&](bool){

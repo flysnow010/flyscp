@@ -4,6 +4,7 @@
 #include "model/localdirmodel.h"
 #include "core/filemanager.h"
 #include "core/filetransfer.h"
+#include "core/winshell.h"
 #include "core/clipboard.h"
 #include "core/contextmenu.h"
 #include "util/utils.h"
@@ -187,7 +188,7 @@ void LocalDirDockWidget::viewClick(QModelIndex const& index)
     if(model_->cd(fileName))
         updateCurrentDir(model_->dir());
     else
-        FileManager::Open(model_->filePath(index.row()));
+        WinShell::Open(model_->filePath(index.row()));
 }
 
 void LocalDirDockWidget::sortIndicatorChanged(int logicalIndex, Qt::SortOrder order)
@@ -217,7 +218,7 @@ void LocalDirDockWidget::customContextMenuRequested(const QPoint & pos)
 
         QAction* action = menu.addAction(name, this, [=]()
         {
-            FileManager::OpenByExplorer(fileName);
+            WinShell::OpenByExplorer(fileName);
         });
 
         QFont font = action->font();
@@ -235,7 +236,7 @@ void LocalDirDockWidget::customContextMenuRequested(const QPoint & pos)
         if(fileInfo.isFile())
         {
             QAction* action = menu.addAction(tr("Open with"), this, [=](){
-                FileManager::OpenWith(fileInfo.filePath());
+                WinShell::OpenWith(fileInfo.filePath());
             });
 
             QFont font = action->font();
@@ -300,9 +301,9 @@ void LocalDirDockWidget::customContextMenuRequested(const QPoint & pos)
     menu.addAction("Properties", this, [&](bool) {
         QStringList fileNames = selectedileNames(QString(), false, true);
         if(fileNames.size() > 1)
-            FileManager::Property(fileNames);
+            WinShell::Property(fileNames);
         else
-            FileManager::Property(fileName);
+            WinShell::Property(fileName);
     });
 
     menu.exec(QCursor::pos());
@@ -315,7 +316,7 @@ void LocalDirDockWidget::beginDragFile(QPoint const& point)
         return;
     QDrag *drag = new QDrag(ui->treeView);
     QStringList fileNames = selectedileNames("file:///");
-    QMimeData* mimeData = FileManager::dropMimeData(fileNames);
+    QMimeData* mimeData = WinShell::dropMimeData(fileNames);
     drag->setMimeData(mimeData);
     drag->setPixmap(QPixmap(":/image/copy.png"));
     drag->exec();
@@ -375,13 +376,13 @@ void LocalDirDockWidget::drop(QDropEvent * event)
 void LocalDirDockWidget::cut()
 {
     QStringList fileNames = selectedileNames(QString(), false, true);
-    FileManager::Copy(fileNames, true);
+    WinShell::Copy(fileNames, true);
 }
 
 void LocalDirDockWidget::copy()
 {
     QStringList fileNames = selectedileNames(QString(), false, true);
-    FileManager::Copy(fileNames, false);
+    WinShell::Copy(fileNames, false);
 }
 
 void LocalDirDockWidget::paste()
@@ -456,14 +457,14 @@ void LocalDirDockWidget::viewFile()
     QString fileName = selectedFileName();
     QFileInfo fileInfo(fileName);
     if(fileInfo.isFile())
-        FileManager::Open(fileName);
+        WinShell::Open(fileName);
 }
 void LocalDirDockWidget::editFile()
 {
     QString fileName = selectedFileName();
     QFileInfo fileInfo(fileName);
     if(fileInfo.isFile())
-        FileManager::Open(fileName);
+        WinShell::Open(fileName);
 }
 
 void LocalDirDockWidget::copyFiles(QString const& dstFilePath)
