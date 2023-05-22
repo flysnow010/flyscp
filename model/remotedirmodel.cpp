@@ -89,6 +89,16 @@ ssh::FileInfoPtr RemoteDirModel::fileInfo(int row) const
     return ssh::FileInfoPtr();
 }
 
+std::string RemoteDirModel::fileName(int row) const
+{
+    ssh::FileInfoPtr fileinfo = fileInfo(row);
+    if(fileinfo)
+    {
+        return fileinfo->name();
+    }
+    return std::string();
+}
+
 std::string RemoteDirModel::filePath(int row) const
 {
     ssh::FileInfoPtr fileinfo = fileInfo(row);

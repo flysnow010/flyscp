@@ -12,7 +12,7 @@ public:
 protected:
     void doUploadFiles(FileNames const& fileNames) override;
     void doDownloadFiles(FileNames const& fileNames) override;
-    void doDelereFiles(QStringList const& remoteFileNames, bool isDst) override;
+    void doDelereFiles(QStringList const& remoteFileNames, QString const& filePath, bool isDst) override;
 private:
     bool uploadFile(QString const& srcFileName, QString const& dstfileName);
     bool downloadFile(QString const& srcFileName, QString const& dstfileName);

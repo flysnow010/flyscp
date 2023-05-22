@@ -35,9 +35,9 @@ void RemoteFileTransfer::downloadFiles(FileNames const& fileNames)
     emit onDownloadFiles(fileNames);
 }
 
-void RemoteFileTransfer::delereFiles(QStringList const& remoteFileNames, bool isDst)
+void RemoteFileTransfer::delereFiles(QStringList const& fileNames, QString const& filePath, bool isDst)
 {
-    emit onDelereFiles(remoteFileNames, isDst);
+    emit onDelereFiles(fileNames, filePath, isDst);
 }
 
 void RemoteFileTransfer::cancel()

@@ -46,7 +46,7 @@ void SFtpFileManager::doDownloadFiles(FileNames const& fileNames)
     emit finished();
 }
 
-void SFtpFileManager::doDelereFiles(QStringList const& remoteFileNames, bool isDst)
+void SFtpFileManager::doDelereFiles(QStringList const& remoteFileNames, QString const& filePath, bool isDst)
 {
     QStringList newFileNames;
     FileNames::MakeFileNames(remoteFileNames, newFileNames);
@@ -56,11 +56,6 @@ void SFtpFileManager::doDelereFiles(QStringList const& remoteFileNames, bool isD
             break;
 
         emit totalProgress(newFileNames[i], QString(), newFileNames.size(), i);
-//        QFileInfo fileInfo(newFileNames[i]);
-//        if(fileInfo.isDir())
-//            RemoveDirectory(newFileNames[i].toStdWString().c_str());
-//        else
-//            DeleteFile(newFileNames[i].toStdWString().c_str());
         emit totalProgress(newFileNames[i], QString(), newFileNames.size(), i + 1);
     }
     emit finished();

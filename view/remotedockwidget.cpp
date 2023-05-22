@@ -468,7 +468,8 @@ void RemoteDockWidget::deleteFile()
 
 void RemoteDockWidget::deleteFiles()
 {
-    qDebug() << selectedileNames() << model_->dirName();
+    SFtpFileManager fileManager(sftp);
+    fileManager.delereFiles(selectedileNames(),  model_->dirName(), true)
 }
 
 QStringList RemoteDockWidget::selectedileNames()
@@ -476,9 +477,7 @@ QStringList RemoteDockWidget::selectedileNames()
     QModelIndexList indexs = ui->treeView->selectionModel()->selectedRows(0);
     QStringList names;
     for(int i = 0; i < indexs.size(); i++)
-    {
-        names << QString::fromStdString(model_->filePath(indexs[i].row()));
-    }
+        names << QString::fromStdString(model_->fileName(indexs[i].row()));
     return names;
 }
 

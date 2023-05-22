@@ -16,12 +16,12 @@ public:
 public:
     void uploadFiles(FileNames const& fileNames);
     void downloadFiles(FileNames const& fileNames);
-    void delereFiles(QStringList const& remoteFileNames, bool isDst);
+    void delereFiles(QStringList const& fileNames, QString const& filePath, bool isDst);
     void cancel();
 signals:
     void onUploadFiles(FileNames const& fileNames);
     void onDownloadFiles(FileNames const& fileNames);
-    void onDelereFiles(QStringList const& fileNames, bool isDst);
+    void onDelereFiles(QStringList const& fileNames, QString const& filePath, bool isDst);
 
     void totalProgress(QString const& srcFilename, QString const& dstFilename,
                        int totalSize, int totalSizeTransferred);

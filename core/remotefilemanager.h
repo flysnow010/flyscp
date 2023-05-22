@@ -14,7 +14,7 @@ public:
 public slots:
     void uploadFiles(FileNames const& fileNames);
     void downloadFiles(FileNames const& fileNames);
-    void delereFiles(QStringList const& remoteFileNames, bool isDst);
+    void delereFiles(QStringList const& fileNames, QString const& filePath, bool isDst);
     void cancel();
 
 signals:
@@ -26,7 +26,7 @@ signals:
 protected:
     virtual void doUploadFiles(FileNames const& fileNames);
     virtual void doDownloadFiles(FileNames const& fileNames);
-    virtual void doDelereFiles(QStringList const& remoteFileNames, bool isDst) = 0;
+    virtual void doDelereFiles(QStringList const& fileNames, QString const& filePath, bool isDst) = 0;
 protected:
     bool singled() { return signal_; }
     void doSignal() { signal_ = true; };

@@ -16,9 +16,9 @@ void RemoteFileManager::downloadFiles(FileNames const& fileNames)
     doDownloadFiles(fileNames);
 }
 
-void RemoteFileManager::delereFiles(QStringList const& remoteFileNames, bool isDst)
+void RemoteFileManager::delereFiles(QStringList const& fileNames, QString const& filePath, bool isDst)
 {
-    doDelereFiles(remoteFileNames, isDst);
+    doDelereFiles(fileNames, filePath, isDst);
 }
 
 void RemoteFileManager::cancel()
