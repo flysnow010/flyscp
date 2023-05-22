@@ -61,7 +61,9 @@ bool Session::verify()
         return false;
     enum ssh_known_hosts_e state = ssh_session_is_known_server(d->session);
     ssh_clean_pubkey_hash(&hash);
-    if(state != SSH_KNOWN_HOSTS_OK && state != SSH_KNOWN_HOSTS_OTHER)
+    if(state != SSH_KNOWN_HOSTS_OK
+            && state != SSH_KNOWN_HOSTS_OTHER
+            && state != SSH_KNOWN_HOSTS_NOT_FOUND)
         return false;
     return true;
 }
