@@ -469,7 +469,7 @@ void RemoteDockWidget::deleteFile()
 void RemoteDockWidget::deleteFiles()
 {
     SFtpFileManager fileManager(sftp);
-    fileManager.delereFiles(selectedileNames(),  model_->dirName(), true)
+    fileManager.delereFiles(selectedileNames(),  model_->dirName(), true);
 }
 
 QStringList RemoteDockWidget::selectedileNames()
