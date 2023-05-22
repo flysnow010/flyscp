@@ -26,10 +26,6 @@ signals:
     void finished();
 private:
     quint32 onProgress(qint64 TotalFileSize, qint64 TotalBytesTransferred);
-    void makeFileNames(FileNames const& fileNames, FileNames & newFileNames);
-    void makeFileNames(QStringList const& fileNames, QStringList & newFileNames);
-    void findFilenames(FileName const& fileName, FileNames &fileNames);
-    void findFilenames(QString const& fileName, QStringList &fileNames);
 
     bool singled() { return signal_; }
     void doSignal() { signal_ = true; };

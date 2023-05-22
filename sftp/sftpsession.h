@@ -24,6 +24,11 @@ public:
         return sftp ? sftp->dir(path.c_str()) : scp->dir(path.c_str());
     }
 
+    inline bool mkdir(std::string const& path)
+    {
+        return sftp ? sftp->mkdir(path.c_str()) : scp->mkdir(path.c_str());
+    }
+
     ssh::File::Ptr openForRead(const char* filename);
     ssh::File::Ptr openForWrite(const char* filename, uint64_t filesize = 0);
 

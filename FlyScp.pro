@@ -17,7 +17,11 @@ SOURCES += \
     core/dirfavorite.cpp \
     core/dirhistory.cpp \
     core/filemanager.cpp \
+    core/filename.cpp \
     core/filetransfer.cpp \
+    core/remotefilemanager.cpp \
+    core/remotefiletransfer.cpp \
+    core/sftpfilemanager.cpp \
     core/winshell.cpp \
     dialog/aboutdialog.cpp \
     dialog/connectdialog.cpp \
@@ -57,6 +61,9 @@ HEADERS += \
     core/filemanager.h \
     core/filename.h \
     core/filetransfer.h \
+    core/remotefilemanager.h \
+    core/remotefiletransfer.h \
+    core/sftpfilemanager.h \
     core/sshsettings.h \
     core/winshell.h \
     dialog/aboutdialog.h \

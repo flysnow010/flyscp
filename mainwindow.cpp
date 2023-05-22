@@ -52,14 +52,14 @@ MainWindow::~MainWindow()
     save();
     delete ui;
 }
-//#define SCP
+
 void MainWindow::createConnects()
 {
     createMenuConnect();
     createViewConnect();
     createButtonsConnect();
 }
-#define HOME
+//#define SCP
 void MainWindow::createMenuConnect()
 {
     connect(ui->actionConnect, &QAction::triggered, this, [=](bool){

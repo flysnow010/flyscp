@@ -41,6 +41,9 @@
       <property name="frameShape">
        <enum>QFrame::NoFrame</enum>
       </property>
+      <property name="selectionMode">
+       <enum>QAbstractItemView::ExtendedSelection</enum>
+      </property>
      </widget>
     </item>
    </layout>

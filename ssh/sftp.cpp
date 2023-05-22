@@ -4,6 +4,8 @@
 #include "dir.h"
 #include "sshprivate.h"
 
+#include <sys/stat.h>
+
 namespace ssh {
 
 SFtp::SFtp(Session const& session)
@@ -49,6 +51,13 @@ const char * SFtp::extension_name(unsigned int index)
 const char * SFtp::extension_data(unsigned int index)
 {
     return sftp_extensions_get_data(d->sftp, index);
+}
+
+bool SFtp::mkdir(const char* dirname)
+{
+    if(sftp_mkdir(d->sftp, dirname, S_IRWXU) != SSH_OK)
+        return false;
+    return true;
 }
 
 DirPtr SFtp::home() const

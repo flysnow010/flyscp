@@ -74,7 +74,6 @@ private:
                                  bool isOnlyFilename = false, bool isParent = false);
     QString selectedFileName(bool isOnlyFilename = false);
 
-    FileNames getFileNames(QStringList const& fileNames, QString const& filePath);
     void copyFilels(QStringList const& fileNames, QString const& dstFilePath);
     void cutFiles(QStringList const& fileNames, QString const& dstFilePath);
     void fileTransfer(FileNames const& fileNames, bool isMove);

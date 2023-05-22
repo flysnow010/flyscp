@@ -22,6 +22,7 @@ public:
     const char * extension_name(unsigned int index);
     const char * extension_data(unsigned int index);
 
+    bool mkdir(const char* dirname);
     DirPtr home() const;
     DirPtr root() const;
     DirPtr dir(const char* path) const;

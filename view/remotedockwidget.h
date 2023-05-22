@@ -1,6 +1,7 @@
 #ifndef REMOTEDOCKWIDGET_H
 #define REMOTEDOCKWIDGET_H
-#include <core/sshsettings.h>
+#include "core/sshsettings.h"
+#include "core/filename.h"
 #include "core/basedir.h"
 #include <QDockWidget>
 
@@ -43,6 +44,10 @@ private slots:
     void viewClick(QModelIndex const& index);
     void customContextMenuRequested(const QPoint &pos);
     void sortIndicatorChanged(int logicalIndex, Qt::SortOrder order);
+    void beginDragFile(QPoint const& point);
+    void dragEnter(QDragEnterEvent * event);
+    void dragMove(QDragMoveEvent * event);
+    void drop(QDropEvent * event);
     void connected();
     void unconnected();
     void connectionError(QString const& error);
@@ -58,6 +63,7 @@ private slots:
     void download();
     void deleteDir();
     void deleteFile();
+    void deleteFiles();
     void rename();
     void copyFilepath();
     void properties();
@@ -65,10 +71,13 @@ private slots:
 private:
     void saveSettings();
     void loadSettings();
-    QString getText(QString const& label, QString const& value = QString());
+
+    QStringList selectedileNames();
+
     void openDir(ssh::FileInfoPtr const& fileInfo);
     QString download(ssh::FileInfoPtr const& fileInfo, QDir const& dstDir);
     bool upload(QString const& fileName);
+    void fileTransfer(FileNames const& fileNames, bool isDowload);
     void updateCurrentDir(QString const& dir, QString const& caption = QString(), bool  isNavigation = false);
 private:
     Ui::RemoteDockWidget *ui;

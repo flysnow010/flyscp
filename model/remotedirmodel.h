@@ -18,6 +18,7 @@ public:
 
     ssh::FileInfoPtr fileInfo(QString const& fileName) const;
     ssh::FileInfoPtr fileInfo(int row) const;
+    std::string filePath(int row) const;
     std::string filePath(const char* path) const;
     std::string parentPath() const;
 

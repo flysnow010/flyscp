@@ -368,8 +368,7 @@ void LocalDirDockWidget::drop(QDropEvent * event)
         return;
 
     QStringList fileNames = mimeData->text().split("\n");
-    FileNames  newFileNames = getFileNames(fileNames, filePath);
-    fileTransfer(newFileNames, false);
+    fileTransfer(FileNames::GetFileNames(fileNames, filePath, "file:///"), false);
     model_->refresh();
 }
 
@@ -566,43 +565,14 @@ QString LocalDirDockWidget::selectedFileName(bool isOnlyFilename)
     return model_->filePath(index.row());
 }
 
-FileNames LocalDirDockWidget::getFileNames(QStringList const& fileNames, QString const& filePath)
-{
-    FileNames  newFileNames;
-    QDir dir(filePath);
-    for(int i = 0; i < fileNames.size(); i++)
-    {
-        if(fileNames[i].isEmpty())
-            continue;
-
-        QFileInfo fileInfo(fileNames[i].mid(QString("file:///").size()));
-
-        FileName fileName;
-        fileName.src = fileInfo.filePath();
-        fileName.dst = dir.filePath(fileInfo.fileName());
-        if(fileName.src == fileName.dst)
-        {
-            QString filename ;
-            if(fileInfo.isDir())
-                filename = QString("%1_copy").arg(fileInfo.completeBaseName());
-            else
-                filename = QString("%1_copy.%2").arg(fileInfo.completeBaseName(), fileInfo.suffix());
-            fileName.dst = dir.filePath(filename);
-        }
-        newFileNames << fileName;
-    }
-    return newFileNames;
-}
 void LocalDirDockWidget::copyFilels(QStringList const& fileNames, QString const& dstFilePath)
 {
-    FileNames  newFileNames = getFileNames(fileNames, dstFilePath);
-    fileTransfer(newFileNames, false);
+    fileTransfer(FileNames::GetFileNames(fileNames, dstFilePath, "file:///"), false);
 }
 
 void LocalDirDockWidget::cutFiles(QStringList const& fileNames, QString const& dstFilePath)
 {
-    FileNames  newFileNames = getFileNames(fileNames, dstFilePath);
-    fileTransfer(newFileNames, true);
+    fileTransfer(FileNames::GetFileNames(fileNames, dstFilePath, "file:///"), true);
 }
 
 void LocalDirDockWidget::fileTransfer(FileNames const& fileNames, bool isMove)
