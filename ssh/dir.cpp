@@ -331,7 +331,7 @@ bool ChannelDirPrivate::rename(const char *original, const  char *newname)
 bool ChannelDirPrivate::chmod(const char* filename, uint16_t mode)
 {
     char strMode[64];
-    snprintf(strMode, sizeof(strMode), "%O", mode);
+    snprintf(strMode, sizeof(strMode), "%o", mode);
     std::string command = std::string("chmod  ") + std::to_string(mode)
             + std::string(" ") + filename;
     return exec(command);
@@ -531,6 +531,22 @@ bool Dir::rename(const char *original, const  char *newname)
 bool Dir::chmod(const char* filename, uint16_t mode)
 {
     return d->chmod(filename, mode);
+}
+
+std::string Dir::dirname(const char* filename)
+{
+    char* name = ssh_dirname(filename);
+    std::string dir(name);
+    SSH_STRING_FREE_CHAR(name);
+    return dir;
+}
+
+std::string Dir::basename(const char* filename)
+{
+    char* name = ssh_basename(filename);
+    std::string base(name);
+    SSH_STRING_FREE_CHAR(name);
+    return base;
 }
 
 }

@@ -1,6 +1,7 @@
 #ifndef SSH_DIR_H
 #define SSH_DIR_H
 #include <memory>
+#include <string>
 
 namespace ssh {
 class DirPrivate;
@@ -67,6 +68,8 @@ public:
     bool rmfile(const char* filename);
     bool rename(const char *original, const  char *newname);
     bool chmod(const char* filename, uint16_t mode);
+    static std::string dirname(const char* filename);
+    static std::string basename(const char* filename);
 private:
     void sort(FileInfos &fileInfos, SortFlag sortFlag);
     Dir(Dir const&);
