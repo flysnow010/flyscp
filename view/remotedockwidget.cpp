@@ -337,7 +337,16 @@ void RemoteDockWidget::drop(QDropEvent * event)
         return;
 
     QStringList fileNames = mimeData->text().split("\n");
-    fileTransfer(FileNames::GetFileNames(fileNames, filePath, "file:///"), false);
+    QStringList newFileNames;
+    QString prefix("file:///");
+    foreach(auto const& fileName, fileNames)
+    {
+        if(fileName.startsWith(prefix))
+            newFileNames << fileName.mid(prefix.size());
+        else
+            newFileNames << fileName;
+    }
+    fileTransfer(newFileNames, QString(), filePath, Upload);
     model_->refresh();
 }
 
@@ -433,43 +442,21 @@ void RemoteDockWidget::openWith()
 
 void RemoteDockWidget::download()
 {
+    QStringList fileNames = selectedileNames();
+    if(fileNames.isEmpty())
+        return;
+
     QString filePath = QFileDialog::getExistingDirectory(this, QApplication::applicationName());
     if(filePath.isEmpty())
         return;
 
-    QModelIndex index = ui->treeView->currentIndex();
-    ssh::FileInfoPtr fileInfo = model_->fileInfo(index.row());
-    if(!fileInfo)
-        return;
-
-    download(fileInfo, QDir(filePath));
-}
-
-void RemoteDockWidget::deleteDir()
-{
-    QModelIndex index = ui->treeView->currentIndex();
-    ssh::FileInfoPtr fileInfo = model_->fileInfo(index.row());
-    if(!fileInfo)
-        return;
-    model_->rmdir(fileInfo->basename());
-    model_->refresh();
-}
-
-void RemoteDockWidget::deleteFile()
-{
-    QModelIndex index = ui->treeView->currentIndex();
-    ssh::FileInfoPtr fileInfo = model_->fileInfo(index.row());
-    if(!fileInfo)
-        return;
-
-    model_->rmFile(fileInfo->name());
-    model_->refresh();
+    fileTransfer(selectedileNames(), model_->dirName(), filePath, Download);
 }
 
 void RemoteDockWidget::deleteFiles()
 {
-    SFtpFileManager fileManager(sftp);
-    fileManager.delereFiles(selectedileNames(),  model_->dirName(), true);
+    fileTransfer(selectedileNames(), model_->dirName(), QString(), Delete);
+    model_->refresh();
 }
 
 QStringList RemoteDockWidget::selectedileNames()
@@ -563,6 +550,7 @@ QString RemoteDockWidget::download(ssh::FileInfoPtr const& fileInfo, QDir const&
      QFile file(fileName);
      if(!file.open(QIODevice::WriteOnly))
          return QString();
+
      uint64_t filesize = fileInfo->size();
      while(filesize > 0)
      {
@@ -581,11 +569,14 @@ QString RemoteDockWidget::download(ssh::FileInfoPtr const& fileInfo, QDir const&
 bool RemoteDockWidget::upload(QString const& fileName)
 {
     SFtpFileManager fileManger(sftp);
-    fileManger.uploadFiles(FileNames::GetFileNames(fileName, model_->dirName()));
+    fileTransfer(QStringList() << fileName, QString(), model_->dirName(), Upload);
     return true;
 }
 
-void RemoteDockWidget::fileTransfer(FileNames const& fileNames, bool isDowload)
+void RemoteDockWidget::fileTransfer(QStringList const& srcFileNames,
+                                    QString const& srcFilePath,
+                                    QString const& dstFilePath,
+                                    OperateType type)
 {
     RemoteFileTransfer transfer(new SFtpFileManager(sftp));
     FileProgressDialog dialog(this);
@@ -596,15 +587,20 @@ void RemoteDockWidget::fileTransfer(FileNames const& fileNames, bool isDowload)
     connect(&transfer, &RemoteFileTransfer::error, &dialog, &FileProgressDialog::error);
     dialog.setModal(true);
     dialog.show();
-    if(isDowload)
+    if(type == Download)
     {
         dialog.setWindowTitle("DownloadFiles");
-        transfer.downloadFiles(fileNames);
+        transfer.downloadFiles(srcFileNames, srcFilePath, dstFilePath);
     }
-    else
+    else if(type == Upload)
     {
         dialog.setWindowTitle("UploadFiles");
-        transfer.uploadFiles(fileNames);
+        transfer.uploadFiles(srcFileNames, dstFilePath);
+    }
+    else if(type == Delete)
+    {
+        dialog.setWindowTitle("DeleteFiles");
+        transfer.deleteFiles(srcFileNames, srcFilePath, false);
     }
     while(!dialog.isFinished())
     {

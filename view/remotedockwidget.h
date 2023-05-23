@@ -3,6 +3,7 @@
 #include "core/sshsettings.h"
 #include "core/filename.h"
 #include "core/basedir.h"
+
 #include <QDockWidget>
 
 namespace Ui {
@@ -25,6 +26,7 @@ class RemoteDockWidget : public QDockWidget, public BaseDir
 public:
     explicit RemoteDockWidget(QWidget *parent = nullptr);
     ~RemoteDockWidget();
+    enum OperateType{ Upload, Download, Delete };
 
     bool isRemote() const override { return true; }
     void setDir(QString const& dir, QString const& caption = QString(), bool  isNavigation = false) override;
@@ -61,8 +63,6 @@ private slots:
     void open();
     void openWith();
     void download();
-    void deleteDir();
-    void deleteFile();
     void deleteFiles();
     void rename();
     void copyFilepath();
@@ -77,8 +77,13 @@ private:
     void openDir(ssh::FileInfoPtr const& fileInfo);
     QString download(ssh::FileInfoPtr const& fileInfo, QDir const& dstDir);
     bool upload(QString const& fileName);
-    void fileTransfer(FileNames const& fileNames, bool isDowload);
-    void updateCurrentDir(QString const& dir, QString const& caption = QString(), bool  isNavigation = false);
+    void fileTransfer(QStringList const& srcFileNames,
+                      QString const& srcFilePath,
+                      QString const& dstFilePath,
+                      OperateType type);
+    void updateCurrentDir(QString const& dir,
+                          QString const& caption = QString(),
+                          bool  isNavigation = false);
 private:
     Ui::RemoteDockWidget *ui;
     RemoteDirModel* model_;
