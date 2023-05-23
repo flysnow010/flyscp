@@ -12,9 +12,14 @@ public:
     virtual ~RemoteFileManager(){};
 
 public slots:
-    void uploadFiles(FileNames const& fileNames);
-    void downloadFiles(FileNames const& fileNames);
-    void delereFiles(QStringList const& fileNames, QString const& filePath, bool isDst);
+    virtual void uploadFiles(QStringList const& srcFileNames,
+                             QString const& dstFilePath) = 0;
+    virtual void downloadFiles(QStringList const& srcFileNames,
+                       QString const& srcFilePath,
+                       QString const& dstFilePath) = 0;
+    virtual void deleteFiles(QStringList const& fileNames,
+                     QString const& filePath,
+                     bool isDst) = 0;
     void cancel();
 
 signals:
@@ -23,10 +28,7 @@ signals:
     void fileProgress(qint64 totalFileSize, qint64 totalBytesTransferred);
     void error(QString const& e);
     void finished();
-protected:
-    virtual void doUploadFiles(FileNames const& fileNames);
-    virtual void doDownloadFiles(FileNames const& fileNames);
-    virtual void doDelereFiles(QStringList const& fileNames, QString const& filePath, bool isDst) = 0;
+
 protected:
     bool singled() { return signal_; }
     void doSignal() { signal_ = true; };

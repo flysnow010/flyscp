@@ -14,14 +14,24 @@ public:
     ~RemoteFileTransfer();
 
 public:
-    void uploadFiles(FileNames const& fileNames);
-    void downloadFiles(FileNames const& fileNames);
-    void delereFiles(QStringList const& fileNames, QString const& filePath, bool isDst);
+    void uploadFiles(QStringList const& srcFileNames,
+                     QString const& dstFilePath);
+    void downloadFiles(QStringList const& srcFileNames,
+                       QString const& srcFilePath,
+                       QString const& dstFilePath);
+    void deleteFiles(QStringList const& fileNames,
+                     QString const& filePath,
+                     bool isDst);
     void cancel();
 signals:
-    void onUploadFiles(FileNames const& fileNames);
-    void onDownloadFiles(FileNames const& fileNames);
-    void onDelereFiles(QStringList const& fileNames, QString const& filePath, bool isDst);
+    void onUploadFiles(QStringList const& srcFileNames,
+                       QString const& dstFilePath);
+    void onDownloadFiles(QStringList const& srcFileNames,
+                         QString const& srcFilePath,
+                         QString const& dstFilePath);
+    void onDeleteFiles(QStringList const& fileNames,
+                       QString const& filePath,
+                       bool isDst);
 
     void totalProgress(QString const& srcFilename, QString const& dstFilename,
                        int totalSize, int totalSizeTransferred);

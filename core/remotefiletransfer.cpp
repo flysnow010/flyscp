@@ -9,7 +9,7 @@ RemoteFileTransfer::RemoteFileTransfer(RemoteFileManager* worker, QObject *paren
 
     connect(this, &RemoteFileTransfer::onUploadFiles, worker, &RemoteFileManager::uploadFiles);
     connect(this, &RemoteFileTransfer::onDownloadFiles, worker, &RemoteFileManager::downloadFiles);
-    connect(this, &RemoteFileTransfer::onDelereFiles, worker, &RemoteFileManager::delereFiles);
+    connect(this, &RemoteFileTransfer::onDeleteFiles, worker, &RemoteFileManager::deleteFiles);
 
     connect(worker, &RemoteFileManager::totalProgress, this, &RemoteFileTransfer::totalProgress);
     connect(worker, &RemoteFileManager::fileProgress, this, &RemoteFileTransfer::fileProgress);
@@ -25,19 +25,22 @@ RemoteFileTransfer::~RemoteFileTransfer()
     workerThread.wait();
 }
 
-void RemoteFileTransfer::uploadFiles(FileNames const& fileNames)
+void RemoteFileTransfer::uploadFiles(QStringList const& srcFileNames,
+                                     QString const& dstFilePath)
 {
-    emit onUploadFiles(fileNames);
+    emit onUploadFiles(srcFileNames, dstFilePath);
 }
 
-void RemoteFileTransfer::downloadFiles(FileNames const& fileNames)
+void RemoteFileTransfer::downloadFiles(QStringList const& srcFileNames,
+                                       QString const& srcFilePath,
+                                       QString const& dstFilePath)
 {
-    emit onDownloadFiles(fileNames);
+    emit onDownloadFiles(srcFileNames, srcFilePath, dstFilePath);
 }
 
-void RemoteFileTransfer::delereFiles(QStringList const& fileNames, QString const& filePath, bool isDst)
+void RemoteFileTransfer::deleteFiles(QStringList const& fileNames, QString const& filePath, bool isDst)
 {
-    emit onDelereFiles(fileNames, filePath, isDst);
+    emit onDeleteFiles(fileNames, filePath, isDst);
 }
 
 void RemoteFileTransfer::cancel()

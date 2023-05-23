@@ -9,6 +9,18 @@ struct FileName
     QString dst;
 };
 
+struct FileInfo
+{
+    FileInfo(QString const& f, bool dir)
+        : fileName(f)
+        , isDir(dir)
+    {}
+
+    QString fileName;
+    bool isDir = false;
+};
+typedef QList<FileInfo> FileInfos;
+
 class FileNames : public QList<FileName>
 {
 public:
