@@ -26,7 +26,7 @@ public:
 
     inline bool mkdir(std::string const& path)
     {
-        return sftp ? sftp->mkdir(path.c_str()) : scp->mkdir(path.c_str());
+        return sftp ? sftp->mkdir(path.c_str()) : createDir(path);
     }
 
     ssh::File::Ptr openForRead(const char* filename);
@@ -47,6 +47,7 @@ signals:
     void connectionError(QString const& error);
 private:
     ssh::File::Ptr createFile();
+    bool createDir(std::string const& path);
 
 private:
     ssh::Session::Ptr sessioin;

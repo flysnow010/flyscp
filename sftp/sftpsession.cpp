@@ -1,5 +1,6 @@
 #include "sftpsession.h"
 #include "ssh/channel.h"
+#include "ssh/dir.h"
 #include <fcntl.h>
 
 SFtpSession::SFtpSession(QObject *parent)
@@ -71,6 +72,22 @@ ssh::File::Ptr SFtpSession::createFile()
         return ssh::File::Ptr(new ssh::File(*sftp));
     else
         return ssh::File::Ptr(new ssh::File(*sessioin));
+}
+
+bool SFtpSession::createDir(std::string const& path)
+{
+    if(!scp)
+        return false;
+
+    std::string dirname = ssh::Dir::dirname(path.c_str());
+    std::string basename = ssh::Dir::basename(path.c_str());
+    if(scp->open(dirname.c_str(), false))
+    {
+        scp->mkdir(basename.c_str());
+        scp->close();
+        return true;
+    }
+    return false;
 }
 
 std::string SFtpSession::homeDir()
