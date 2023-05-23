@@ -100,4 +100,14 @@ uint64_t FileInfo::size() const
     return d->info->size;
 }
 
+FileInfoPtr FileInfos::find(std::string const& name) const
+{
+    for(auto it = begin(); it != end(); ++it)
+    {
+        if(strcmp((*it)->name(), name.c_str()) == 0)
+            return *it;
+    }
+    return FileInfoPtr();
+}
+
 }

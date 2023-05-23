@@ -63,7 +63,8 @@ public:
 
 class FileInfos : public std::vector<FileInfoPtr>
 {
-
+public:
+    FileInfoPtr find(std::string const& name) const;
 };
 }
 #endif // SSH_FILEINFO_H
