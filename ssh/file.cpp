@@ -68,7 +68,11 @@ bool ScpFilePrivate::open(const char *filename, int accesstype, mode_t mode)
     if(isRead)
         scp = ssh_scp_new(session, SSH_SCP_READ, filename);
     else
-        scp = ssh_scp_new(session, SSH_SCP_WRITE | SSH_SCP_RECURSIVE, ssh_dirname(filename));
+    {
+        char* dirname = ssh_dirname(filename);
+        scp = ssh_scp_new(session, SSH_SCP_WRITE | SSH_SCP_RECURSIVE, dirname);
+        SSH_STRING_FREE_CHAR(dirname);
+    }
     if(!scp)
         return false;
 
@@ -86,11 +90,17 @@ bool ScpFilePrivate::open(const char *filename, int accesstype, mode_t mode)
             return false;
         }
     }
-    else if(ssh_scp_push_file64(scp, ssh_basename(filename), filesize, mode) != SSH_OK)
+    else
     {
-        ssh_scp_close(scp);
-        ssh_scp_free(scp);
-        return false;
+        char *basename = ssh_basename(filename);
+        if(ssh_scp_push_file64(scp, basename, filesize, mode) != SSH_OK)
+        {
+            SSH_STRING_FREE_CHAR(basename);
+            ssh_scp_close(scp);
+            ssh_scp_free(scp);
+            return false;
+        }
+        SSH_STRING_FREE_CHAR(basename);
     }
     return true;
 }
