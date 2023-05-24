@@ -18,5 +18,11 @@
         <file>image/previous.png</file>
         <file>image/refresh.png</file>
         <file>image/upload.png</file>
+        <file>image/search.png</file>
+        <file>image/diff.png</file>
+        <file>image/zip.png</file>
+        <file>image/unzip.png</file>
+        <file>image/filezip.png</file>
+        <file>image/fileunzip.png</file>
     </qresource>
 </RCC>

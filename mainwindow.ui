@@ -296,7 +296,7 @@
   <action name="actionZip">
    <property name="icon">
     <iconset resource="FlyScp.qrc">
-     <normaloff>:/image/zip.png</normaloff>:/image/zip.png</iconset>
+     <normaloff>:/image/filezip.png</normaloff>:/image/filezip.png</iconset>
    </property>
    <property name="text">
     <string>Zip</string>
@@ -305,7 +305,7 @@
   <action name="actionUnzip">
    <property name="icon">
     <iconset resource="FlyScp.qrc">
-     <normaloff>:/image/unzip.png</normaloff>:/image/unzip.png</iconset>
+     <normaloff>:/image/fileunzip.png</normaloff>:/image/fileunzip.png</iconset>
    </property>
    <property name="text">
     <string>Unzip</string>
