@@ -64,6 +64,8 @@ QStringList ClipBoard::fileNames(QStringList const& fileNames)
 QStringList ClipBoard::fileNames(const QMimeData *mimeData)
 {
     QString text = mimeData->text().remove(FILE_URL_HEADER);
+    if(text.endsWith("\n"))
+        text.remove(text.size() - 1, 1);
     return text.split("\n");
 
 }
