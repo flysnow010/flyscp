@@ -319,7 +319,7 @@ void LocalDirDockWidget::beginDragFile(QPoint const& point)
     QMimeData* mimeData = WinShell::dropMimeData(fileNames);
     drag->setMimeData(mimeData);
     drag->setPixmap(QPixmap(":/image/copy.png"));
-    drag->exec();
+    drag->exec(Qt::LinkAction | Qt::MoveAction | Qt::CopyAction , Qt::CopyAction);
 }
 
 void LocalDirDockWidget::dragEnter(QDragEnterEvent * event)
@@ -368,7 +368,23 @@ void LocalDirDockWidget::drop(QDropEvent * event)
         return;
 
     QStringList fileNames = ClipBoard::fileNames(mimeData);
-    fileTransfer(FileNames::GetFileNames(fileNames, filePath), false);
+    if(event->dropAction() == Qt::MoveAction)
+    {
+        if(!Utils::question(QString("Move %1 files or folders to\n%2").arg(fileNames.size()).arg(filePath)))
+            return;
+        fileTransfer(FileNames::GetFileNames(fileNames, filePath), true);
+    }
+    else if(event->dropAction() == Qt::CopyAction)
+    {
+        if(!Utils::question(QString("Copy %1 files or folders to\n%2").arg(fileNames.size()).arg(filePath)))
+            return;
+        fileTransfer(FileNames::GetFileNames(fileNames, filePath), false);
+    }
+    else if(event->dropAction() == Qt::LinkAction)
+    {
+        if(!Utils::question(QString("Create %1 shortcuts in %2").arg(fileNames.size()).arg(filePath)))
+            return;
+    }
     model_->refresh();
 }
 
