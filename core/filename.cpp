@@ -2,15 +2,12 @@
 #include <QFileInfo>
 #include <QDir>
 
-FileNames FileNames::GetFileNames(QString const& fileName,
-                                  QString const& filePath, QString const& prefix)
+FileNames FileNames::GetFileNames(QString const& fileName, QString const& filePath)
 {
-    return GetFileNames(QStringList() << fileName, filePath, prefix);
+    return GetFileNames(QStringList() << fileName, filePath);
 }
 
-FileNames FileNames::GetFileNames(QStringList const& fileNames,
-                                  QString const& filePath,
-                                  QString const& prefix)
+FileNames FileNames::GetFileNames(QStringList const& fileNames, QString const& filePath)
 {
     FileNames  newFileNames;
     QDir dir(filePath);
@@ -19,7 +16,7 @@ FileNames FileNames::GetFileNames(QStringList const& fileNames,
         if(fileNames[i].isEmpty())
             continue;
 
-        QFileInfo fileInfo(fileNames[i].mid(prefix.size()));
+        QFileInfo fileInfo(fileNames[i]);
 
         FileName fileName;
         fileName.src = fileInfo.filePath();
