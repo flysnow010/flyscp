@@ -20,7 +20,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -96,6 +96,12 @@
    <addaction name="actionRefresh"/>
    <addaction name="actionPrevious"/>
    <addaction name="actionNext"/>
+   <addaction name="separator"/>
+   <addaction name="actionZip"/>
+   <addaction name="actionUnzip"/>
+   <addaction name="separator"/>
+   <addaction name="actionSearch"/>
+   <addaction name="actionDiff"/>
    <addaction name="separator"/>
    <addaction name="actionConnect"/>
   </widget>
@@ -267,6 +273,42 @@
    </property>
    <property name="text">
     <string>Previous</string>
+   </property>
+  </action>
+  <action name="actionSearch">
+   <property name="icon">
+    <iconset resource="FlyScp.qrc">
+     <normaloff>:/image/search.png</normaloff>:/image/search.png</iconset>
+   </property>
+   <property name="text">
+    <string>Search</string>
+   </property>
+  </action>
+  <action name="actionDiff">
+   <property name="icon">
+    <iconset resource="FlyScp.qrc">
+     <normaloff>:/image/diff.png</normaloff>:/image/diff.png</iconset>
+   </property>
+   <property name="text">
+    <string>Diff</string>
+   </property>
+  </action>
+  <action name="actionZip">
+   <property name="icon">
+    <iconset resource="FlyScp.qrc">
+     <normaloff>:/image/zip.png</normaloff>:/image/zip.png</iconset>
+   </property>
+   <property name="text">
+    <string>Zip</string>
+   </property>
+  </action>
+  <action name="actionUnzip">
+   <property name="icon">
+    <iconset resource="FlyScp.qrc">
+     <normaloff>:/image/unzip.png</normaloff>:/image/unzip.png</iconset>
+   </property>
+   <property name="text">
+    <string>Unzip</string>
    </property>
   </action>
  </widget>
