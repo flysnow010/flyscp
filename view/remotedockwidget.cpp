@@ -335,18 +335,8 @@ void RemoteDockWidget::drop(QDropEvent * event)
     QMimeData const* mimeData = event->mimeData();
     if(!mimeData)
         return;
-
-    QStringList fileNames = mimeData->text().split("\n");
-    QStringList newFileNames;
-    QString prefix("file:///");
-    foreach(auto const& fileName, fileNames)
-    {
-        if(fileName.startsWith(prefix))
-            newFileNames << fileName.mid(prefix.size());
-        else
-            newFileNames << fileName;
-    }
-    fileTransfer(newFileNames, QString(), filePath, Upload);
+    QStringList fileNames = ClipBoard::fileNames(mimeData);
+    fileTransfer(fileNames, QString(), filePath, Upload);
     model_->refresh();
 }
 

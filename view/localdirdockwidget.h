@@ -70,8 +70,7 @@ private slots:
     void createShortcut();
 private:
     bool isMultiSelected();
-    QStringList selectedileNames(QString const& prefix = QString(),
-                                 bool isOnlyFilename = false, bool isParent = false);
+    QStringList selectedileNames(bool isOnlyFilename = false, bool isParent = false);
     QString selectedFileName(bool isOnlyFilename = false);
 
     void copyFilels(QStringList const& fileNames, QString const& dstFilePath);
