@@ -53,7 +53,7 @@ void FileManager::delereFiles(QStringList const& fileNames)
 
         emit totalProgress(newFileNames[i], QString(), newFileNames.size(), i);
         QFileInfo fileInfo(newFileNames[i]);
-        if(fileInfo.isDir())
+        if(fileInfo.isDir() && !fileInfo.isSymLink())
             dir.rmdir(newFileNames[i]);
         else
            dir.remove(newFileNames[i]);

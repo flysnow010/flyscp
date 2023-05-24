@@ -52,7 +52,7 @@ void FileNames::MakeFileNames(QStringList const& fileNames, QStringList & newFil
     for(int i = 0; i < fileNames.size(); i++)
     {
         QFileInfo fileInfo(fileNames[i]);
-        if(fileInfo.isDir())
+        if(fileInfo.isDir() && !fileInfo.isSymLink())
             FindFilenames(fileNames[i], newFileNames);
         newFileNames << fileNames[i];
     }

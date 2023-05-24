@@ -36,10 +36,7 @@ QVariant LocalDirModel::icon(const QModelIndex &index) const
     if(index.column() != 0)
         return QVariant();
     if(fileInfos_[index.row()].isRoot() || fileInfos_[index.row()].isSymLink())
-    {
-        QFileIconProvider fip;
-        return fip.icon(fileInfos_[index.row()]);
-    }
+        return QFileIconProvider().icon(fileInfos_[index.row()]);
     else if(fileInfos_[index.row()].fileName() == "..")
         return backIcon;
     else if(fileInfos_[index.row()].isDir())
@@ -86,9 +83,6 @@ QVariant LocalDirModel::headerTextAlignment(int column) const
 
 bool LocalDirModel::editable(const QModelIndex &index) const
 {
-//    if(index.column() != 0 || fileInfos_[index.row()].fileName() == "..")
-//        return false;
-//    return true;
     Q_UNUSED(index)
     return false;
 }
@@ -103,13 +97,15 @@ void LocalDirModel::setDir(QString const& dir)
         fileInfos_ = dir_.entryInfoList(QDir::AllEntries | QDir::NoDot,
                                         QDir::DirsFirst);
     }
+    modifyFileInfos(fileInfos_);
     setupData();
 }
 
 void LocalDirModel::refresh()
 {
     fileInfos_ = dir_.entryInfoList(QDir::AllEntries | QDir::NoDot,
-                                    QDir::DirsFirst);
+                                     QDir::DirsFirst);
+    modifyFileInfos(fileInfos_);
     setupData();
 }
 
@@ -174,6 +170,7 @@ bool LocalDirModel::cd(const QString &dirName)
 
     fileInfos_ = dir_.entryInfoList(QDir::AllEntries | QDir::NoDot,
                                     QDir::DirsFirst);
+    modifyFileInfos(fileInfos_);
     setupData();
     return true;
 }
@@ -193,16 +190,22 @@ void LocalDirModel::setupModelData(TreeItem *parent)
         QList<QVariant> rowData;
         if(fileInfos_[i].isRoot())
             rowData << fileInfos_[i].filePath();
+        else if(fileInfos_[i].isSymLink())
+                rowData << fileInfos_[i].completeBaseName();
         else if(fileInfos_[i].isDir())
             rowData << fileInfos_[i].fileName();
         else
             rowData << fileInfos_[i].completeBaseName();
-        if(fileInfos_[i].isFile())
+        if(fileInfos_[i].isFile() || fileInfos_[i].isSymLink())
         {
             QString suffix = fileInfos_[i].suffix();
-            rowData << suffix
-                    << Utils::formatFileSizeB(fileInfos_[i].size())
-                    << fileInfos_[i].lastModified().toString("yyyy-MM-dd HH:mm:ss");
+            qint64 size = fileInfos_[i].size();
+            rowData << suffix;
+            if(size == 0 && fileInfos_[i].isSymLink())
+                rowData << QString("<DIR>");
+            else
+                rowData    << Utils::formatFileSizeB(fileInfos_[i].size());
+            rowData << fileInfos_[i].lastModified().toString("yyyy-MM-dd HH:mm:ss");
 
             if(!iconMap.contains(suffix))
                 iconMap.insert(suffix, Utils::fileIcon(suffix));
@@ -220,6 +223,7 @@ void LocalDirModel::setupModelData(TreeItem *parent)
 
 void LocalDirModel::modifyFileInfos(QFileInfoList &fileInfos)
 {
+    int dirIndex = -1;
     for(int i = 0; i < fileInfos.size(); i++)
     {
         if(fileInfos[i].fileName() == ".." && i != 0)
@@ -227,7 +231,20 @@ void LocalDirModel::modifyFileInfos(QFileInfoList &fileInfos)
             QFileInfo filInfo = fileInfos[i];
             fileInfos.removeAt(i);
             fileInfos.push_front(filInfo);
-            break;
+        }
+        if(fileInfos[i].isDir())
+            dirIndex = i;
+    }
+    for(int i = 0; i <= dirIndex; i++)
+    {
+        if(fileInfos[i].isDir() && fileInfos[i].isSymLink())
+        {
+            if(i != dirIndex)
+            {
+                QFileInfo filInfo = fileInfos[i];
+                fileInfos.removeAt(i);
+                fileInfos.insert(dirIndex, filInfo);
+            }
         }
     }
 }

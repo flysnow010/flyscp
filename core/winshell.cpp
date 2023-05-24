@@ -224,6 +224,34 @@ void WinShell::OpenByExplorer(QString const& fileName)
                  filePath.toStdWString().c_str(), 0, SW_SHOWNORMAL);
 }
 
+bool WinShell::CreateShortcut(QString const& linkFilePath,
+                              QString const& targetFilePath)
+{
+    IShellLink     *pShellLink;
+    IPersistFile   *pPersistFile;
+
+    HRESULT hr = CoCreateInstance(CLSID_ShellLink, NULL,
+    CLSCTX_INPROC_SERVER, IID_IShellLink, (void**)&pShellLink);
+    if(FAILED(hr))
+        return false;
+
+    hr = pShellLink->QueryInterface(IID_IPersistFile, (void**)&pPersistFile);
+    if(FAILED(hr))
+    {
+         pShellLink->Release();
+         return false;
+    }
+
+    pShellLink->SetPath(targetFilePath.toStdWString().c_str());
+    pShellLink->SetWorkingDirectory(QFileInfo(targetFilePath).path().toStdWString().c_str());
+    hr = pPersistFile->Save(linkFilePath.toStdWString().c_str(), TRUE);
+
+    pPersistFile->Release();
+    pShellLink->Release();
+
+    return SUCCEEDED(hr);
+}
+
 QList<WinLibDir> WinShell::winLibDirs()
 {
    QList<WinLibDir> dirs;

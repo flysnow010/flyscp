@@ -28,6 +28,8 @@ public:
     static void Open(QString const& fileName);
     static void OpenWith(QString const& fileName);
     static void OpenByExplorer(QString const& fileName);
+    static bool CreateShortcut(QString const& linkFilePath,
+                               QString const& targetFilePath);
     static QList<WinLibDir> winLibDirs();
 };
 

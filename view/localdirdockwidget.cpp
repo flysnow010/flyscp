@@ -184,11 +184,21 @@ bool LocalDirDockWidget::eventFilter(QObject *obj, QEvent *event)
 
 void LocalDirDockWidget::viewClick(QModelIndex const& index)
 {
-    QString fileName = model_->fileName(index.row());
-    if(model_->cd(fileName))
-        updateCurrentDir(model_->dir());
+    QFileInfo fileInfo = model_->fileInfo(index.row());
+
+    if(!fileInfo.isDir())
+         WinShell::Open(model_->filePath(index.row()));
     else
-        WinShell::Open(model_->filePath(index.row()));
+    {
+        if(fileInfo.isSymLink())
+        {
+            QString dir = QFile::symLinkTarget(fileInfo.filePath());
+            model_->setDir(dir);
+            updateCurrentDir(model_->dir());
+        }
+        else if(model_->cd(fileInfo.fileName()))
+            updateCurrentDir(model_->dir());
+    }
 }
 
 void LocalDirDockWidget::sortIndicatorChanged(int logicalIndex, Qt::SortOrder order)
@@ -384,6 +394,10 @@ void LocalDirDockWidget::drop(QDropEvent * event)
     {
         if(!Utils::question(QString("Create %1 shortcuts in %2").arg(fileNames.size()).arg(filePath)))
             return;
+        foreach(auto const& fileName,  fileNames)
+        {
+            WinShell::CreateShortcut(QString("%1 - shortcut.lnk").arg(fileName), fileName);
+        }
     }
     model_->refresh();
 }
@@ -455,7 +469,12 @@ void LocalDirDockWidget::rename()
 
 void LocalDirDockWidget::createShortcut()
 {
-
+    QStringList fileNames = selectedileNames(false, true);
+    foreach(auto const& fileName,  fileNames)
+    {
+        WinShell::CreateShortcut(QString("%1 - shortcut.lnk").arg(fileName), fileName);
+    }
+    model_->refresh();
 }
 
 void LocalDirDockWidget::newFolder()
