@@ -248,3 +248,8 @@ bool Utils::question(QString const& text)
         return true;
     return false;
 }
+
+void Utils::warring(QString const& text)
+{
+    QMessageBox::warning(0, QApplication::applicationName(), text);
+}
