@@ -14,6 +14,7 @@
 #include <QStringList>
 #include <QFileInfo>
 #include <QFileIconProvider>
+#include <QDebug>
 
 struct ShellHelper
 {
@@ -85,11 +86,9 @@ struct ShellHelper
         if(fileNames.size() > 1)
             text += "\n";
         mineData->setData("Shell IDList Array", GetBlob(GetClipboardFormat(CFSTR_SHELLIDLIST)));
-        mineData->setText(text);
+        mineData->setData("text/uri-list", text.toUtf8());
         mineData->setData("FileName", GetBlob(GetClipboardFormat(CFSTR_FILENAMEA)));
-        mineData->setData("FileContents", GetBlob(GetClipboardFormat(CFSTR_FILECONTENTS)));
         mineData->setData("FileNameW", GetBlob(GetClipboardFormat(CFSTR_FILENAMEW)));
-        mineData->setData("FileGroupDescriptorW", GetBlob(GetClipboardFormat(CFSTR_FILEDESCRIPTORW)));
         return mineData;
     }
 
