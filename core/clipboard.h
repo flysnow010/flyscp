@@ -16,6 +16,8 @@ public:
     static uint32_t dropEffect();
     static bool isCut(uint32_t dropEffect);
     static bool isCopy(uint32_t dropEffect);
+    static QStringList fileNames(QStringList const& fileNames);
+    static QStringList fileNames(const QMimeData *mimeData);
     static QStringList fileNames();
 };
 

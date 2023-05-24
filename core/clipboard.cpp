@@ -5,7 +5,7 @@
 #include <QStringList>
 
 #include <oleidl.h>
-
+#define FILE_URL_HEADER "file:///"
 ClipBoard::ClipBoard()
 {
 
@@ -15,7 +15,7 @@ bool ClipBoard::canPaste()
 {
     const QMimeData *mineData = QApplication::clipboard()->mimeData();
     if(mineData && mineData->hasFormat("Preferred DropEffect")
-        && mineData->text().startsWith("file:///"))
+        && mineData->text().startsWith(FILE_URL_HEADER))
         return true;
     return false;
 }
@@ -53,9 +53,23 @@ bool ClipBoard::isCopy(uint32_t dropEffect)
     return false;
 }
 
+QStringList ClipBoard::fileNames(QStringList const& fileNames)
+{
+    QStringList newFileNames;
+    foreach(auto const& fileName, fileNames)
+        newFileNames << FILE_URL_HEADER + fileName;
+    return newFileNames;
+}
+
+QStringList ClipBoard::fileNames(const QMimeData *mimeData)
+{
+    QString text = mimeData->text().remove(FILE_URL_HEADER);
+    return text.split("\n");
+
+}
+
 QStringList ClipBoard::fileNames()
 {
-    const QMimeData *mimeData = QApplication::clipboard()->mimeData();
-    return mimeData->text().split("\n");
+    return fileNames(QApplication::clipboard()->mimeData());
 }
 
