@@ -43,6 +43,7 @@ quint32 FileManager::onProgress(qint64 TotalFileSize, qint64 TotalBytesTransferr
 
 void FileManager::delereFiles(QStringList const& fileNames)
 {
+    QDir dir;
     QStringList newFileNames;
     FileNames::MakeFileNames(fileNames, newFileNames);
     for(int i = 0; i < newFileNames.size(); i++)
@@ -53,9 +54,9 @@ void FileManager::delereFiles(QStringList const& fileNames)
         emit totalProgress(newFileNames[i], QString(), newFileNames.size(), i);
         QFileInfo fileInfo(newFileNames[i]);
         if(fileInfo.isDir())
-            RemoveDirectory(newFileNames[i].toStdWString().c_str());
+            dir.rmdir(newFileNames[i]);
         else
-            DeleteFile(newFileNames[i].toStdWString().c_str());
+           dir.remove(newFileNames[i]);
         emit totalProgress(newFileNames[i], QString(), newFileNames.size(), i + 1);
     }
     emit finished();
@@ -70,8 +71,7 @@ void FileManager::copyFiles(FileNames const& fileNames)
         if(singled())
             break;
         emit totalProgress(newFileNames[i].src, newFileNames[i].dst, newFileNames.size(), i);
-        QDir dir;
-        dir.mkpath(QFileInfo(newFileNames[i].dst).path());
+        QDir().mkpath(QFileInfo(newFileNames[i].dst).path());
         CopyFileEx(newFileNames[i].src.toStdWString().c_str(),
                    newFileNames[i].dst.toStdWString().c_str(),
                    ProgressCallback, this, 0,   COPY_FILE_OPEN_SOURCE_FOR_WRITE);
@@ -89,11 +89,17 @@ void FileManager::moveFiles(FileNames const& fileNames)
         if(singled())
             break;
         emit totalProgress(newFileNames[i].src, newFileNames[i].dst, newFileNames.size(), i);
+        QDir().mkpath(QFileInfo(newFileNames[i].dst).path());
         MoveFileWithProgress(newFileNames[i].src.toStdWString().c_str(),
                              newFileNames[i].dst.toStdWString().c_str(),
                              ProgressCallback, this,
                              MOVEFILE_COPY_ALLOWED | MOVEFILE_WRITE_THROUGH);
         emit totalProgress(newFileNames[i].src, newFileNames[i].dst, newFileNames.size(), i + 1);
+    }
+    foreach(auto const& fileName, fileNames)
+    {
+        if(QFileInfo(fileName.src).isDir())
+            QDir(fileName.src).removeRecursively();
     }
     emit finished();
 }
