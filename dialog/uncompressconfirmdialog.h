@@ -15,6 +15,11 @@ public:
     explicit UnCompressConfirmDialog(QWidget *parent = nullptr);
     ~UnCompressConfirmDialog();
 
+    void setTargetPath(QString const& filePath);
+    QString targetPath() const;
+    QString targetFileName() const;
+    bool isAlongWithPath() const;
+    bool isOverwrite() const;
 private:
     Ui::UnCompressConfirmDialog *ui;
 };

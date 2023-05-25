@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>441</width>
-    <height>194</height>
+    <width>581</width>
+    <height>222</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>FlyScp</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,1,0">
    <item>
@@ -19,7 +19,7 @@
      <item>
       <widget class="QLabel" name="labelTip">
        <property name="text">
-        <string/>
+        <string>Extract the specified file to:</string>
        </property>
       </widget>
      </item>
@@ -42,6 +42,9 @@
        <property name="editable">
         <bool>true</bool>
        </property>
+       <property name="currentText">
+        <string>*.*</string>
+       </property>
       </widget>
      </item>
     </layout>
@@ -53,10 +56,13 @@
        <property name="text">
         <string>Along with path name</string>
        </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
      <item>
-      <widget class="QCheckBox" name="cbRelaceFile">
+      <widget class="QCheckBox" name="cbOverWrite">
        <property name="text">
         <string>Replace existing files</string>
        </property>
