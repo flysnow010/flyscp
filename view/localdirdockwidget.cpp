@@ -279,7 +279,7 @@ void LocalDirDockWidget::customContextMenuRequested(const QPoint & pos)
     foreach(auto const& item, items)
     {
         menu.addAction(item.icon, item.name, [=](bool){
-            QStringList fileNames = selectedileNames(false, true);
+            QStringList fileNames = selectedFileNames(false, true);
             item.exec(fileNames);
         });
     }
@@ -316,7 +316,7 @@ void LocalDirDockWidget::customContextMenuRequested(const QPoint & pos)
     }
     menu.addSeparator();
     menu.addAction("Properties", this, [&](bool) {
-        QStringList fileNames = selectedileNames(false, true);
+        QStringList fileNames = selectedFileNames(false, true);
         if(fileNames.size() > 1)
             WinShell::Property(fileNames);
         else
@@ -332,7 +332,7 @@ void LocalDirDockWidget::beginDragFile(QPoint const& point)
     if(!index.isValid())
         return;
     QDrag *drag = new QDrag(ui->treeView);
-    QStringList fileNames = ClipBoard::fileNames(selectedileNames());
+    QStringList fileNames = ClipBoard::fileNames(selectedFileNames());
     QMimeData* mimeData = WinShell::dropMimeData(fileNames);
     drag->setMimeData(mimeData);
     drag->setPixmap(QPixmap(":/image/copy.png"));
@@ -411,13 +411,13 @@ void LocalDirDockWidget::drop(QDropEvent * event)
 
 void LocalDirDockWidget::cut()
 {
-    QStringList fileNames = selectedileNames(false, true);
+    QStringList fileNames = selectedFileNames(false, true);
     WinShell::Copy(fileNames, true);
 }
 
 void LocalDirDockWidget::copy()
 {
-    QStringList fileNames = selectedileNames(false, true);
+    QStringList fileNames = selectedFileNames(false, true);
     WinShell::Copy(fileNames, false);
 }
 
@@ -433,7 +433,7 @@ void LocalDirDockWidget::paste()
 
 void LocalDirDockWidget::delFilesWithConfirm()
 {
-    QStringList fileNames = selectedileNames(true);
+    QStringList fileNames = selectedFileNames(true);
     QString tipText;
     if(fileNames.size() > 1)
         tipText = QString("Are you sure you want to delete %1 files or folders?\n\n%2").arg(fileNames.size())
@@ -455,7 +455,7 @@ void LocalDirDockWidget::delFilesWithConfirm()
 
 void LocalDirDockWidget::delFiles()
 {
-    QStringList fileNames = selectedileNames();
+    QStringList fileNames = selectedFileNames();
     FileManager fileManger;
     fileManger.delereFiles(fileNames);
     model_->refresh();
@@ -476,7 +476,7 @@ void LocalDirDockWidget::rename()
 
 void LocalDirDockWidget::createShortcut()
 {
-    QStringList fileNames = selectedileNames(false, true);
+    QStringList fileNames = selectedFileNames(false, true);
     foreach(auto const& fileName,  fileNames)
     {
         WinShell::CreateShortcut(QString("%1 - shortcut.lnk").arg(fileName), fileName);
@@ -510,7 +510,7 @@ void LocalDirDockWidget::editFile()
 
 void LocalDirDockWidget::copyFiles(QString const& dstFilePath)
 {
-    QStringList fileNames = selectedileNames(true);
+    QStringList fileNames = selectedFileNames(true);
     if(fileNames.isEmpty())
     {
         Utils::warring("No files or folders selected!");
@@ -532,12 +532,12 @@ void LocalDirDockWidget::copyFiles(QString const& dstFilePath)
     }
     dialog.setPath(dstFilePath);
     if(dialog.exec() == QDialog::Accepted)
-        copyFilels(selectedileNames(), dstFilePath);
+        copyFilels(selectedFileNames(), dstFilePath);
 }
 
 void LocalDirDockWidget::moveFiles(QString const& dstFilePath)
 {
-    QStringList fileNames = selectedileNames(true);
+    QStringList fileNames = selectedFileNames(true);
     if(fileNames.isEmpty())
     {
         Utils::warring("No files or folders selected!");
@@ -559,7 +559,7 @@ void LocalDirDockWidget::moveFiles(QString const& dstFilePath)
     dialog.setPath(dstFilePath);
     if(dialog.exec() == QDialog::Accepted)
     {
-        cutFiles(selectedileNames(), dstFilePath);
+        cutFiles(selectedFileNames(), dstFilePath);
         model_->refresh();
     }
 }
@@ -574,20 +574,45 @@ void LocalDirDockWidget::selectAll()
     ui->treeView->selectAll();
 }
 
-void LocalDirDockWidget::compressFiles()
+void LocalDirDockWidget::compressFiles(QString const& dstFilePath)
 {
+    QStringList fileNames = selectedFileNames();
+    if(fileNames.isEmpty())
+        return;
+
     CompressConfirmDialog dialog(this);
     dialog.adjustSize();
+    dialog.setFileCount(fileNames.size());
+    QString fileName;
+    if(fileNames.size()> 1)
+        fileName = model_->dir() + ".zip";
+    else
+        fileName = QFileInfo(fileNames[0]).completeBaseName() + ".zip";
+    dialog.setTargetFileName(QDir(dstFilePath).filePath(fileName));
     if(dialog.exec() == QDialog::Accepted)
-        ;
+    {
+        QString appName = QDir(Utils::currentPath()).filePath("7z.exe");
+        QString targetFileName = dialog.targetFileName();
+        QString params = QString("a %1 %2")
+                .arg(targetFileName, fileNames.join(" "));
+        WinShell::Exec(appName, params);
+    }
 }
 
-void LocalDirDockWidget::uncompressFiles()
+void LocalDirDockWidget::uncompressFiles(QString const& dstFilePath)
 {
     UnCompressConfirmDialog dialog(this);
     dialog.adjustSize();
+    dialog.setTargetPath(dstFilePath);
     if(dialog.exec() == QDialog::Accepted)
-        ;
+    {
+        QString appName = QDir(Utils::currentPath()).filePath("7z.exe");
+        QString fileName = selectedFileName();
+        QString targetPath = dialog.targetPath();
+        QString params = QString("%1 %2 -o%3")
+                .arg(dialog.isAlongWithPath() ? "x" : "e", fileName, targetPath);
+        WinShell::Exec(appName, params);
+    }
 }
 
 void LocalDirDockWidget::newTxtFile()
@@ -608,7 +633,7 @@ bool LocalDirDockWidget::isMultiSelected()
     return ui->treeView->selectionModel()->selectedRows(0).size() > 1;
 }
 
-QStringList LocalDirDockWidget::selectedileNames(bool isOnlyFilename, bool isParent)
+QStringList LocalDirDockWidget::selectedFileNames(bool isOnlyFilename, bool isParent)
 {
     QModelIndexList indexs = ui->treeView->selectionModel()->selectedRows(0);
     QStringList names;

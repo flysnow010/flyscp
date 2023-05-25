@@ -346,15 +346,27 @@ void MainWindow::selectAll()
 void MainWindow::compressFiles()
 {
     if(leftDirView->isActived())
-        leftDirView->compressFiles();
+    {
+        leftDirView->compressFiles(rightDirView->dir());
+        rightDirView->refresh();
+    }
     else
-        rightDirView->compressFiles();
+    {
+        rightDirView->compressFiles(leftDirView->dir());
+        leftDirView->refresh();
+    }
 }
 
 void MainWindow::uncompressFiles()
 {
     if(leftDirView->isActived())
-        leftDirView->uncompressFiles();
+    {
+        leftDirView->uncompressFiles(rightDirView->dir());
+        rightDirView->refresh();
+    }
     else
-        rightDirView->uncompressFiles();
+    {
+        rightDirView->uncompressFiles(leftDirView->dir());
+        leftDirView->refresh();
+    }
 }

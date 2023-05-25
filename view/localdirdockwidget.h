@@ -38,8 +38,8 @@ public:
     void refresh();
     void delFilesWithConfirm();
     void selectAll();
-    void compressFiles();
-    void uncompressFiles();
+    void compressFiles(QString const& dstFilePath);
+    void uncompressFiles(QString const& dstFilePath);
 public slots:
     void newFolder();
     void newTxtFile();
@@ -72,7 +72,7 @@ private slots:
     void createShortcut();
 private:
     bool isMultiSelected();
-    QStringList selectedileNames(bool isOnlyFilename = false, bool isParent = false);
+    QStringList selectedFileNames(bool isOnlyFilename = false, bool isParent = false);
     QString selectedFileName(bool isOnlyFilename = false);
 
     void copyFilels(QStringList const& fileNames, QString const& dstFilePath);
