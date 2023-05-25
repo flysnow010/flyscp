@@ -224,6 +224,23 @@ void WinShell::OpenByExplorer(QString const& fileName)
                  filePath.toStdWString().c_str(), 0, SW_SHOWNORMAL);
 }
 
+void WinShell::Exec(QString const& appName, QString const& params)
+{
+    SHELLEXECUTEINFO shellExecInfo;
+    memset(&shellExecInfo, 0, sizeof(shellExecInfo));
+
+    shellExecInfo.cbSize = sizeof(shellExecInfo);
+    shellExecInfo.lpFile = appName.toStdWString().c_str();
+    shellExecInfo.lpParameters = params.toStdWString().c_str();
+    shellExecInfo.lpDirectory = QFileInfo(appName).path().toStdWString().c_str();
+    shellExecInfo.lpVerb = L"open";
+    shellExecInfo.nShow = SW_HIDE;
+    shellExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS ;
+
+    ShellExecuteEx(&shellExecInfo);
+    WaitForSingleObject(shellExecInfo.hProcess, INFINITE);
+}
+
 bool WinShell::CreateShortcut(QString const& linkFilePath,
                               QString const& targetFilePath)
 {
