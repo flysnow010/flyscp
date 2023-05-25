@@ -24,11 +24,13 @@ SOURCES += \
     core/sftpfilemanager.cpp \
     core/winshell.cpp \
     dialog/aboutdialog.cpp \
+    dialog/compressconfirmdialog.cpp \
     dialog/connectdialog.cpp \
     dialog/fileoperateconfirmdialog.cpp \
     dialog/fileprogressdialog.cpp \
     dialog/permissionsdialog.cpp \
     dialog/propertydialog.cpp \
+    dialog/uncompressconfirmdialog.cpp \
     main.cpp \
     mainwindow.cpp \
     model/localdirmodel.cpp \
@@ -67,11 +69,13 @@ HEADERS += \
     core/sshsettings.h \
     core/winshell.h \
     dialog/aboutdialog.h \
+    dialog/compressconfirmdialog.h \
     dialog/connectdialog.h \
     dialog/fileoperateconfirmdialog.h \
     dialog/fileprogressdialog.h \
     dialog/permissionsdialog.h \
     dialog/propertydialog.h \
+    dialog/uncompressconfirmdialog.h \
     mainwindow.h \
     model/localdirmodel.h \
     model/remotedirmodel.h \
@@ -96,11 +100,13 @@ HEADERS += \
 
 FORMS += \
     dialog/aboutdialog.ui \
+    dialog/compressconfirmdialog.ui \
     dialog/connectdialog.ui \
     dialog/fileoperateconfirmdialog.ui \
     dialog/fileprogressdialog.ui \
     dialog/permissionsdialog.ui \
     dialog/propertydialog.ui \
+    dialog/uncompressconfirmdialog.ui \
     mainwindow.ui \
     view/localdirdockwidget.ui \
     view/panelwidget.ui \
