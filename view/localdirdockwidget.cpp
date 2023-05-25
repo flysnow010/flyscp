@@ -10,6 +10,8 @@
 #include "util/utils.h"
 #include "dialog/fileprogressdialog.h"
 #include "dialog/fileoperateconfirmdialog.h"
+#include "dialog/compressconfirmdialog.h"
+#include "dialog/uncompressconfirmdialog.h"
 
 #include <QMenu>
 #include <QSettings>
@@ -171,6 +173,11 @@ bool LocalDirDockWidget::eventFilter(QObject *obj, QEvent *event)
          else if(keyEvent->matches(QKeySequence::Delete))
          {
              delFiles();
+             return true;
+         }
+         else if(keyEvent->matches(QKeySequence::SelectAll))
+         {
+             selectAll();
              return true;
          }
     }
@@ -565,6 +572,22 @@ void LocalDirDockWidget::refresh()
 void LocalDirDockWidget::selectAll()
 {
     ui->treeView->selectAll();
+}
+
+void LocalDirDockWidget::compressFiles()
+{
+    CompressConfirmDialog dialog(this);
+    dialog.adjustSize();
+    if(dialog.exec() == QDialog::Accepted)
+        ;
+}
+
+void LocalDirDockWidget::uncompressFiles()
+{
+    UnCompressConfirmDialog dialog(this);
+    dialog.adjustSize();
+    if(dialog.exec() == QDialog::Accepted)
+        ;
 }
 
 void LocalDirDockWidget::newTxtFile()

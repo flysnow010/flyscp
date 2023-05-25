@@ -36,6 +36,8 @@ private slots:
     void moveFiles();
     void delFiles();
     void selectAll();
+    void compressFiles();
+    void uncompressFiles();
 private:
     Ui::MainWindow *ui;
     PanelWidget* leftPanelWidget;

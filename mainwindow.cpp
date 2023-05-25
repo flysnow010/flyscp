@@ -107,6 +107,9 @@ void MainWindow::createMenuConnect()
     connect(ui->actionCopy, SIGNAL(triggered(bool)), this, SLOT(copyFiles()));
     connect(ui->actionMove, SIGNAL(triggered(bool)), this, SLOT(moveFiles()));
     connect(ui->actionDelete, SIGNAL(triggered(bool)), this, SLOT(delFiles()));
+    connect(ui->actionSelectAll, SIGNAL(triggered(bool)), this, SLOT(selectAll()));
+    connect(ui->actionCompress, SIGNAL(triggered(bool)), this, SLOT(compressFiles()));
+    connect(ui->actionUncompress, SIGNAL(triggered(bool)), this, SLOT(uncompressFiles()));
     connect(ui->actionRefresh, &QAction::triggered, this, [&](){
         if(leftDirView->isActived())
             leftDirView->refresh();
@@ -125,6 +128,7 @@ void MainWindow::createMenuConnect()
         else
             rightPanelWidget->nextDir();
     });
+
 
     connect(ui->actionToolBar,  &QAction::triggered, this, [&](bool on){
         ui->toolBar->setVisible(on);
@@ -337,4 +341,20 @@ void MainWindow::selectAll()
         leftDirView->selectAll();
     else
         rightDirView->selectAll();
+}
+
+void MainWindow::compressFiles()
+{
+    if(leftDirView->isActived())
+        leftDirView->compressFiles();
+    else
+        rightDirView->compressFiles();
+}
+
+void MainWindow::uncompressFiles()
+{
+    if(leftDirView->isActived())
+        leftDirView->uncompressFiles();
+    else
+        rightDirView->uncompressFiles();
 }

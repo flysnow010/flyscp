@@ -38,6 +38,8 @@ public:
     void refresh();
     void delFilesWithConfirm();
     void selectAll();
+    void compressFiles();
+    void uncompressFiles();
 public slots:
     void newFolder();
     void newTxtFile();

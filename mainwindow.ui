@@ -20,7 +20,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>25</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -97,8 +97,8 @@
    <addaction name="actionPrevious"/>
    <addaction name="actionNext"/>
    <addaction name="separator"/>
-   <addaction name="actionZip"/>
-   <addaction name="actionUnzip"/>
+   <addaction name="actionCompress"/>
+   <addaction name="actionUncompress"/>
    <addaction name="separator"/>
    <addaction name="actionSearch"/>
    <addaction name="actionDiff"/>
@@ -293,22 +293,22 @@
     <string>Diff</string>
    </property>
   </action>
-  <action name="actionZip">
+  <action name="actionCompress">
    <property name="icon">
     <iconset resource="FlyScp.qrc">
      <normaloff>:/image/filezip.png</normaloff>:/image/filezip.png</iconset>
    </property>
    <property name="text">
-    <string>Zip</string>
+    <string>Compress files</string>
    </property>
   </action>
-  <action name="actionUnzip">
+  <action name="actionUncompress">
    <property name="icon">
     <iconset resource="FlyScp.qrc">
      <normaloff>:/image/fileunzip.png</normaloff>:/image/fileunzip.png</iconset>
    </property>
    <property name="text">
-    <string>Unzip</string>
+    <string>Uncompress files</string>
    </property>
   </action>
  </widget>
