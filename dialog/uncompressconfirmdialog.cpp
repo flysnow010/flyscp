@@ -25,9 +25,23 @@ QString UnCompressConfirmDialog::targetPath() const
     return ui->lineEditPath->text();
 }
 
-QString UnCompressConfirmDialog::targetFileName() const
+QString UnCompressConfirmDialog::targetFileType() const
 {
-    return ui->comboBoxFileName->currentText();
+    return ui->comboBoxFileType->currentText();
+}
+
+QString UnCompressConfirmDialog::overwriteMode() const
+{
+    if(isAlongWithPath())
+        return QString();
+
+    if(ui->rbOverWrite->isChecked())
+        return QString(" -aoa");
+    else if(ui->rbSkip->isChecked())
+        return QString(" -aos");
+    else if(ui->rbAutoRename->isChecked())
+        return QString(" -aot");
+    return QString();
 }
 
 bool UnCompressConfirmDialog::isAlongWithPath() const
@@ -35,7 +49,9 @@ bool UnCompressConfirmDialog::isAlongWithPath() const
     return ui->cbAlongPath->isChecked();
 }
 
-bool UnCompressConfirmDialog::isOverwrite() const
+bool UnCompressConfirmDialog::isSameNameSubFolder() const
 {
-    return ui->cbOverWrite->isChecked();
+    return ui->cbUncompressToSubFolderSameName->isChecked();
 }
+
+

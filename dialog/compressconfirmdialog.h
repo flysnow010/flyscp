@@ -15,9 +15,19 @@ public:
     explicit CompressConfirmDialog(QWidget *parent = nullptr);
     ~CompressConfirmDialog();
 
-    void setFileCount(int size);
+    void setFileNames(QStringList const& fileNames);
     void setTargetFileName(QString const& fileName);
     QString targetFileName();
+
+    bool isAlongWithPath() const;
+    bool isRecursively() const;
+    bool isCreateSFX() const;
+    bool isCompressSignle() const;
+    bool isEncryption() const;
+    QString password() const;
+private:
+    void changeSuffix(QString const& suffix, bool isCanEncryption = false);
+    void setLabel(int size);
 private:
     Ui::CompressConfirmDialog *ui;
 };

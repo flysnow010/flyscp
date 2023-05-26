@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>649</width>
-    <height>326</height>
+    <height>303</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -73,6 +73,47 @@
           </widget>
          </item>
          <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_5">
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QCheckBox" name="cbMultiVolume">
+             <property name="text">
+              <string>Multi volume compression</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="comboBoxVolumeSize">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="cbMoveCompress">
+           <property name="text">
+            <string>Delete files after compression</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QCheckBox" name="cbCreateSFX">
            <property name="text">
             <string>Create a self extracting package</string>
@@ -87,11 +128,47 @@
           </widget>
          </item>
          <item>
-          <widget class="QCheckBox" name="cbEncryption">
-           <property name="text">
-            <string>Encryption</string>
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <property name="leftMargin">
+            <number>0</number>
            </property>
-          </widget>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QCheckBox" name="cbEncryption">
+             <property name="text">
+              <string>Encryption</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEditPassword">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="echoMode">
+              <enum>QLineEdit::Password</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </item>
          <item>
           <spacer name="verticalSpacer">
@@ -133,21 +210,35 @@
          </widget>
         </item>
         <item>
-         <widget class="QRadioButton" name="rbTargz">
-          <property name="text">
-           <string>tar.gz</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="bz7z">
+         <widget class="QRadioButton" name="rb7z">
           <property name="text">
            <string>7z</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QRadioButton" name="bzXZ">
+         <widget class="QRadioButton" name="rbWim">
+          <property name="text">
+           <string>wim</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="rbTar">
+          <property name="text">
+           <string>tar</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="rbGZ">
+          <property name="text">
+           <string>gz</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="rbXZ">
           <property name="text">
            <string>xz</string>
           </property>
@@ -161,16 +252,23 @@
          </widget>
         </item>
         <item>
-         <widget class="QRadioButton" name="bzTar">
+         <widget class="QRadioButton" name="rbTarGz">
           <property name="text">
-           <string>tar</string>
+           <string>tar.gz</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QRadioButton" name="bzGZ">
+         <widget class="QRadioButton" name="rbTarXz">
           <property name="text">
-           <string>gz</string>
+           <string>tar.xz</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="rbTarBz2">
+          <property name="text">
+           <string>tar.bz2</string>
           </property>
          </widget>
         </item>
@@ -239,8 +337,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>337</x>
-     <y>253</y>
+     <x>527</x>
+     <y>292</y>
     </hint>
     <hint type="destinationlabel">
      <x>127</x>
@@ -255,12 +353,44 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>445</x>
-     <y>254</y>
+     <x>638</x>
+     <y>292</y>
     </hint>
     <hint type="destinationlabel">
      <x>223</x>
      <y>251</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cbMultiVolume</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>comboBoxVolumeSize</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>86</x>
+     <y>123</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>213</x>
+     <y>130</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cbEncryption</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>lineEditPassword</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>42</x>
+     <y>232</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>163</x>
+     <y>228</y>
     </hint>
    </hints>
   </connection>

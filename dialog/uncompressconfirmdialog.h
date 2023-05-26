@@ -17,9 +17,11 @@ public:
 
     void setTargetPath(QString const& filePath);
     QString targetPath() const;
-    QString targetFileName() const;
+    QString targetFileType() const;
+    QString  overwriteMode() const;
     bool isAlongWithPath() const;
-    bool isOverwrite() const;
+    bool isSameNameSubFolder() const;
+
 private:
     Ui::UnCompressConfirmDialog *ui;
 };

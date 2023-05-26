@@ -578,40 +578,73 @@ void LocalDirDockWidget::compressFiles(QString const& dstFilePath)
 {
     QStringList fileNames = selectedFileNames();
     if(fileNames.isEmpty())
-        return;
-
-    CompressConfirmDialog dialog(this);
-    dialog.adjustSize();
-    dialog.setFileCount(fileNames.size());
-    QString fileName;
-    if(fileNames.size()> 1)
-        fileName = model_->dir() + ".zip";
-    else
-        fileName = QFileInfo(fileNames[0]).completeBaseName() + ".zip";
-    dialog.setTargetFileName(QDir(dstFilePath).filePath(fileName));
-    if(dialog.exec() == QDialog::Accepted)
     {
-        QString appName = QDir(Utils::currentPath()).filePath("7z.exe");
-        QString targetFileName = dialog.targetFileName();
-        QString params = QString("a %1 %2")
-                .arg(targetFileName, fileNames.join(" "));
-        WinShell::Exec(appName, params);
+        Utils::warring("No select files!");
+        return;
+    }
+
+    {
+        CompressConfirmDialog dialog(this);
+        QString fileName;
+        if(fileNames.size()> 1)
+            fileName = QFileInfo(model_->dir()).completeBaseName() + ".zip";
+        else
+            fileName = QFileInfo(fileNames[0]).completeBaseName() + ".zip";
+
+        dialog.adjustSize();
+        dialog.setFileNames(fileNames);
+        dialog.setTargetFileName(QDir(dstFilePath).filePath(fileName));
+        if(dialog.exec() == QDialog::Accepted)
+        {
+            QString appName = QDir(Utils::currentPath()).filePath("7z.exe");
+            QString targetFileName = dialog.targetFileName();
+            QString params = QString("a %1 %2")
+                    .arg(targetFileName, fileNames.join(" "));
+            WinShell::Exec(appName, params);
+        }
     }
 }
 
 void LocalDirDockWidget::uncompressFiles(QString const& dstFilePath)
 {
-    UnCompressConfirmDialog dialog(this);
-    dialog.adjustSize();
-    dialog.setTargetPath(dstFilePath);
-    if(dialog.exec() == QDialog::Accepted)
+    QStringList fileNames = selectedFileNames();
+    if(fileNames.isEmpty())
     {
-        QString appName = QDir(Utils::currentPath()).filePath("7z.exe");
-        QString fileName = selectedFileName();
-        QString targetPath = dialog.targetPath();
-        QString params = QString("%1 %2 -o%3")
-                .arg(dialog.isAlongWithPath() ? "x" : "e", fileName, targetPath);
-        WinShell::Exec(appName, params);
+        Utils::warring("No select files!");
+        return;
+    }
+
+    if(isCompressFiles(fileNames))
+    {
+        UnCompressConfirmDialog dialog(this);
+        dialog.setTargetPath(dstFilePath);
+        if(dialog.exec() == QDialog::Accepted)
+        {
+            QString appName = QDir(Utils::currentPath()).filePath("7z.exe");
+            QString targetPath = dialog.targetPath();
+            QString targetFileType = dialog.targetFileType();
+            bool isSameNameSubFolder = dialog.isSameNameSubFolder();
+            foreach(auto const& fileName, fileNames)
+            {
+                QString newTargetPath;
+
+                if(!isSameNameSubFolder)
+                    newTargetPath = targetPath;
+                {
+                    QDir dir(targetPath);
+                    QString pathName = QFileInfo(fileName).baseName();
+                    dir.mkdir(pathName);
+                    newTargetPath = dir.filePath(pathName);
+                }
+
+                QString params = QString("%1 %2 -o%3 %4 -r")
+                        .arg(dialog.isAlongWithPath() ? "x" : "e",
+                             fileName, newTargetPath, targetFileType);
+                if(!dialog.isAlongWithPath())
+                    params = params + dialog.overwriteMode();
+                WinShell::Exec(appName, params);
+            }
+        }
     }
 }
 
@@ -631,6 +664,21 @@ void LocalDirDockWidget::newTxtFile()
 bool LocalDirDockWidget::isMultiSelected()
 {
     return ui->treeView->selectionModel()->selectedRows(0).size() > 1;
+}
+
+bool LocalDirDockWidget::isCompressFiles(QStringList const& fileNames)
+{
+    QStringList suffixs = QStringList() << "zip" << ".tar.gz" << "7z" << "iso"
+                                        << "xz" << "bz2" << "tar" << "gz" << "wim";
+    foreach(auto const& fileName, fileNames)
+    {
+        if(!suffixs.contains(QFileInfo(fileName).suffix().toLower()))
+        {
+            Utils::warring(QString("Compression package error!\n%1").arg(fileName));
+            return false;
+        }
+    }
+    return true;
 }
 
 QStringList LocalDirDockWidget::selectedFileNames(bool isOnlyFilename, bool isParent)

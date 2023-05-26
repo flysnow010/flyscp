@@ -228,13 +228,15 @@ void WinShell::Exec(QString const& appName, QString const& params)
 {
     SHELLEXECUTEINFO shellExecInfo;
     memset(&shellExecInfo, 0, sizeof(shellExecInfo));
-
+    std::wstring lpFile = appName.toStdWString();
+    std::wstring lpParameters = params.toStdWString();
+    std::wstring lpDirectory = QFileInfo(appName).path().toStdWString();
     shellExecInfo.cbSize = sizeof(shellExecInfo);
-    shellExecInfo.lpFile = appName.toStdWString().c_str();
-    shellExecInfo.lpParameters = params.toStdWString().c_str();
-    shellExecInfo.lpDirectory = QFileInfo(appName).path().toStdWString().c_str();
+    shellExecInfo.lpFile = lpFile.c_str();
+    shellExecInfo.lpParameters = lpParameters.c_str();
+    shellExecInfo.lpDirectory = lpDirectory.c_str();
     shellExecInfo.lpVerb = L"open";
-    shellExecInfo.nShow = SW_HIDE;
+    shellExecInfo.nShow = SW_SHOWNORMAL;
     shellExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS ;
 
     ShellExecuteEx(&shellExecInfo);

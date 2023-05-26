@@ -72,6 +72,7 @@ private slots:
     void createShortcut();
 private:
     bool isMultiSelected();
+    bool isCompressFiles(QStringList const& fileNames);
     QStringList selectedFileNames(bool isOnlyFilename = false, bool isParent = false);
     QString selectedFileName(bool isOnlyFilename = false);
 

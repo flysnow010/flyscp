@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>581</width>
-    <height>222</height>
+    <height>246</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -38,7 +38,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="comboBoxFileName">
+      <widget class="QComboBox" name="comboBoxFileType">
        <property name="editable">
         <bool>true</bool>
        </property>
@@ -62,18 +62,57 @@
       </widget>
      </item>
      <item>
-      <widget class="QCheckBox" name="cbOverWrite">
+      <widget class="QRadioButton" name="rbOverWrite">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
-        <string>Replace existing files</string>
+        <string>Overwrite All existing files without prompt</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QCheckBox" name="cbCompressSingle">
+      <widget class="QRadioButton" name="rbSkip">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
-        <string>Extract each compressed package into a sub file with the same name</string>
+        <string>Skip extracting of existing files</string>
        </property>
       </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="rbAutoRename">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Auto rename existing file </string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="cbUncompressToSubFolderSameName">
+       <property name="text">
+        <string>Extract each compressed package into a sub folder with the same name</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
    </item>
@@ -119,8 +158,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>294</x>
-     <y>172</y>
+     <x>484</x>
+     <y>235</y>
     </hint>
     <hint type="destinationlabel">
      <x>149</x>
@@ -135,12 +174,60 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>381</x>
-     <y>173</y>
+     <x>570</x>
+     <y>235</y>
     </hint>
     <hint type="destinationlabel">
      <x>44</x>
      <y>165</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cbAlongPath</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>rbOverWrite</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>100</x>
+     <y>101</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>210</x>
+     <y>118</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cbAlongPath</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>rbSkip</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>123</x>
+     <y>97</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>85</x>
+     <y>142</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cbAlongPath</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>rbAutoRename</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>312</x>
+     <y>98</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>59</x>
+     <y>169</y>
     </hint>
    </hints>
   </connection>
