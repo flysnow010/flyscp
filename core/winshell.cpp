@@ -236,7 +236,7 @@ void WinShell::Exec(QString const& appName, QString const& params)
     shellExecInfo.lpParameters = lpParameters.c_str();
     shellExecInfo.lpDirectory = lpDirectory.c_str();
     shellExecInfo.lpVerb = L"open";
-    shellExecInfo.nShow = SW_SHOWNORMAL;
+    shellExecInfo.nShow = SW_HIDE;
     shellExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS ;
 
     ShellExecuteEx(&shellExecInfo);
