@@ -20,38 +20,38 @@ void UnCompressConfirmDialog::setTargetPath(QString const& filePath)
     ui->lineEditPath->setFocus();
 }
 
+void UnCompressConfirmDialog::setSettings(UncompressParam const& param)
+{
+    ui->cbAlongPath->setChecked(param.isWithPath);
+    ui->cbCreateDir->setChecked(param.isCreateDir);
+    if(param.mode == UncompressParam::OverWrite)
+        ui->rbOverWrite->setChecked(true);
+    else if(param.mode == UncompressParam::Skip)
+        ui->rbSkip->setChecked(true);
+    else if(param.mode == UncompressParam::AutoRename)
+        ui->rbAutoRename->setChecked(true);
+    ui->comboBoxFilter->setCurrentText(param.filter);
+}
+
+UncompressParam UnCompressConfirmDialog::settings() const
+{
+    UncompressParam param;
+    param.isWithPath = ui->cbAlongPath->isChecked();
+    param.isCreateDir = ui->cbCreateDir->isChecked();
+    if(ui->rbOverWrite->isChecked())
+        param.mode = UncompressParam::OverWrite;
+    else if(ui->rbSkip->isChecked())
+        param.mode = UncompressParam::Skip;
+    else if(ui->rbAutoRename->isChecked())
+        param.mode = UncompressParam::AutoRename;
+    param.filter = ui->comboBoxFilter->currentText();
+    return param;
+}
+
 QString UnCompressConfirmDialog::targetPath() const
 {
     return ui->lineEditPath->text();
 }
 
-QString UnCompressConfirmDialog::targetFileType() const
-{
-    return ui->comboBoxFileType->currentText();
-}
-
-QString UnCompressConfirmDialog::overwriteMode() const
-{
-    if(isAlongWithPath())
-        return QString();
-
-    if(ui->rbOverWrite->isChecked())
-        return QString(" -aoa");
-    else if(ui->rbSkip->isChecked())
-        return QString(" -aos");
-    else if(ui->rbAutoRename->isChecked())
-        return QString(" -aot");
-    return QString();
-}
-
-bool UnCompressConfirmDialog::isAlongWithPath() const
-{
-    return ui->cbAlongPath->isChecked();
-}
-
-bool UnCompressConfirmDialog::isSameNameSubFolder() const
-{
-    return ui->cbUncompressToSubFolderSameName->isChecked();
-}
 
 

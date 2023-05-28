@@ -20,6 +20,17 @@ FileProgressDialog::~FileProgressDialog()
     delete ui;
 }
 
+void FileProgressDialog::setStatusTextMode()
+{
+    ui->label1->hide();
+    ui->label2->hide();
+    ui->label3->hide();
+    ui->label4->hide();
+    ui->totalProgressBar->hide();
+    ui->fileProgressBar->hide();
+    adjustSize();
+}
+
 void FileProgressDialog::totalProgress(QString const& srcFilename,
                    QString const& dstFilename,
                    int totalSize, int totalSizeTransferred)
@@ -34,6 +45,11 @@ void FileProgressDialog::fileProgress(qint64 totalFileSize, qint64 totalBytesTra
 {
     if(totalFileSize > 0)
         ui->fileProgressBar->setValue(totalBytesTransferred * 100 / totalFileSize);
+}
+
+void FileProgressDialog::progressText(QString const& text)
+{
+    ui->srcFileName->setText(text);
 }
 
 void FileProgressDialog::finished()

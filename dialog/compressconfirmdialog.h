@@ -1,5 +1,6 @@
 #ifndef COMPRESSCONFIRMDIALOG_H
 #define COMPRESSCONFIRMDIALOG_H
+#include "core/filecompresser.h"
 
 #include <QDialog>
 
@@ -19,17 +20,14 @@ public:
     void setTargetFileName(QString const& fileName);
     QString targetFileName();
 
-    bool isAlongWithPath() const;
-    bool isRecursively() const;
-    bool isCreateSFX() const;
-    bool isCompressSignle() const;
-    bool isEncryption() const;
-    QString password() const;
+    void setSettings(CompressParam const& param);
+    CompressParam settings() const;
 private:
     void changeSuffix(QString const& suffix, bool isCanEncryption = false);
     void setLabel(int size);
 private:
     Ui::CompressConfirmDialog *ui;
+    QString suffix_;
 };
 
 #endif // COMPRESSCONFIRMDIALOG_H

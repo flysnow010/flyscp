@@ -1,6 +1,6 @@
 #ifndef UNCOMPRESSCONFIRMDIALOG_H
 #define UNCOMPRESSCONFIRMDIALOG_H
-
+#include "core/fileuncompresser.h"
 #include <QDialog>
 
 namespace Ui {
@@ -17,13 +17,11 @@ public:
 
     void setTargetPath(QString const& filePath);
     QString targetPath() const;
-    QString targetFileType() const;
-    QString  overwriteMode() const;
-    bool isAlongWithPath() const;
-    bool isSameNameSubFolder() const;
-
+    void setSettings(UncompressParam const& param);
+    UncompressParam settings() const;
 private:
     Ui::UnCompressConfirmDialog *ui;
+    UncompressParam param_;
 };
 
 #endif // UNCOMPRESSCONFIRMDIALOG_H

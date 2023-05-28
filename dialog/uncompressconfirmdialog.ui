@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>581</width>
-    <height>246</height>
+    <width>597</width>
+    <height>283</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -38,12 +38,12 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="comboBoxFileType">
+      <widget class="QComboBox" name="comboBoxFilter">
        <property name="editable">
         <bool>true</bool>
        </property>
        <property name="currentText">
-        <string>*.*</string>
+        <string>*</string>
        </property>
       </widget>
      </item>
@@ -95,7 +95,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QCheckBox" name="cbUncompressToSubFolderSameName">
+      <widget class="QCheckBox" name="cbCreateDir">
        <property name="text">
         <string>Extract each compressed package into a sub folder with the same name</string>
        </property>

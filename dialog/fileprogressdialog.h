@@ -18,11 +18,13 @@ public:
     bool isFinished() const { return isFinished_; }
     bool isCancel() const { return isCancel_; }
 
+    void setStatusTextMode();
 public slots:
     void totalProgress(QString const& srcFilename,
                        QString const& dstFilename,
                        int totalSize, int totalSizeTransferred);
     void fileProgress(qint64 totalFileSize, qint64 totalBytesTransferred);
+    void progressText(QString const& text);
     void finished();
     void error(QString const& e);
 private:
