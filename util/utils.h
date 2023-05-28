@@ -8,6 +8,7 @@ class Utils
 {
 public:
     static QString currentPath();
+    static QString compressApp();
     static QDir tempPath();
     static QByteArray readFile(QString const& filename);
 

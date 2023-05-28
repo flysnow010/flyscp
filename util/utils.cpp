@@ -20,6 +20,11 @@ QString Utils::currentPath()
     return QApplication::applicationDirPath();
 }
 
+QString Utils::compressApp()
+{
+    return QString("%1/7z.exe").arg(QApplication::applicationDirPath());
+}
+
 QDir Utils::tempPath()
 {
     QDir dir = QDir::temp();
