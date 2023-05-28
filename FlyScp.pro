@@ -16,9 +16,11 @@ SOURCES += \
     core/contextmenu.cpp \
     core/dirfavorite.cpp \
     core/dirhistory.cpp \
+    core/filecompresser.cpp \
     core/filemanager.cpp \
     core/filename.cpp \
     core/filetransfer.cpp \
+    core/fileuncompresser.cpp \
     core/remotefilemanager.cpp \
     core/remotefiletransfer.cpp \
     core/sftpfilemanager.cpp \
@@ -60,9 +62,11 @@ HEADERS += \
     core/contextmenu.h \
     core/dirfavorite.h \
     core/dirhistory.h \
+    core/filecompresser.h \
     core/filemanager.h \
     core/filename.h \
     core/filetransfer.h \
+    core/fileuncompresser.h \
     core/remotefilemanager.h \
     core/remotefiletransfer.h \
     core/sftpfilemanager.h \
