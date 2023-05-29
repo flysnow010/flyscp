@@ -3,7 +3,7 @@
 #include <QString>
 #include <QObject>
 
-class QStringList;
+
 struct UncompressParam
 {
     enum OverwriteMode{ OverWrite, Skip, AutoRename };
@@ -16,6 +16,9 @@ struct UncompressParam
     QString overwriteMode() const;
 };
 
+class QStringList;
+class QProcess;
+
 class FileUncompresser: public QObject
 {
     Q_OBJECT
@@ -25,11 +28,19 @@ public:
     bool uncompress(QStringList const& fileNames,
                     UncompressParam const& param,
                     QString const& targetFilePath);
-
+    void cancel();
 signals:
     void progress(QString const& text);
     void error(QString const& error);
     void finished();
+private:
+    void onError(QString const& error);
+    QString errorToText(int errorCode) const;
+    QStringList nextArgs() const;
+private:
+    QProcess* process;
+    int currentIndex;
+    QList<QStringList> argsList;
 };
 
 #endif // FILEUNCOMPRESSER_H

@@ -16,6 +16,8 @@ struct CompressParam
     bool isCreateSFX = false;
     bool isSignle = false;
     bool isEncryption = false;
+    QString volumeText() const;
+    QString passwordText() const;
 };
 
 class QStringList;
@@ -30,18 +32,22 @@ public:
                   CompressParam const& param,
                   QString const& targetFilePath);
     void cancel();
-    bool isFinished() const;
 signals:
     void progress(QString const& text);
     void error(QString const& error);
     void finished();
-public slots:
-    void onDataReady();
 private:
-    QString errorToText(int errorCode);
+    void onError(QString const& error);
+    QString errorToText(int errorCode) const;
+    QStringList nextArgs() const;
+    void setArgs(QStringList & args, CompressParam const& param);
+    QStringList getFileNames(QString const&fileName,
+                          CompressParam const& param);
 private:
     QProcess* process;
-    int compressCount;
+    int currentIndex;
+    QList<QStringList> argsList;
+    QStringList targetFileNames;
 };
 
 #endif // FILECOMPRESSER_H
