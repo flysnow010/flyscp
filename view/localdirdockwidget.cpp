@@ -7,6 +7,8 @@
 #include "core/winshell.h"
 #include "core/clipboard.h"
 #include "core/contextmenu.h"
+#include "core/filecompresser.h"
+#include "core/fileuncompresser.h"
 #include "util/utils.h"
 #include "dialog/fileprogressdialog.h"
 #include "dialog/fileoperateconfirmdialog.h"
@@ -172,12 +174,7 @@ bool LocalDirDockWidget::eventFilter(QObject *obj, QEvent *event)
          }
          else if(keyEvent->matches(QKeySequence::Delete))
          {
-             delFiles();
-             return true;
-         }
-         else if(keyEvent->matches(QKeySequence::SelectAll))
-         {
-             selectAll();
+             delFilesWithConfirm();
              return true;
          }
     }
@@ -246,7 +243,6 @@ void LocalDirDockWidget::customContextMenuRequested(const QPoint & pos)
     }
     else
     {
-        fileName = selectedFileName();
         fileName = model_->filePath(index.row());
         fileInfo.setFile(fileName);
 
@@ -306,8 +302,11 @@ void LocalDirDockWidget::customContextMenuRequested(const QPoint & pos)
     menu.addAction("Create shortcut", this, SLOT(createShortcut()));
     if(index.isValid())
     {
-        menu.addAction("Delete", this, SLOT(delFiles()));
-        menu.addAction("Rename", this, SLOT(rename()));
+        if(!model_->isParent(index.row()))
+        {
+            menu.addAction("Delete", this, SLOT(delFiles()));
+            menu.addAction("Rename", this, SLOT(rename()));
+        }
     }
     else
     {
@@ -572,6 +571,14 @@ void LocalDirDockWidget::refresh()
 void LocalDirDockWidget::selectAll()
 {
     ui->treeView->selectAll();
+    if(model_->isParent(0))
+    {
+        QModelIndexList indexList = ui->treeView->selectionModel()->selectedColumns(0);
+        foreach(auto const& index, indexList)
+        {
+            ui->treeView->selectionModel()->select(index, QItemSelectionModel::Deselect);
+        }
+    }
 }
 
 void LocalDirDockWidget::compressFiles(QString const& dstFilePath)
@@ -584,23 +591,43 @@ void LocalDirDockWidget::compressFiles(QString const& dstFilePath)
     }
 
     {
-        CompressConfirmDialog dialog(this);
+        CompressConfirmDialog d(this);
         QString fileName;
         if(fileNames.size()> 1)
             fileName = QFileInfo(model_->dir()).completeBaseName() + ".zip";
         else
             fileName = QFileInfo(fileNames[0]).completeBaseName() + ".zip";
 
-        dialog.adjustSize();
-        dialog.setFileNames(fileNames);
-        dialog.setTargetFileName(QDir(dstFilePath).filePath(fileName));
-        if(dialog.exec() == QDialog::Accepted)
+        d.adjustSize();
+        d.setFileNames(fileNames);
+        d.setTargetFileName(QDir(dstFilePath).filePath(fileName));
+        if(d.exec() == QDialog::Accepted)
         {
-            QString appName = QDir(Utils::currentPath()).filePath("7z.exe");
-            QString targetFileName = dialog.targetFileName();
-            QString params = QString("a %1 %2")
-                    .arg(targetFileName, fileNames.join(" "));
-            WinShell::Exec(appName, params);
+            QString targetFileName = d.targetFileName();
+            CompressParam param = d.settings();
+            FileCompresser compresser;
+            FileProgressDialog dialog(this);
+            dialog.setStatusTextMode();
+
+            connect(&compresser, &FileCompresser::progress, &dialog, &FileProgressDialog::progressText);
+            connect(&compresser, &FileCompresser::finished, &dialog, &FileProgressDialog::finished);
+            connect(&compresser, &FileCompresser::error, &dialog, &FileProgressDialog::error);
+
+            dialog.setModal(true);
+            dialog.show();
+            compresser.compress(fileNames, param, targetFileName);
+            while(!dialog.isFinished())
+            {
+                if(dialog.isCancel())
+                {
+                    compresser.cancel();
+                    while(!dialog.isFinished())
+                        QApplication::processEvents();
+                }
+                QApplication::processEvents();
+            }
+            if(param.isMoveFile)
+                model_->refresh();
         }
     }
 }
@@ -616,33 +643,33 @@ void LocalDirDockWidget::uncompressFiles(QString const& dstFilePath)
 
     if(isCompressFiles(fileNames))
     {
-        UnCompressConfirmDialog dialog(this);
-        dialog.setTargetPath(dstFilePath);
-        if(dialog.exec() == QDialog::Accepted)
+        UnCompressConfirmDialog d(this);
+        d.setTargetPath(dstFilePath);
+        if(d.exec() == QDialog::Accepted)
         {
-            QString appName = QDir(Utils::currentPath()).filePath("7z.exe");
-            QString targetPath = dialog.targetPath();
-            QString targetFileType = dialog.targetFileType();
-            bool isSameNameSubFolder = dialog.isSameNameSubFolder();
-            foreach(auto const& fileName, fileNames)
+            UncompressParam param = d.settings();
+            QString targetPath = d.targetPath();
+
+            FileUncompresser uncompresser;
+            FileProgressDialog dialog(this);
+            dialog.setStatusTextMode();
+
+            connect(&uncompresser, &FileUncompresser::progress, &dialog, &FileProgressDialog::progressText);
+            connect(&uncompresser, &FileUncompresser::finished, &dialog, &FileProgressDialog::finished);
+            connect(&uncompresser, &FileUncompresser::error, &dialog, &FileProgressDialog::error);
+
+            dialog.setModal(true);
+            dialog.show();
+            uncompresser.uncompress(fileNames, param, targetPath);
+            while(!dialog.isFinished())
             {
-                QString newTargetPath;
-
-                if(!isSameNameSubFolder)
-                    newTargetPath = targetPath;
+                if(dialog.isCancel())
                 {
-                    QDir dir(targetPath);
-                    QString pathName = QFileInfo(fileName).baseName();
-                    dir.mkdir(pathName);
-                    newTargetPath = dir.filePath(pathName);
+                    uncompresser.cancel();
+                    while(!dialog.isFinished())
+                        QApplication::processEvents();
                 }
-
-                QString params = QString("%1 %2 -o%3 %4 -r")
-                        .arg(dialog.isAlongWithPath() ? "x" : "e",
-                             fileName, newTargetPath, targetFileType);
-                if(!dialog.isAlongWithPath())
-                    params = params + dialog.overwriteMode();
-                WinShell::Exec(appName, params);
+                QApplication::processEvents();
             }
         }
     }
@@ -687,6 +714,9 @@ QStringList LocalDirDockWidget::selectedFileNames(bool isOnlyFilename, bool isPa
     QStringList names;
     for(int i = 0; i < indexs.size(); i++)
     {
+        if(model_->isParent(indexs[i].row()))
+            continue;
+
         if(isOnlyFilename)
             names << model_->fileName(indexs[i].row());
         else
