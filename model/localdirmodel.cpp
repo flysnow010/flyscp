@@ -7,6 +7,10 @@
 #include <QDateTime>
 #include <QDir>
 #include <QFileIconProvider>
+
+#define ParentPath ".."
+#define ExeSuffix  "exe"
+
 namespace  {
 int const NAME_INDEX = 0;
 int const SUFFIX_INDEX = 1;
@@ -37,14 +41,14 @@ QVariant LocalDirModel::icon(const QModelIndex &index) const
         return QVariant();
     if(fileInfos_[index.row()].isRoot() || fileInfos_[index.row()].isSymLink())
         return QFileIconProvider().icon(fileInfos_[index.row()]);
-    else if(fileInfos_[index.row()].fileName() == "..")
+    else if(fileInfos_[index.row()].fileName() == ParentPath)
         return backIcon;
     else if(fileInfos_[index.row()].isDir())
         return dirIcon;
     else if(fileInfos_[index.row()].isFile())
     {
-        QString suffix = fileInfos_[index.row()].suffix();
-        if(suffix == "exe")
+        QString suffix = fileInfos_[index.row()].suffix().toLower();
+        if(suffix == ExeSuffix)
         {
             QIcon icon = Utils::GetIcon(fileInfos_[index.row()].filePath());
             if(!icon.isNull())
@@ -163,6 +167,11 @@ QString LocalDirModel::filePath(QString const& fileName)
     return dir_.filePath(fileName);
 }
 
+bool LocalDirModel::isParent(int index) const
+{
+    return fileInfos_[index].fileName() == ParentPath;
+}
+
 bool LocalDirModel::cd(const QString &dirName)
 {
     if(!dir_.cd(dirName))
@@ -226,7 +235,7 @@ void LocalDirModel::modifyFileInfos(QFileInfoList &fileInfos)
     int dirIndex = -1;
     for(int i = 0; i < fileInfos.size(); i++)
     {
-        if(fileInfos[i].fileName() == ".." && i != 0)
+        if(fileInfos[i].fileName() == ParentPath && i != 0)
         {
             QFileInfo filInfo = fileInfos[i];
             fileInfos.removeAt(i);

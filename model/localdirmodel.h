@@ -24,6 +24,7 @@ public:
     QString fileName(int index);
     QString filePath(int index);
     QString filePath(QString const& fileName);
+    bool isParent(int index) const;
 protected:
     virtual TreeItem *createRootItem();
     virtual QVariant textAlignment(const QModelIndex &index) const;
