@@ -22,12 +22,15 @@ public:
 
     void setSettings(CompressParam const& param);
     CompressParam settings() const;
+    static QString CurrentSuffix();
+    static void setCurrentSuffix(QString const& suffix);
 private:
     void changeSuffix(QString const& suffix, bool isCanEncryption = false);
     void setLabel(int size);
 private:
     Ui::CompressConfirmDialog *ui;
     QString suffix_;
+    static QString currentSuffix;
 };
 
 #endif // COMPRESSCONFIRMDIALOG_H

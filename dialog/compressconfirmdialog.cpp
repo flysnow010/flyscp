@@ -3,6 +3,8 @@
 #include <QDir>
 #include <QFileInfo>
 
+#define ARRAY_SIZE(Array) (sizeof(Array) / sizeof(Array[0]))
+
 CompressConfirmDialog::CompressConfirmDialog(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::CompressConfirmDialog)
@@ -62,6 +64,22 @@ CompressConfirmDialog::CompressConfirmDialog(QWidget *parent)
     ui->comboBoxVolumeSize->addItem("4480M - DVD", 4480);
     ui->comboBoxVolumeSize->addItem("8128M - DVD DL", 8128);
     ui->comboBoxVolumeSize->addItem("23040M - BD", 23040);
+
+    QRadioButton* radioButtons[] = {
+        ui->rbZip, ui->rb7z, ui->rbWim, ui->rbTar,
+        ui->rbGZ, ui->rbXZ, ui->rbBZ2,
+        ui->rbTarGz, ui->rbTarXz, ui->rbTarBz2
+    };
+
+    for(quint16 i = 0; i < ARRAY_SIZE(radioButtons); i++)
+    {
+        QString suffix = QString(".%1").arg(radioButtons[i]->text());
+        if(suffix == currentSuffix)
+        {
+            radioButtons[i]->setChecked(true);
+            break;
+        }
+    }
 }
 
 CompressConfirmDialog::~CompressConfirmDialog()
@@ -82,6 +100,7 @@ void CompressConfirmDialog::changeSuffix(QString const& suffix, bool isCanEncryp
         ui->cbEncryption->setChecked(false);
     }
     suffix_ = suffix;
+    setCurrentSuffix(suffix);
 }
 
 void CompressConfirmDialog::setLabel(int size)
@@ -148,5 +167,16 @@ CompressParam CompressConfirmDialog::settings() const
     param.suffix = suffix_;
     param.volumeSize = ui->comboBoxVolumeSize->currentData().toUInt();
     return param;
+}
+
+QString CompressConfirmDialog::currentSuffix(".zip");
+
+QString CompressConfirmDialog::CurrentSuffix()
+{
+    return currentSuffix;
+}
+void CompressConfirmDialog::setCurrentSuffix(QString const& suffix)
+{
+    currentSuffix = suffix;
 }
 
