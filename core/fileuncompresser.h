@@ -24,7 +24,10 @@ class FileUncompresser: public QObject
     Q_OBJECT
 public:
     explicit FileUncompresser(QObject *parent = nullptr);
+
     enum Mode { Uncompress, CheckEncrypt, List };
+
+    static bool isCompressFiles(QStringList const& fileNames);
     bool uncompress(QStringList const& fileNames,
                     UncompressParam const& param,
                     QString const& targetFilePath);

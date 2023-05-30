@@ -147,3 +147,66 @@ QString FileUncompresser::errorToText(int errorCode) const
         return QString("User stopped the process");
     return QString();
 }
+
+bool FileUncompresser::isCompressFiles(QStringList const& fileNames)
+{
+    static QStringList suffixs = QStringList()
+            << "7z"                                //7z
+            << "bz2" << "bzip2" << "tbz2" << "tbz" // BZIP2
+            << "gz" << "gzip" << "tgz"             //GZIP
+            << "tar"                               //TAR
+            << "wim" << "swm" << "esd"             //WIM
+            << "xz" << "txz"                       //XZ
+            << "zip" << "zipx" << "jar" << "xpi"
+            << "odt" << "ods" << "docx" << "xlsx"
+            << "epub"                              //ZIP
+            << "apm"                               //APM
+            << "ar" << "a" << "deb" << "lib"       //AR
+            << "arj"                               //ARJ
+            << "cab"                               //CAB
+            << "chm" << "chw" << "chi" << "chq"    //CHM
+            << "msi" << "msp" << "doc" << "xls"
+            << "ppt"                               //COMPOUND
+            << "cpio"                              //CPIO
+            << "cramfs"                            //CramFS
+            << "dmg"                               //DMG
+            << "ext" << "ext2" << "ext3" << "ext4"
+            << "img"                               //Ext
+            << "fat" << "img"                      //FAT
+            << "hfs" << "hfsx"                     //HFS
+            << "hxs" << "hxi" << "hxr" << "hxq"
+            << "hxw" << "lit"                      //HXS
+            << "ihex"                              //iHEX
+            << "iso" << "img"                      //ISO
+            << "lzh" << "lha"                      //LZH
+            << "lzma"                              //LZMA
+            << "mbr"                               //MBR
+            << "mslz"                              //MsLZ
+            << "mub"                               //Mub
+            << "nsis"                              //NSIS
+            << "ntfs" << "img"                     //NTFS
+            << "rar" << "r00"                      //RAR
+            << "rpm"                               //RPM
+            << "ppmd"                              //PPMD
+            << "qcow" << "qcow2" << "qcow2c"       //QCOW2
+            << "squashfs"                          //SquashFS
+            << "udf" << "iso" << "img"             //UDF
+            << "scap"                              //UEFIc
+            << "uefif"                             //UEFIs
+            << "vdi"                               //VDI
+            << "vhd"                               //VHD
+            << "vmdk"                              //VMDK
+            << "xar" << "pkg"                      //XAR
+            << "z" << "taz";                       //Z
+    foreach(auto const& fileName, fileNames)
+    {
+        QString suffix = QFileInfo(fileName).suffix().toLower();
+        if(!suffixs.contains(suffix))
+        {
+            bool isOK = false;
+            suffix.toUInt(&isOK);
+            return isOK;
+        }
+    }
+    return true;
+}
