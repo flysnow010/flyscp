@@ -19,6 +19,11 @@ QString CompressParam::passwordText() const
     return QString("-p%1").arg(password);
 }
 
+bool CompressParam::isMultiSuffix() const
+{
+    return suffix.startsWith(".tar.");
+}
+
 FileCompresser::FileCompresser(QObject *parent)
     : QObject(parent)
     , process(new QProcess(this))
@@ -62,22 +67,44 @@ bool FileCompresser::compress(QStringList const& fileNames,
     {
         foreach(auto const& fileName, fileNames)
         {
+            QString newFileName = getNewFileName(targetFilePath, fileName);
+            QString targetFileName;
             QStringList args;
-            QFileInfo fileInfo(targetFilePath);
-            QString targetFileName = fileInfo.dir()
-                    .filePath(QFileInfo(fileName).baseName() + "." + fileInfo.suffix());
-            args << "a" << targetFileName
-                 << getFileNames(fileName, param);
+
+            args << "a";
+            if(!param.isMultiSuffix())
+                args << newFileName;
+            else
+            {
+                targetFileName = getFileName(newFileName, ".tar");
+                args << targetFileName;
+            }
+            args << getFileNames(fileName, param);
             setArgs(args, param);
             argsList << args;
             qDebug()<< args.join(" ");
-            targetFileNames << targetFileName;
+            if(param.isMultiSuffix())
+            {
+                args = QStringList() << "a" << newFileName << targetFileName << "-sdel";
+                argsList << args;
+                qDebug()<< args.join(" ");
+            }
+            targetFileNames << newFileName;
         }
     }
     else
     {
         QStringList args;
-        args << "a" << targetFilePath;
+        QString targetFileName;
+
+        args << "a";
+        if(!param.isMultiSuffix())
+            args << targetFilePath;
+        else
+        {
+            targetFileName = getFileName(targetFilePath, ".tar");
+            args << targetFileName;
+        }
         foreach(auto const& fileName, fileNames)
         {
             args << getFileNames(fileName, param);
@@ -85,6 +112,12 @@ bool FileCompresser::compress(QStringList const& fileNames,
         setArgs(args, param);
         argsList << args;
         qDebug()<< args.join(" ");
+        if(param.isMultiSuffix())
+        {
+            args = QStringList() << "a" << targetFilePath << targetFileName << "-sdel";
+            argsList << args;
+            qDebug()<< args.join(" ");
+        }
         targetFileNames << targetFilePath;
     }
     currentIndex = 0;
@@ -108,10 +141,6 @@ void FileCompresser::cancel()
 
 void FileCompresser::setArgs(QStringList & args, CompressParam const& param)
 {
-    if(param.isRecursively)
-        args << "-r";
-    else
-        args << "-r-";
     if(param.isMultiVolume)
         args << param.volumeText();
     if(param.isMoveFile)
@@ -131,13 +160,41 @@ QStringList FileCompresser::getFileNames(QString const&fileName,
         newFileNames << fileName;
     else
     {
-        if(param.isWithPath)
-            newFileNames << fileName;
+        if(param.isRecursively)
+        {
+            if(param.isWithPath)
+                newFileNames << "-spf1";
+            newFileNames << "-r" << fileName + "/" +  param.filter;
+        }
         else
-            newFileNames << fileName + "/*";
+        {
+            QDir dir(fileName);
+            QFileInfoList fileInfos = dir.entryInfoList();
+            foreach(auto const& info, fileInfos)//param.filter
+            {
+                if(!info.isFile())
+                    continue;
+                newFileNames << dir.filePath(info.fileName());
+            }
+            if(param.isWithPath)
+                newFileNames << "-spf1";
+        }
 
     }
     return newFileNames;
+}
+
+QString FileCompresser::getFileName(QString const& fileName, QString const& newSuffix)
+{
+    QFileInfo fileInfo(fileName);
+    return fileInfo.dir().filePath(fileInfo.baseName() + newSuffix);
+}
+
+QString FileCompresser::getNewFileName(QString const& targetFilePath, QString const& fileName)
+{
+    QFileInfo fileInfo(targetFilePath);
+    return fileInfo.dir().filePath(
+                QFileInfo(fileName).baseName() + "." + fileInfo.completeSuffix());
 }
 
 QStringList FileCompresser::nextArgs() const

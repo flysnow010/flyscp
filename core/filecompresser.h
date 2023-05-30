@@ -18,6 +18,7 @@ struct CompressParam
     bool isEncryption = false;
     QString volumeText() const;
     QString passwordText() const;
+    bool isMultiSuffix() const;
 };
 
 class QStringList;
@@ -43,6 +44,8 @@ private:
     void setArgs(QStringList & args, CompressParam const& param);
     QStringList getFileNames(QString const&fileName,
                           CompressParam const& param);
+    QString getFileName(QString const& fileName, QString const& newSuffix);
+    QString getNewFileName(QString const& targetFilePath, QString const& fileName);
 private:
     QProcess* process;
     int currentIndex;

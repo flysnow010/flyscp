@@ -23,13 +23,23 @@ QString UncompressParam::overwriteMode() const
 FileUncompresser::FileUncompresser(QObject *parent)
     : QObject(parent)
     , process(new QProcess(this))
+    , mode(Uncompress)
+    , isEncrypted_(false)
 {
     connect(process, &QProcess::readyReadStandardOutput, this, [=](){
         while(process->canReadLine())
         {
             QString text = QString::fromUtf8(process->readLine()).remove("\r\n");
             if(!text.isEmpty())
-                emit progress(text);
+            {
+                if(mode == Uncompress)
+                    emit progress(text);
+                else if(mode == CheckEncrypt)
+                {
+                    if(text.contains("Encrypted = +"))
+                        isEncrypted_ = true;
+                }
+            }
         }
     });
     connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this,
@@ -56,6 +66,7 @@ bool FileUncompresser::uncompress(QStringList const& fileNames,
                 QString const& targetFilePath)
 {
     QString app = Utils::compressApp();
+    mode = Uncompress;
     process->setProgram(app);
     foreach(auto const& fileName, fileNames)
     {
@@ -81,6 +92,21 @@ bool FileUncompresser::uncompress(QStringList const& fileNames,
     process->setArguments(nextArgs());
     process->start();
     return true;
+}
+
+bool FileUncompresser::isEncrypted(QString const& fileName)
+{
+    QString app = Utils::compressApp();
+    process->setProgram(app);
+    QStringList args;
+    args << "l -slt" << fileName;
+    argsList << args;
+    mode = CheckEncrypt;
+    currentIndex = 0;
+    process->setArguments(nextArgs());
+    process->start();
+    process->waitForFinished();
+    return isEncrypted_;
 }
 
 void FileUncompresser::cancel()
