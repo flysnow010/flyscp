@@ -593,10 +593,15 @@ void LocalDirDockWidget::compressFiles(QString const& dstFilePath)
     {
         CompressConfirmDialog d(this);
         QString fileName;
-        if(fileNames.size()> 1)
-            fileName = QFileInfo(model_->dir()).completeBaseName() + ".zip";
+        if(fileNames.size() > 1)
+            fileName = model_->dir() + CompressConfirmDialog::CurrentSuffix();
         else
-            fileName = QFileInfo(fileNames[0]).completeBaseName() + ".zip";
+        {
+            if(QFileInfo(fileNames[0]).isDir())
+                fileName = fileNames[0] + CompressConfirmDialog::CurrentSuffix();
+            else
+                fileName = QFileInfo(fileNames[0]).completeBaseName() + CompressConfirmDialog::CurrentSuffix();
+        }
 
         d.adjustSize();
         d.setFileNames(fileNames);
