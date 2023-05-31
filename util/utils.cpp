@@ -25,6 +25,21 @@ QString Utils::compressApp()
     return QString("%1/7z.exe").arg(QApplication::applicationDirPath());
 }
 
+QString Utils::viewApp()
+{
+    return QString("%1/MobaRTE.exe").arg(QApplication::applicationDirPath());
+}
+
+QString Utils::editApp()
+{
+    return QString("%1/MobaRTE.exe").arg(QApplication::applicationDirPath());
+}
+
+QString Utils::diffApp()
+{
+    return QString("%1/MobaRTE.exe").arg(QApplication::applicationDirPath());
+}
+
 QDir Utils::tempPath()
 {
     QDir dir = QDir::temp();

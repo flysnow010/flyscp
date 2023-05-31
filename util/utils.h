@@ -9,6 +9,9 @@ class Utils
 public:
     static QString currentPath();
     static QString compressApp();
+    static QString viewApp();
+    static QString editApp();
+    static QString diffApp();
     static QDir tempPath();
     static QByteArray readFile(QString const& filename);
 
