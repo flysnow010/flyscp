@@ -10,6 +10,7 @@ class LocalDirDockWidget;
 class LocalDirModel;
 class QMimeData;
 class TitleBarWidget;
+class QFileSystemWatcher;
 class LocalDirDockWidget : public QDockWidget, public BaseDir
 {
     Q_OBJECT
@@ -56,6 +57,7 @@ protected:
      bool eventFilter(QObject *obj, QEvent *event) override;
 private slots:
     void viewClick(QModelIndex const& index);
+    void directoryChanged(const QString &path);
     void sortIndicatorChanged(int logicalIndex, Qt::SortOrder order);
     void customContextMenuRequested(const QPoint &pos);
     void beginDragFile(QPoint const& point);
@@ -84,6 +86,7 @@ private:
     Ui::LocalDirDockWidget *ui;
     LocalDirModel* model_;
     TitleBarWidget* titleBarWidget;
+    QFileSystemWatcher* fileSystemWatcher;
 };
 
 #endif // LOCALDIRDOCKWIDGET_H

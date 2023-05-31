@@ -19,12 +19,14 @@
 #include <QSettings>
 #include <QDrag>
 #include <QMimeData>
+#include <QFileSystemWatcher>
 
 LocalDirDockWidget::LocalDirDockWidget(QWidget *parent)
     : QDockWidget(parent)
     , ui(new Ui::LocalDirDockWidget)
     , model_(new LocalDirModel(this))
     , titleBarWidget(new TitleBarWidget())
+    , fileSystemWatcher(new QFileSystemWatcher(this))
 {
     ui->setupUi(this);
     ui->treeView->setModel(model_);
@@ -58,6 +60,8 @@ LocalDirDockWidget::LocalDirDockWidget(QWidget *parent)
     {
         setDir(dir);
     });
+    connect(fileSystemWatcher, SIGNAL(directoryChanged(QString)),
+        this, SLOT(directoryChanged(QString)));
 }
 
 LocalDirDockWidget::~LocalDirDockWidget()
@@ -67,7 +71,9 @@ LocalDirDockWidget::~LocalDirDockWidget()
 
 void LocalDirDockWidget::setDir(QString const& dir, QString const& caption, bool isNavigation)
 {
+    fileSystemWatcher->removePath(model_->dir());
     model_->setDir(dir);
+    fileSystemWatcher->addPath(dir);
     updateCurrentDir(dir, caption, isNavigation);
 }
 
@@ -105,9 +111,12 @@ bool LocalDirDockWidget::isActived() const
 
 void LocalDirDockWidget::cd(QString const& dir)
 {
+    QString oldDir = model_->dir();
     if(model_->cd(dir))
     {
         QString dirName = model_->dir();
+        fileSystemWatcher->removePath(oldDir);
+        fileSystemWatcher->addPath(dirName);
         updateCurrentDir(dirName);
     }
 }
@@ -203,6 +212,12 @@ void LocalDirDockWidget::viewClick(QModelIndex const& index)
         else if(model_->cd(fileInfo.fileName()))
             updateCurrentDir(model_->dir());
     }
+}
+
+void LocalDirDockWidget::directoryChanged(const QString &path)
+{
+    if(path == model_->dir())
+        model_->refresh();
 }
 
 void LocalDirDockWidget::sortIndicatorChanged(int logicalIndex, Qt::SortOrder order)
