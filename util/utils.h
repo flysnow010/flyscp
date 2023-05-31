@@ -32,6 +32,7 @@ public:
 
     static QString permissionsText(quint32 permissions, bool isDir);
     static QString getText(QString const& label, QString const& value = QString());
+    static QString getPassword(QString const& label);
     static bool question(QString const& text);
     static void warring(QString const& text);
 };

@@ -247,6 +247,19 @@ QString Utils::getText(QString const& label, QString const& value)
     return QString();
 }
 
+QString Utils::getPassword(QString const& label)
+{
+    QInputDialog dialog;
+    dialog.setInputMode(QInputDialog::TextInput);
+    dialog.setWindowTitle(QApplication::applicationName());
+    dialog.setLabelText(label);
+    dialog.setTextEchoMode(QLineEdit::Password);
+    dialog.setWindowFlags(dialog.windowFlags() & ~Qt::WindowContextHelpButtonHint);
+    if(dialog.exec() == QDialog::Accepted)
+        return dialog.textValue();
+    return QString();
+}
+
 bool Utils::question(QString const& text)
 {
     if(QMessageBox::question(0, QApplication::applicationName(), text) == QMessageBox::Yes)
