@@ -224,6 +224,11 @@ void WinShell::OpenByExplorer(QString const& fileName)
                  filePath.toStdWString().c_str(), 0, SW_SHOWNORMAL);
 }
 
+void WinShell::Exec(QString const& appName, QStringList const& params)
+{
+    Exec(appName, params.join(" "));
+}
+
 void WinShell::Exec(QString const& appName, QString const& params)
 {
     SHELLEXECUTEINFO shellExecInfo;
