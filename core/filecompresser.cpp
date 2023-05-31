@@ -137,6 +137,10 @@ void FileCompresser::cancel()
     process->kill();
     process->waitForFinished(1000);
     onError("User stopped the process");
+    foreach(auto const& fileName, targetFileNames)
+    {
+        QFile::remove(fileName);
+    }
 }
 
 void FileCompresser::setArgs(QStringList & args, CompressParam const& param)
@@ -145,10 +149,16 @@ void FileCompresser::setArgs(QStringList & args, CompressParam const& param)
         args << param.volumeText();
     if(param.isMoveFile)
         args <<  "-sdel";
-    if(param.isCreateSFX)
-        args <<  "-sfx";
     if(param.isEncryption)
         args << param.passwordText();
+    if(param.isCreateSFX)
+    {
+        if(param.isGuiSFX)
+             args <<  "-sfx7z.sfx";
+        else
+            args <<  "-sfx7zCon.sfx";
+        args << "-t7z";
+    }
 }
 
 QStringList FileCompresser::getFileNames(QString const&fileName,

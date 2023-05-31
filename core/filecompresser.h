@@ -14,6 +14,7 @@ struct CompressParam
     bool isMultiVolume = false;
     bool isMoveFile = false;
     bool isCreateSFX = false;
+    bool isGuiSFX = false;
     bool isSignle = false;
     bool isEncryption = false;
     QString volumeText() const;
