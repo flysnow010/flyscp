@@ -36,12 +36,15 @@ protected:
     virtual QVariant foreColor(const QModelIndex &index) const;
 private:
     void modifyFileInfos(QFileInfoList &fileIfos);
+    void defaultRefresh();
 private:
     QDir dir_;
     QFileInfoList fileInfos_;
     QMap<QString, QIcon> iconMap;
     QIcon dirIcon;
     QIcon backIcon;
+    int sortIndex;
+    bool isDescending;
 };
 
 #endif // LOCALDIRMODEL_H

@@ -12,6 +12,7 @@
 #define ExeSuffix  "exe"
 
 namespace  {
+int const NONE_INDEX = -1;
 int const NAME_INDEX = 0;
 int const SUFFIX_INDEX = 1;
 int const SIZE_INDEX = 2;
@@ -23,6 +24,7 @@ LocalDirModel::LocalDirModel(QObject *parent)
     : TreeModel(parent)
     , dirIcon(Utils::dirIcon())
     , backIcon(":/image/back.png")
+    , sortIndex(NONE_INDEX)
 {
     setupData();
 }
@@ -94,23 +96,24 @@ bool LocalDirModel::editable(const QModelIndex &index) const
 void LocalDirModel::setDir(QString const& dir)
 {
     if(dir.isEmpty())
+    {
         fileInfos_ = QDir::drives();
+        modifyFileInfos(fileInfos_);
+        setupData();
+    }
     else
     {
         dir_.setPath(dir);
-        fileInfos_ = dir_.entryInfoList(QDir::AllEntries | QDir::NoDot,
-                                        QDir::DirsFirst);
+        refresh();
     }
-    modifyFileInfos(fileInfos_);
-    setupData();
 }
 
 void LocalDirModel::refresh()
 {
-    fileInfos_ = dir_.entryInfoList(QDir::AllEntries | QDir::NoDot,
-                                     QDir::DirsFirst);
-    modifyFileInfos(fileInfos_);
-    setupData();
+    if(sortIndex != NONE_INDEX)
+        sortItems(sortIndex, isDescending);
+    else
+        defaultRefresh();
 }
 
 void LocalDirModel::sortItems(int index, bool isDescendingOrder)
@@ -128,6 +131,8 @@ void LocalDirModel::sortItems(int index, bool isDescendingOrder)
     if(!isDescendingOrder)
         sortFlag |=  QDir::SortFlag::Reversed;
     fileInfos_ = dir_.entryInfoList(QDir::AllEntries | QDir::NoDot, sortFlag);
+    sortIndex = index;
+    isDescending = isDescendingOrder;
     modifyFileInfos(fileInfos_);
     setupData();
 }
@@ -256,4 +261,12 @@ void LocalDirModel::modifyFileInfos(QFileInfoList &fileInfos)
             }
         }
     }
+}
+
+void LocalDirModel::defaultRefresh()
+{
+    fileInfos_ = dir_.entryInfoList(QDir::AllEntries | QDir::NoDot,
+                                    QDir::DirsFirst);
+    modifyFileInfos(fileInfos_);
+    setupData();
 }
