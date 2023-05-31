@@ -8,6 +8,7 @@
 #include "dialog/connectdialog.h"
 #include "dialog/aboutdialog.h"
 #include "util/utils.h"
+#include "core/winshell.h"
 #include <QSplitter>
 #include <QTabWidget>
 #include <QSettings>
@@ -110,6 +111,8 @@ void MainWindow::createMenuConnect()
     connect(ui->actionSelectAll, SIGNAL(triggered(bool)), this, SLOT(selectAll()));
     connect(ui->actionCompress, SIGNAL(triggered(bool)), this, SLOT(compressFiles()));
     connect(ui->actionUncompress, SIGNAL(triggered(bool)), this, SLOT(uncompressFiles()));
+    connect(ui->actionSearch, SIGNAL(triggered(bool)), this, SLOT(searchFiles()));
+    connect(ui->actionDiff, SIGNAL(triggered(bool)), this, SLOT(diffFiles()));
     connect(ui->actionRefresh, &QAction::triggered, this, [&](){
         if(leftDirView->isActived())
             leftDirView->refresh();
@@ -369,4 +372,20 @@ void MainWindow::uncompressFiles()
         rightDirView->uncompressFiles(leftDirView->dir());
         leftDirView->refresh();
     }
+}
+
+void MainWindow::searchFiles()
+{
+    if(leftDirView->isActived())
+        leftDirView->searchFiles(leftDirView->dir());
+    else
+        rightDirView->searchFiles(rightDirView->dir());
+}
+
+void MainWindow::diffFiles()
+{
+    QStringList params;
+    params << "-contextdiff"
+           << leftDirView->dir() << rightDirView->dir();
+    WinShell::Exec(Utils::diffApp(), params);
 }

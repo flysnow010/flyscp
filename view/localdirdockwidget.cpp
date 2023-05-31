@@ -14,6 +14,7 @@
 #include "dialog/fileoperateconfirmdialog.h"
 #include "dialog/compressconfirmdialog.h"
 #include "dialog/uncompressconfirmdialog.h"
+#include "dialog/serchfiledialog.h"
 
 #include <QMenu>
 #include <QSettings>
@@ -512,14 +513,14 @@ void LocalDirDockWidget::viewFile()
     QString fileName = selectedFileName();
     QFileInfo fileInfo(fileName);
     if(fileInfo.isFile())
-        WinShell::Open(fileName);
+        WinShell::Exec(Utils::viewApp(), fileName);
 }
 void LocalDirDockWidget::editFile()
 {
     QString fileName = selectedFileName();
     QFileInfo fileInfo(fileName);
     if(fileInfo.isFile())
-        WinShell::Open(fileName);
+        WinShell::Exec(Utils::editApp(), fileName);
 }
 
 void LocalDirDockWidget::copyFiles(QString const& dstFilePath)
@@ -704,6 +705,13 @@ void LocalDirDockWidget::uncompressFiles(QString const& dstFilePath)
             }
         }
     }
+}
+
+void LocalDirDockWidget::searchFiles(QString const& dstFilePath)
+{
+    SerchFileDialog dialog;
+    dialog.setSearchPath(dstFilePath);
+    dialog.exec();
 }
 
 void LocalDirDockWidget::newTxtFile()

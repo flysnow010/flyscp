@@ -41,6 +41,7 @@ public:
     void selectAll();
     void compressFiles(QString const& dstFilePath);
     void uncompressFiles(QString const& dstFilePath);
+    void searchFiles(QString const& dstFilePath);
 public slots:
     void newFolder();
     void newTxtFile();

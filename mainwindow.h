@@ -38,6 +38,8 @@ private slots:
     void selectAll();
     void compressFiles();
     void uncompressFiles();
+    void searchFiles();
+    void diffFiles();
 private:
     Ui::MainWindow *ui;
     PanelWidget* leftPanelWidget;
