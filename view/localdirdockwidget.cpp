@@ -594,7 +594,12 @@ void LocalDirDockWidget::compressFiles(QString const& dstFilePath)
         CompressConfirmDialog d(this);
         QString fileName;
         if(fileNames.size() > 1)
-            fileName = model_->dir() + CompressConfirmDialog::CurrentSuffix();
+        {
+            QString baseName = QFileInfo(model_->dir()).baseName();
+            if(baseName.isEmpty())
+                baseName = "archive";
+            fileName = baseName + CompressConfirmDialog::CurrentSuffix();
+        }
         else
         {
             if(QFileInfo(fileNames[0]).isDir())
@@ -646,7 +651,10 @@ void LocalDirDockWidget::uncompressFiles(QString const& dstFilePath)
         return;
     }
 
-    if(isCompressFiles(fileNames))
+    QString fileName;
+    if(!FileUncompresser::isCompressFiles(fileNames, fileName))
+        Utils::warring(QString("Compression package error!\n%1").arg(fileName));
+    else
     {
         UnCompressConfirmDialog d(this);
         d.setTargetPath(dstFilePath);
@@ -658,6 +666,8 @@ void LocalDirDockWidget::uncompressFiles(QString const& dstFilePath)
             FileUncompresser uncompresser;
             FileProgressDialog dialog(this);
             dialog.setStatusTextMode();
+            if(uncompresser.isEncrypted(fileNames[0]))
+                param.password = Utils::getPassword("Input password");
 
             connect(&uncompresser, &FileUncompresser::progress, &dialog, &FileProgressDialog::progressText);
             connect(&uncompresser, &FileUncompresser::finished, &dialog, &FileProgressDialog::finished);
@@ -665,6 +675,7 @@ void LocalDirDockWidget::uncompressFiles(QString const& dstFilePath)
 
             dialog.setModal(true);
             dialog.show();
+
             uncompresser.uncompress(fileNames, param, targetPath);
             while(!dialog.isFinished())
             {
@@ -700,15 +711,12 @@ bool LocalDirDockWidget::isMultiSelected()
 
 bool LocalDirDockWidget::isCompressFiles(QStringList const& fileNames)
 {
-    QStringList suffixs = QStringList() << "zip" << ".tar.gz" << "7z" << "iso"
-                                        << "xz" << "bz2" << "tar" << "gz" << "wim";
+    QStringList suffixs = QStringList() << "zip" << "7z" << "wim" << "tar"
+                                        << "gz" << "xz" << "bz2" << "iso";
     foreach(auto const& fileName, fileNames)
     {
         if(!suffixs.contains(QFileInfo(fileName).suffix().toLower()))
-        {
-            Utils::warring(QString("Compression package error!\n%1").arg(fileName));
             return false;
-        }
     }
     return true;
 }
