@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>657</width>
-    <height>410</height>
+    <height>351</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -151,11 +151,57 @@
           </widget>
          </item>
          <item>
-          <widget class="QCheckBox" name="cbCreateSFX">
-           <property name="text">
-            <string>Create a self extracting package</string>
+          <layout class="QHBoxLayout" name="horizontalLayout_7">
+           <property name="topMargin">
+            <number>0</number>
            </property>
-          </widget>
+           <item>
+            <widget class="QCheckBox" name="cbCreateSFX">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>Create a self extracting package</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="rbConsoleSFX">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>Console </string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="rbGUISFX">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>GUI </string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_5">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </item>
          <item>
           <widget class="QCheckBox" name="cbCompressSingle">
@@ -374,8 +420,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>527</x>
-     <y>292</y>
+     <x>535</x>
+     <y>399</y>
     </hint>
     <hint type="destinationlabel">
      <x>127</x>
@@ -390,8 +436,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>638</x>
-     <y>292</y>
+     <x>646</x>
+     <y>399</y>
     </hint>
     <hint type="destinationlabel">
      <x>223</x>
@@ -406,12 +452,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>86</x>
-     <y>123</y>
+     <x>99</x>
+     <y>164</y>
     </hint>
     <hint type="destinationlabel">
-     <x>213</x>
-     <y>130</y>
+     <x>259</x>
+     <y>166</y>
     </hint>
    </hints>
   </connection>
@@ -422,12 +468,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>42</x>
-     <y>232</y>
+     <x>55</x>
+     <y>270</y>
     </hint>
     <hint type="destinationlabel">
-     <x>163</x>
-     <y>228</y>
+     <x>267</x>
+     <y>272</y>
     </hint>
    </hints>
   </connection>

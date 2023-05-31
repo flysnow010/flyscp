@@ -54,6 +54,14 @@ CompressConfirmDialog::CompressConfirmDialog(QWidget *parent)
         if(isChecked)
             changeSuffix(".tar.bz2");
     });
+    connect(ui->cbCreateSFX, &QAbstractButton::clicked, this, [&](bool isChecked){
+        if(isChecked)
+        {
+            QFileInfo fileInfo(ui->lineEditFileName->text());
+            QString fileName = fileInfo.dir().filePath(fileInfo.baseName() + ".exe");
+            ui->lineEditFileName->setText(fileName);
+        }
+    });
 
     ui->comboBoxVolumeSize->addItem("10M", 10);
     ui->comboBoxVolumeSize->addItem("100M", 100);
@@ -77,6 +85,7 @@ CompressConfirmDialog::CompressConfirmDialog(QWidget *parent)
         if(suffix == currentSuffix)
         {
             radioButtons[i]->setChecked(true);
+            radioButtons[i]->click();
             break;
         }
     }
@@ -98,6 +107,20 @@ void CompressConfirmDialog::changeSuffix(QString const& suffix, bool isCanEncryp
     {
         ui->cbEncryption->setEnabled(false);
         ui->cbEncryption->setChecked(false);
+    }
+
+    if(suffix == ".7z")
+    {
+        ui->cbCreateSFX->setEnabled(true);
+        ui->rbConsoleSFX->setEnabled(true);
+        ui->rbGUISFX->setEnabled(true);
+    }
+    else
+    {
+        ui->cbCreateSFX->setEnabled(false);
+        ui->rbConsoleSFX->setEnabled(false);
+        ui->rbGUISFX->setEnabled(false);
+        ui->cbCreateSFX->setChecked(false);
     }
     suffix_ = suffix;
     setCurrentSuffix(suffix);
@@ -147,6 +170,7 @@ void CompressConfirmDialog::setSettings(CompressParam const& param)
     ui->cbMultiVolume->setChecked(param.isMultiVolume);
     ui->cbMoveCompress->setChecked(param.isMoveFile);
     ui->cbCreateSFX->setChecked(param.isCreateSFX);
+    ui->rbGUISFX->setChecked(param.isGuiSFX);
     ui->cbCompressSingle->setChecked(param.isSignle);
     ui->cbEncryption->setChecked(param.isEncryption);
     ui->comboBoxFilter->setCurrentText(param.filter);
@@ -160,6 +184,7 @@ CompressParam CompressConfirmDialog::settings() const
     param.isMultiVolume = ui->cbMultiVolume->isChecked();
     param.isMoveFile = ui->cbMoveCompress->isChecked();
     param.isCreateSFX = ui->cbCreateSFX->isChecked();
+    param.isGuiSFX = ui->rbGUISFX->isChecked();
     param.isSignle = ui->cbCompressSingle->isChecked();
     param.isEncryption = ui->cbEncryption->isChecked();
     param.password = ui->lineEditPassword->text();
