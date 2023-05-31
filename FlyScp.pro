@@ -32,6 +32,7 @@ SOURCES += \
     dialog/fileprogressdialog.cpp \
     dialog/permissionsdialog.cpp \
     dialog/propertydialog.cpp \
+    dialog/serchfiledialog.cpp \
     dialog/uncompressconfirmdialog.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -79,6 +80,7 @@ HEADERS += \
     dialog/fileprogressdialog.h \
     dialog/permissionsdialog.h \
     dialog/propertydialog.h \
+    dialog/serchfiledialog.h \
     dialog/uncompressconfirmdialog.h \
     mainwindow.h \
     model/localdirmodel.h \
@@ -110,6 +112,7 @@ FORMS += \
     dialog/fileprogressdialog.ui \
     dialog/permissionsdialog.ui \
     dialog/propertydialog.ui \
+    dialog/serchfiledialog.ui \
     dialog/uncompressconfirmdialog.ui \
     mainwindow.ui \
     view/localdirdockwidget.ui \
