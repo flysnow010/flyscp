@@ -25,6 +25,7 @@ FileUncompresser::FileUncompresser(QObject *parent)
     , process(new QProcess(this))
     , mode(Uncompress)
     , isEncrypted_(false)
+    , isListStart_(false)
 {
     connect(process, &QProcess::readyReadStandardOutput, this, [=](){
         while(process->canReadLine())
@@ -39,11 +40,27 @@ FileUncompresser::FileUncompresser(QObject *parent)
                     if(text.contains("Encrypted = +"))
                         isEncrypted_ = true;
                 }
+                else if(mode == List)
+                {
+                    /*
+                       Date      Time    Attr         Size   Compressed  Name
+                    ------------------- ----- ------------ ------------  ------------------------
+                    2022-04-26 10:32:54 ....A     79463864     78946166  VSCodeUserSetup-x64-1.66.2.exe
+                    ------------------- ----- ------------ ------------  ------------------------
+                    2022-04-26 10:32:54           79463864     78946166  1 files
+                    */
+                    if(text.startsWith("-------------------"))                    
+                       isListStart_ = !isListStart_;
+                    else if(isListStart_)
+                        fileInfos << text;
+                }
             }
         }
     });
     connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this,
         [=](int exitCode, QProcess::ExitStatus exitStatus) {
+        if(mode != Uncompress)
+            return;
         if(exitStatus != QProcess::ExitStatus::NormalExit)
             onError("Program is crash exit");
         else {
@@ -65,9 +82,9 @@ bool FileUncompresser::uncompress(QStringList const& fileNames,
                 UncompressParam const& param,
                 QString const& targetFilePath)
 {
-    QString app = Utils::compressApp();
     mode = Uncompress;
-    process->setProgram(app);
+    process->setProgram(Utils::compressApp());
+    argsList.clear();
     foreach(auto const& fileName, fileNames)
     {
         QStringList args;
@@ -84,6 +101,8 @@ bool FileUncompresser::uncompress(QStringList const& fileNames,
             args <<  "-o" + dir.filePath(pathName);
         }
         args << param.filter;
+        if(!param.password.isEmpty())
+            args << "-p" + param.password;
         if(!param.isWithPath)
             args <<  param.overwriteMode() << "-y";
         argsList << args;
@@ -96,17 +115,33 @@ bool FileUncompresser::uncompress(QStringList const& fileNames,
 
 bool FileUncompresser::isEncrypted(QString const& fileName)
 {
-    QString app = Utils::compressApp();
-    process->setProgram(app);
     QStringList args;
-    args << "l -slt" << fileName;
+    args << "l"  << "-slt" << fileName;
+    argsList.clear();
     argsList << args;
     mode = CheckEncrypt;
     currentIndex = 0;
+    process->setProgram(Utils::compressApp());
     process->setArguments(nextArgs());
     process->start();
     process->waitForFinished();
     return isEncrypted_;
+}
+
+QStringList FileUncompresser::listFileInfo(QString const& fileName)
+{
+    QStringList args;
+    args << "l"  << fileName;
+    argsList.clear();
+    argsList << args;
+    mode = List;
+    currentIndex = 0;
+    process->setProgram(Utils::compressApp());
+    process->setArguments(nextArgs());
+    fileInfos.clear();
+    process->start();
+    process->waitForFinished();
+    return fileInfos;
 }
 
 void FileUncompresser::cancel()
@@ -148,7 +183,7 @@ QString FileUncompresser::errorToText(int errorCode) const
     return QString();
 }
 
-bool FileUncompresser::isCompressFiles(QStringList const& fileNames)
+bool FileUncompresser::isCompressFiles(QStringList const& fileNames, QString &unCompressfileName)
 {
     static QStringList suffixs = QStringList()
             << "7z"                                //7z
@@ -205,6 +240,8 @@ bool FileUncompresser::isCompressFiles(QStringList const& fileNames)
         {
             bool isOK = false;
             suffix.toUInt(&isOK);
+            if(!isOK)
+                unCompressfileName = fileName;
             return isOK;
         }
     }

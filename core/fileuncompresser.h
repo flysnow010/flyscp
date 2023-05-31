@@ -12,6 +12,7 @@ struct UncompressParam
     bool isCreateDir = false;
     OverwriteMode mode = AutoRename;
     QString filter = QString("*");
+    QString password;
 
     QString overwriteMode() const;
 };
@@ -27,12 +28,13 @@ public:
 
     enum Mode { Uncompress, CheckEncrypt, List };
 
-    static bool isCompressFiles(QStringList const& fileNames);
+    static bool isCompressFiles(QStringList const& fileNames, QString &unCompressfileName);
     bool uncompress(QStringList const& fileNames,
                     UncompressParam const& param,
                     QString const& targetFilePath);
 
     bool isEncrypted(QString const& fileName);
+    QStringList listFileInfo(QString const& fileName);
 
     void cancel();
 signals:
@@ -47,8 +49,10 @@ private:
     QProcess* process;
     int currentIndex;
     QList<QStringList> argsList;
+    QStringList fileInfos;
     Mode mode;
     bool isEncrypted_;
+    bool isListStart_;
 };
 
 #endif // FILEUNCOMPRESSER_H
