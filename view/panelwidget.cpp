@@ -22,7 +22,7 @@ PanelWidget::PanelWidget(QWidget *parent)
 {
     ui->setupUi(this);
     ui->tabWidget->setTabBarAutoHide(true);
-    updateDrivers();
+    initDrivers();
     connect(buttonGroup, SIGNAL(buttonClicked(QAbstractButton*)),
             this, SLOT(buttonClicked(QAbstractButton*)));
     connect(ui->tabWidget, &QTabWidget::currentChanged, this, &PanelWidget::currentChanged);
@@ -234,24 +234,30 @@ void PanelWidget::updateTexts(QWidget* widget)
     }
 }
 
-void PanelWidget::updateDrivers()
+void PanelWidget::initDrivers()
 {
     QFileInfoList drivers = QDir::drives();
     QHBoxLayout* layout = new QHBoxLayout();
     layout->setMargin(3);
     layout->setSpacing(5);
-
-    QFileIconProvider fip;
-    for(int i = 0; i < drivers.size(); i++)
+    for(char ch = 'a'; ch <= 'z'; ch++)
     {
         QToolButton* button = new QToolButton();
         button->setCheckable(true);
         button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-        button->setText(drivers[i].path().at(0).toLower());
+        button->setText(QString::fromLocal8Bit(&ch, 1));
         button->setIconSize(QSize(10, 10));
-        button->setIcon(fip.icon(drivers[i]));
         layout->addWidget(button);
-        buttonGroup->addButton(button);
+        buttonGroup->addButton(button, QChar(ch).unicode());
+        button->hide();
+    }
+    QFileIconProvider fip;
+    for(int i = 0; i < drivers.size(); i++)
+    {
+        QChar ch =drivers[i].path().at(0).toLower();
+        QAbstractButton* button = buttonGroup->button(ch.unicode());
+        button->setIcon(fip.icon(drivers[i]));
+        button->show();
     }
 
     QToolButton* homeButton = new QToolButton();
@@ -271,6 +277,39 @@ void PanelWidget::updateDrivers()
     connect(rootButton, SIGNAL(clicked()), this, SLOT(backToRoot()));
     connect(topButton, SIGNAL(clicked()), this, SLOT(backToPrePath()));
     ui->driverWidget->setLayout(layout);
+}
+
+void PanelWidget::updateDrivers(bool isAdded)
+{
+    QFileInfoList drivers = QDir::drives();
+    if(isAdded)
+    {
+        QFileIconProvider fip;
+        for(int i = 0; i < drivers.size(); i++)
+        {
+            QChar ch = drivers[i].path().at(0).toLower();
+            QAbstractButton* button = buttonGroup->button(ch.unicode());
+            if(button && button->isHidden())
+            {
+                button->setIcon(fip.icon(drivers[i]));
+                button->show();
+            }
+        }
+    }
+    else
+    {
+        QList<int> ids;
+        for(int i = 0; i < drivers.size(); i++)
+            ids << drivers[i].path().at(0).toLower().unicode();
+        QList<QAbstractButton*> buttons = buttonGroup->buttons();
+        foreach(auto & button, buttons)
+        {
+            int id = buttonGroup->id(button);
+            if(!ids.contains(id))
+                button->hide();
+        }
+
+    }
 }
 
 void PanelWidget::buttonClicked(QAbstractButton* button)

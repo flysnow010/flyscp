@@ -17,6 +17,8 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+protected:
+    bool nativeEvent(const QByteArray &eventType, void *message, long *result);
 private:
     void save();
     void load();

@@ -27,6 +27,8 @@ public:
     void loadSettings(QString const& name);
     void preDir();
     void nextDir();
+
+    void updateDrivers(bool isAdded);
 signals:
     void tabCountChanged(int count);
 public slots:
@@ -44,7 +46,8 @@ private slots:
     void currentChanged(int index);
     void tabCloseRequested(int index);
 private:
-    void updateDrivers();
+    void initDrivers();
+
     void updateDir(QString const& driver);
 private:
     Ui::PanelWidget *ui;

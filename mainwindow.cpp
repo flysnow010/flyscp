@@ -16,6 +16,9 @@
 #include <QDebug>
 #include <QScreen>
 
+#include <windows.h>
+#include <dbt.h>
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -52,6 +55,36 @@ MainWindow::~MainWindow()
 {
     save();
     delete ui;
+}
+
+bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, long *result)
+{
+    Q_UNUSED(eventType)
+    MSG* msg = (MSG*)message;
+    if(msg->message == WM_DEVICECHANGE)
+    {
+        if(msg->wParam == DBT_DEVICEARRIVAL)
+        {
+            PDEV_BROADCAST_HDR devHdr = (PDEV_BROADCAST_HDR)msg->lParam;
+            if(devHdr->dbch_devicetype == DBT_DEVTYP_VOLUME)
+            {
+                leftPanelWidget->updateDrivers(true);
+                rightPanelWidget->updateDrivers(true);
+            }
+            *result = 0;
+        }
+        else if(msg->wParam == DBT_DEVICEREMOVECOMPLETE)
+        {
+            PDEV_BROADCAST_HDR devHdr = (PDEV_BROADCAST_HDR)msg->lParam;
+            if(devHdr->dbch_devicetype == DBT_DEVTYP_VOLUME)
+            {
+                leftPanelWidget->updateDrivers(false);
+                rightPanelWidget->updateDrivers(false);
+            }
+            *result = 0;
+        }
+    }
+    return false;
 }
 
 void MainWindow::createConnects()
