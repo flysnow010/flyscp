@@ -214,7 +214,6 @@ void WinShell::OpenWith(QString const& fileName)
     shellExecInfo.fMask = SEE_MASK_INVOKEIDLIST;
 
     ShellExecuteEx(&shellExecInfo);
-    WaitForSingleObject(shellExecInfo.hProcess, INFINITE);
 }
 
 void WinShell::OpenByExplorer(QString const& fileName)
@@ -241,11 +240,10 @@ void WinShell::Exec(QString const& appName, QString const& params)
     shellExecInfo.lpParameters = lpParameters.c_str();
     shellExecInfo.lpDirectory = lpDirectory.c_str();
     shellExecInfo.lpVerb = L"open";
-    shellExecInfo.nShow = SW_HIDE;
-    shellExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS ;
+    shellExecInfo.nShow = SW_SHOWNORMAL;
+    shellExecInfo.fMask = SEE_MASK_DEFAULT;
 
     ShellExecuteEx(&shellExecInfo);
-    WaitForSingleObject(shellExecInfo.hProcess, INFINITE);
 }
 
 bool WinShell::CreateShortcut(QString const& linkFilePath,
