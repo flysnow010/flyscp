@@ -711,6 +711,14 @@ void LocalDirDockWidget::searchFiles(QString const& dstFilePath)
 {
     SerchFileDialog dialog;
     dialog.setSearchPath(dstFilePath);
+    connect(&dialog, &SerchFileDialog::viewFile, this, [=](QString const& fileName){
+        QFileInfo fileInfo(fileName);
+        if(fileInfo.isFile())
+            WinShell::Exec(Utils::viewApp(), fileName);
+    });
+    connect(&dialog, &SerchFileDialog::goToFile, this, [=](QString const& fileName){
+        goToFile(fileName);
+    });
     dialog.exec();
 }
 
@@ -814,6 +822,24 @@ void LocalDirDockWidget::fileTransfer(FileNames const& fileNames, bool isMove)
                 QApplication::processEvents();
         }
         QApplication::processEvents();
+    }
+}
+
+void LocalDirDockWidget::goToFile(QString const& fileName)
+{
+    QFileInfo fileInfo(fileName);
+    QString filePath = fileInfo.dir().path();
+    QString baseName = fileInfo.fileName();
+    if(model_->dir() != filePath)
+        model_->setDir(filePath);
+    int index = model_->indexOfFile(baseName);
+    if(index != -1)
+    {
+        for(int col = 0; col < model_->columnCount(); col++)
+        {
+            QModelIndex modeIndex = model_->index(index, col);
+            ui->treeView->selectionModel()->select(modeIndex, QItemSelectionModel::Select);
+        }
     }
 }
 

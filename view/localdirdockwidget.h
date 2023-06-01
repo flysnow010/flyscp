@@ -82,6 +82,7 @@ private:
     void copyFilels(QStringList const& fileNames, QString const& dstFilePath);
     void cutFiles(QStringList const& fileNames, QString const& dstFilePath);
     void fileTransfer(FileNames const& fileNames, bool isMove);
+    void goToFile(QString const& fileName);
     void updateCurrentDir(QString const& dir, QString const& caption = QString(), bool isNavigation = false);
 private:
     Ui::LocalDirDockWidget *ui;
