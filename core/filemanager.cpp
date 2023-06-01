@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QFileInfo>
 #include <QDir>
+#include <QRegExp>
 
 static DWORD ProgressCallback(
     LARGE_INTEGER TotalFileSize,
@@ -41,6 +42,35 @@ quint32 FileManager::onProgress(qint64 TotalFileSize, qint64 TotalBytesTransferr
     return PROGRESS_CONTINUE;
 }
 
+void FileManager::findFiles(QString const& filePath, QString const& filter)
+{
+    if(singled())
+         return;
+
+    QDir dir(filePath);
+    QFileInfoList fileInfos = dir.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot,
+                                                QDir::DirsFirst);
+    QRegExp regExp(filter, Qt::CaseSensitive, QRegExp::Wildcard);
+    bool isMatch = filter == "*" ? true : false;
+    emit currentFolder(filePath);
+    foreach(auto const& fileInfo, fileInfos)
+    {
+        if(singled())
+            break;
+
+        QString fileName = fileInfo.filePath();
+        if(isMatch || regExp.exactMatch(fileName))
+        {
+            if(fileInfo.isDir())
+                emit foundFolder(fileName);
+            else
+                emit foundFile(fileName);
+        }
+        if(fileInfo.isDir())
+            findFiles(fileInfo.filePath(), filter);
+    }
+}
+
 void FileManager::delereFiles(QStringList const& fileNames)
 {
     QDir dir;
@@ -59,6 +89,12 @@ void FileManager::delereFiles(QStringList const& fileNames)
            dir.remove(newFileNames[i]);
         emit totalProgress(newFileNames[i], QString(), newFileNames.size(), i + 1);
     }
+    emit finished();
+}
+
+void FileManager::searchFiles(QString const& filePath, QString const& filter)
+{
+    findFiles(filePath, filter);
     emit finished();
 }
 
