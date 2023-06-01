@@ -177,6 +177,16 @@ bool LocalDirModel::isParent(int index) const
     return fileInfos_[index].fileName() == ParentPath;
 }
 
+int LocalDirModel::indexOfFile(QString const& fileName)
+{
+    for(int i = 0; i < fileInfos_.size(); i++)
+    {
+        if(fileInfos_[i].fileName() == fileName)
+            return i;
+    }
+    return -1;
+}
+
 bool LocalDirModel::cd(const QString &dirName)
 {
     if(!dir_.cd(dirName))
