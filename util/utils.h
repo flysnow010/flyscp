@@ -36,8 +36,11 @@ public:
     static QString permissionsText(quint32 permissions, bool isDir);
     static QString getText(QString const& label, QString const& value = QString());
     static QString getPassword(QString const& label);
+    static QString getPath(QString const& caption);
+    static QString getSaveFile(QString const& caption);
     static bool question(QString const& text);
     static void warring(QString const& text);
+    static bool saveFile(QString const& fileName, QString const& text);
 };
 
 #endif // UTILS_H

@@ -7,8 +7,10 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QTemporaryFile>
+#include <QFileDialog>
 #include <QDateTime>
 #include <QDir>
+#include <QFile>
 #include <QtWin>
 #include <QDebug>
 
@@ -275,6 +277,16 @@ QString Utils::getPassword(QString const& label)
     return QString();
 }
 
+QString Utils::getPath(QString const& caption)
+{
+    return QFileDialog::getExistingDirectory(0, caption);
+}
+
+QString Utils::getSaveFile(QString const& caption)
+{
+    return QFileDialog::getSaveFileName(0, caption);
+}
+
 bool Utils::question(QString const& text)
 {
     if(QMessageBox::question(0, QApplication::applicationName(), text) == QMessageBox::Yes)
@@ -285,4 +297,13 @@ bool Utils::question(QString const& text)
 void Utils::warring(QString const& text)
 {
     QMessageBox::warning(0, QApplication::applicationName(), text);
+}
+
+bool Utils::saveFile(QString const& fileName, QString const& text)
+{
+    QFile file(fileName);
+    if(!file.open(QIODevice::WriteOnly))
+        return false;
+    file.write(text.toUtf8());
+    return true;
 }
