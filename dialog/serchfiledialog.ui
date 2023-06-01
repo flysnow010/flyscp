@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>999</width>
-    <height>505</height>
+    <width>698</width>
+    <height>508</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Search File</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1,0">
+  <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1,0,0">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
@@ -69,6 +69,12 @@
          </item>
          <item row="1" column="1" colspan="2">
           <widget class="QComboBox" name="cbFolder">
+           <property name="minimumSize">
+            <size>
+             <width>350</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="editable">
             <bool>true</bool>
            </property>
@@ -125,7 +131,7 @@
    </item>
    <item>
     <widget class="QWidget" name="widgetResult" native="true">
-     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,1">
+     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -139,14 +145,14 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QLabel" name="label_3">
+       <widget class="QLabel" name="labelTip">
         <property name="text">
          <string>Result of search</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QListWidget" name="lwResult"/>
+       <widget class="QListView" name="lwResult"/>
       </item>
      </layout>
     </widget>
@@ -197,6 +203,46 @@
      </layout>
     </widget>
    </item>
+   <item>
+    <widget class="QFrame" name="frameCurrentDir">
+     <property name="frameShape">
+      <enum>QFrame::Panel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Sunken</enum>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>6</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="labelCurentPath">
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Sunken</enum>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
   </layout>
  </widget>
  <tabstops>
@@ -214,22 +260,5 @@
   <tabstop>tabWidget</tabstop>
  </tabstops>
  <resources/>
- <connections>
-  <connection>
-   <sender>btnCancel</sender>
-   <signal>clicked()</signal>
-   <receiver>SerchFileDialog</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>968</x>
-     <y>59</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>946</x>
-     <y>102</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

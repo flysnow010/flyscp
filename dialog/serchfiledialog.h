@@ -7,6 +7,7 @@ namespace Ui {
 class SerchFileDialog;
 }
 
+class QStringListModel;
 class SerchFileDialog : public QDialog
 {
     Q_OBJECT
@@ -16,8 +17,20 @@ public:
     ~SerchFileDialog();
 
     void setSearchPath(QString  const& filePath);
+signals:
+    void viewFile(QString const& fileName);
+    void goToFile(QString const& fileName);
+
+private slots:
+    void searchFiles();
+private:
+    void setSeearchState(bool isSearching);
+    void startSearch(bool isStart);
 private:
     Ui::SerchFileDialog *ui;
+    QStringListModel* model;
+    QStringList fileNames;
+    bool isSearching;
 };
 
 #endif // SERCHFILEDIALOG_H
