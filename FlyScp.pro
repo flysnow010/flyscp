@@ -30,6 +30,7 @@ SOURCES += \
     dialog/connectdialog.cpp \
     dialog/fileoperateconfirmdialog.cpp \
     dialog/fileprogressdialog.cpp \
+    dialog/optionsdialog.cpp \
     dialog/permissionsdialog.cpp \
     dialog/propertydialog.cpp \
     dialog/serchfiledialog.cpp \
@@ -78,6 +79,7 @@ HEADERS += \
     dialog/connectdialog.h \
     dialog/fileoperateconfirmdialog.h \
     dialog/fileprogressdialog.h \
+    dialog/optionsdialog.h \
     dialog/permissionsdialog.h \
     dialog/propertydialog.h \
     dialog/serchfiledialog.h \
@@ -110,6 +112,7 @@ FORMS += \
     dialog/connectdialog.ui \
     dialog/fileoperateconfirmdialog.ui \
     dialog/fileprogressdialog.ui \
+    dialog/optionsdialog.ui \
     dialog/permissionsdialog.ui \
     dialog/propertydialog.ui \
     dialog/serchfiledialog.ui \
