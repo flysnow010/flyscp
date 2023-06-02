@@ -91,3 +91,18 @@ void FileNames::FindFilenames(QString const& fileName, QStringList &fileNames)
     }
 }
 
+void FileNames::MakeFileNamesAsParams(QStringList & fileNames)
+{
+    for(int i = 0; i < fileNames.size(); i++)
+    {
+        if(fileNames[i].contains(QChar(' ')))
+            fileNames[i] = QString("%1%2%1").arg(QChar('"'), fileNames[i]);
+    }
+}
+
+void FileNames::MakeFileNameAsParams(QString & fileName)
+{
+    if(fileName.contains(QChar(' ')))
+        fileName = QString("%1%2%1").arg(QChar('"'), fileName);
+}
+

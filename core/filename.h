@@ -30,5 +30,7 @@ public:
     static void MakeFileNames(QStringList const& fileNames, QStringList & newFileNames);
     static void FindFilenames(FileName const& fileName, FileNames &fileNames);
     static void FindFilenames(QString const& fileName, QStringList &fileNames);
+    static void MakeFileNamesAsParams(QStringList & fileNames);
+    static void MakeFileNameAsParams(QString & fileName);
 };
 #endif
