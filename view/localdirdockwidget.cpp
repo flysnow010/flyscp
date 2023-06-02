@@ -512,15 +512,22 @@ void LocalDirDockWidget::viewFile()
 {
     QString fileName = selectedFileName();
     QFileInfo fileInfo(fileName);
+
     if(fileInfo.isFile())
+    {
+        FileNames::MakeFileNameAsParams(fileName);
         WinShell::Exec(Utils::viewApp(), fileName);
+    }
 }
 void LocalDirDockWidget::editFile()
 {
     QString fileName = selectedFileName();
     QFileInfo fileInfo(fileName);
     if(fileInfo.isFile())
+    {
+        FileNames::MakeFileNameAsParams(fileName);
         WinShell::Exec(Utils::editApp(), fileName);
+    }
 }
 
 void LocalDirDockWidget::copyFiles(QString const& dstFilePath)
@@ -618,10 +625,11 @@ void LocalDirDockWidget::compressFiles(QString const& dstFilePath)
         }
         else
         {
-            if(QFileInfo(fileNames[0]).isDir())
-                fileName = fileNames[0] + CompressConfirmDialog::CurrentSuffix();
+            QFileInfo fileInfo(fileNames[0]);
+            if(fileInfo.isDir())
+                fileName = fileInfo.baseName() + CompressConfirmDialog::CurrentSuffix();
             else
-                fileName = QFileInfo(fileNames[0]).completeBaseName() + CompressConfirmDialog::CurrentSuffix();
+                fileName = fileInfo.completeBaseName() + CompressConfirmDialog::CurrentSuffix();
         }
 
         d.adjustSize();
