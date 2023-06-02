@@ -1,10 +1,12 @@
 #include "filecompresser.h"
+#include "filename.h"
 #include "util/utils.h"
 #include <QStringList>
 #include <QFileInfo>
 #include <QDir>
 #include <QProcess>
 #include <QDebug>
+
 QString CompressParam::volumeText() const
 {
     if(volumeSize == 0)
@@ -81,13 +83,11 @@ bool FileCompresser::compress(QStringList const& fileNames,
             }
             args << getFileNames(fileName, param);
             setArgs(args, param);
-            argsList << args;
-            qDebug()<< args.join(" ");
+            addArgs(args);
             if(param.isMultiSuffix())
             {
                 args = QStringList() << "a" << newFileName << targetFileName << "-sdel";
-                argsList << args;
-                qDebug()<< args.join(" ");
+                addArgs(args);
             }
             targetFileNames << newFileName;
         }
@@ -110,13 +110,11 @@ bool FileCompresser::compress(QStringList const& fileNames,
             args << getFileNames(fileName, param);
         }
         setArgs(args, param);
-        argsList << args;
-        qDebug()<< args.join(" ");
+        addArgs(args);
         if(param.isMultiSuffix())
         {
             args = QStringList() << "a" << targetFilePath << targetFileName << "-sdel";
-            argsList << args;
-            qDebug()<< args.join(" ");
+            addArgs(args);
         }
         targetFileNames << targetFilePath;
     }
@@ -231,4 +229,10 @@ QString FileCompresser::errorToText(int errorCode) const
     else if(errorCode == 255)
         return QString("User stopped the process");
     return QString();
+}
+
+void FileCompresser::addArgs(QStringList & args)
+{
+    qDebug()<< args.join(" ");
+    argsList << args;
 }

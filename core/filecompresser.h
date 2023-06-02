@@ -47,6 +47,7 @@ private:
                           CompressParam const& param);
     QString getFileName(QString const& fileName, QString const& newSuffix);
     QString getNewFileName(QString const& targetFilePath, QString const& fileName);
+    void addArgs(QStringList & args);
 private:
     QProcess* process;
     int currentIndex;
