@@ -420,5 +420,6 @@ void MainWindow::diffFiles()
     QStringList params;
     params << "-contextdiff"
            << leftDirView->dir() << rightDirView->dir();
+    FileNames::MakeFileNamesAsParams(params);
     WinShell::Exec(Utils::diffApp(), params);
 }
