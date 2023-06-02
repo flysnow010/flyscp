@@ -400,6 +400,7 @@ void LocalDirDockWidget::drop(QDropEvent * event)
         return;
 
     QStringList fileNames = ClipBoard::fileNames(mimeData);
+
     if(event->dropAction() == Qt::MoveAction)
     {
         if(!Utils::question(QString("Move %1 files or folders to\n%2").arg(fileNames.size()).arg(filePath)))
@@ -410,7 +411,11 @@ void LocalDirDockWidget::drop(QDropEvent * event)
     {
         if(!Utils::question(QString("Copy %1 files or folders to\n%2").arg(fileNames.size()).arg(filePath)))
             return;
-        fileTransfer(FileNames::GetFileNames(fileNames, filePath), false);
+        QString remoteSrc = ClipBoard::remoteSrc(mimeData);
+        if(remoteSrc.isEmpty())
+            fileTransfer(FileNames::GetFileNames(fileNames, filePath), false);
+        else
+            emit remoteDownload(remoteSrc, fileNames, filePath);
     }
     else if(event->dropAction() == Qt::LinkAction)
     {

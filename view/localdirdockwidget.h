@@ -52,6 +52,9 @@ signals:
     void libDirContextMenuRequested();
     void favoritesDirContextMenuRequested();
     void historyDirContextMenuRequested();
+    void remoteDownload(QString const& remoteSrc,
+                        QStringList const& fileNames,
+                        QString const& targetFilePath);
     void actived();
 
 protected:

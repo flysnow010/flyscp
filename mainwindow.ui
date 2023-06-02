@@ -64,8 +64,8 @@
      <string>&amp;Tool</string>
     </property>
     <addaction name="actionControlPanel"/>
-    <addaction name="separator"/>
     <addaction name="actionCalc"/>
+    <addaction name="separator"/>
     <addaction name="actionOption"/>
    </widget>
    <addaction name="menuFile"/>
@@ -107,7 +107,6 @@
    <addaction name="actionSearch"/>
    <addaction name="actionDiff"/>
    <addaction name="separator"/>
-   <addaction name="actionConnect"/>
   </widget>
   <action name="actionConnect">
    <property name="icon">

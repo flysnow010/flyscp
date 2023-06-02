@@ -6,6 +6,7 @@
 #include "view/remotedockwidget.h"
 #include "view/toolbuttons.h"
 #include "dialog/connectdialog.h"
+#include "dialog/optionsdialog.h"
 #include "dialog/aboutdialog.h"
 #include "util/utils.h"
 #include "core/winshell.h"
@@ -38,14 +39,8 @@ MainWindow::MainWindow(QWidget *parent)
     rightPanelWidget->addDirTab(rightDirView, Utils::driverIcon(), "Local of right");
     setCentralWidget(spliter);
 
-    QMenuBar *bar = new QMenuBar(ui->menubar);
-
-    QMenu *menuHelp = new QMenu("?", bar);
-    bar->addMenu(menuHelp);
-    menuHelp->addAction(ui->actionAbout);
-
-    ui->menubar->setCornerWidget(bar);
-    ui->statusbar->addWidget(toolButtons, 1);
+    createHelpMenu();
+    createConnectButton();
     load();
     loadStyleSheet();
     createConnects();
@@ -55,6 +50,41 @@ MainWindow::~MainWindow()
 {
     save();
     delete ui;
+}
+
+void MainWindow::createHelpMenu()
+{
+    QMenuBar *bar = new QMenuBar(ui->menubar);
+    QMenu *menuHelp = new QMenu("?", bar);
+    bar->addMenu(menuHelp);
+    menuHelp->addAction(ui->actionAbout);
+    ui->menubar->setCornerWidget(bar);
+
+    ui->statusbar->addWidget(toolButtons, 1);
+}
+void MainWindow::createConnectButton()
+{
+    QMenu *menu = new QMenu();
+    QStringList historyConnects;
+    historyConnects << "james@13.13.13.159" << "root@192.168.40.80";
+    menu->setIcon(QIcon(":/image/connect.png"));
+    foreach(auto con, historyConnects)
+    {
+        menu->addAction(con, this, [=](){
+            QStringList params = con.split("@");
+            if(params.size() > 1)
+            {
+                SSHSettings settings;
+                settings.hostName = params[1];
+                settings.userName = params[0];
+                settings.passWord = Utils::getPassword(QString("Input Password for %1").arg(con));
+                createRemoteDirWidget(settings);
+            }
+        });
+    }
+    QAction* action = menu->menuAction();
+    connect(action, SIGNAL(triggered(bool)), this, SLOT(connectSftp()));
+    ui->toolBar->addAction(action);
 }
 
 bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, long *result)
@@ -93,48 +123,11 @@ void MainWindow::createConnects()
     createViewConnect();
     createButtonsConnect();
 }
-//#define SCP
+
 void MainWindow::createMenuConnect()
 {
-    connect(ui->actionConnect, &QAction::triggered, this, [=](bool){
-        ConnectDialog dialog;
-        SSHSettings settings;
-#ifdef SCP
-        settings.hostName = "192.168.40.80";
-        settings.userName = "root";
-#else
-#ifdef HOME
-        settings.hostName = "192.168.3.63";
-        settings.userName = "fuwenchao";
-#else
-        settings.hostName = "13.13.13.159";
-        settings.userName = "james";
-#endif
-#endif
-        dialog.setType(ConnectType::SSH);
-        dialog.setSshSettings(settings);
-        if(dialog.exec() == QDialog::Accepted)
-        {
-            RemoteDockWidget* rightDirView = new RemoteDockWidget(this);
-            settings = dialog.sshSettings();
-#ifdef SCP
-            settings.passWord = "123456";
-#else
-#ifdef HOME
-            settings.passWord = "flysnow010";
-#else
-            settings.passWord = "james010";
-#endif
-#endif
-            rightDirView->start(settings);
-            rightPanelWidget->addDirTab(rightDirView, Utils::networkIcon(), rightDirView->name());
-        }
-    });
-
-    connect(ui->actionExit, &QAction::triggered, this, [&](bool) {
-        close();
-    });
-
+    connect(ui->actionConnect, SIGNAL(triggered(bool)), this, SLOT(connectSftp()));
+    connect(ui->actionExit, &QAction::triggered, this, [&](bool) { close(); });
     connect(ui->actionFileFolder, SIGNAL(triggered(bool)), this, SLOT(newFolder()));
     connect(ui->actionTextFile, SIGNAL(triggered(bool)), this, SLOT(newFile()));
     connect(ui->actionViewIt, SIGNAL(triggered(bool)), this, SLOT(viewFile()));
@@ -147,10 +140,17 @@ void MainWindow::createMenuConnect()
     connect(ui->actionSearch, SIGNAL(triggered(bool)), this, SLOT(searchFiles()));
     connect(ui->actionDiff, SIGNAL(triggered(bool)), this, SLOT(diffFiles()));
     connect(ui->actionControlPanel, &QAction::triggered, this, [&](){
-        WinShell::Exec("control", QString());//calc
+        WinShell::Exec("control");
     });
     connect(ui->actionCalc, &QAction::triggered, this, [&](){
-        WinShell::Exec("calc", QString());
+        WinShell::Exec("calc");
+    });
+    connect(ui->actionOption, &QAction::triggered, this, [&](){
+        OptionsDialog dialog;
+        if(dialog.exec() == QDialog::Accepted)
+        {
+            ;
+        }
     });
     connect(ui->actionRefresh, &QAction::triggered, this, [&](){
         if(leftDirView->isActived())
@@ -179,10 +179,7 @@ void MainWindow::createMenuConnect()
         ui->statusbar->setVisible(on);
     });
 
-    connect(ui->actionAbout,  &QAction::triggered, this, [](bool){
-        AboutDialog dialog;
-        dialog.exec();
-    });
+    connect(ui->actionAbout,  &QAction::triggered, this, [](bool){ AboutDialog().exec(); });
 }
 
 void MainWindow::createViewConnect()
@@ -428,4 +425,43 @@ void MainWindow::diffFiles()
            << leftDirView->dir() << rightDirView->dir();
     FileNames::MakeFileNamesAsParams(params);
     WinShell::Exec(Utils::diffApp(), params);
+}
+
+void MainWindow::connectSftp()
+{
+    ConnectDialog dialog;
+
+    dialog.setType(ConnectType::SSH);
+    if(dialog.exec() == QDialog::Accepted)
+    {
+        SSHSettings settings = dialog.sshSettings();
+        settings.passWord = Utils::getPassword("Input password:");
+        createRemoteDirWidget(settings);
+    }
+}
+
+void MainWindow::createRemoteDirWidget(SSHSettings const& settings)
+{
+    RemoteDockWidget* remoteDockWidget = new RemoteDockWidget(this);
+    remoteDockWidget->start(settings);
+    if(rightPanelWidget->tabCount() <= leftPanelWidget->tabCount())
+    {
+        rightPanelWidget->addDirTab(remoteDockWidget, Utils::networkIcon(), remoteDockWidget->name());
+        connect(leftDirView, &LocalDirDockWidget::remoteDownload, this, [=](
+                QString const& remoteSrc, QStringList const& fileNames,
+                QString const& targetFilePath) {
+            remoteDockWidget->downloadFiles(remoteSrc, fileNames, targetFilePath);
+            leftDirView->refresh();
+        });
+    }
+    else
+    {
+        leftPanelWidget->addDirTab(remoteDockWidget, Utils::networkIcon(), remoteDockWidget->name());
+        connect(rightDirView, &LocalDirDockWidget::remoteDownload, this, [=](
+                QString const& remoteSrc, QStringList const& fileNames,
+                QString const& targetFilePath) {
+            remoteDockWidget->downloadFiles(remoteSrc, fileNames, targetFilePath);
+            rightDirView->refresh();
+        });
+    }
 }

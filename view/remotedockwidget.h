@@ -26,10 +26,13 @@ class RemoteDockWidget : public QDockWidget, public BaseDir
 public:
     explicit RemoteDockWidget(QWidget *parent = nullptr);
     ~RemoteDockWidget();
+
     enum OperateType{ Upload, Download, Delete };
 
     bool isRemote() const override { return true; }
-    void setDir(QString const& dir, QString const& caption = QString(), bool  isNavigation = false) override;
+    void setDir(QString const& dir,
+                QString const& caption = QString(),
+                bool  isNavigation = false) override;
     QString dir() const override;
     void cd(QString const& dir) override;
     QString home() const override;
@@ -37,10 +40,14 @@ public:
 
     void start(SSHSettings const& settings);
     QString const& name() const { return name_; }
+
 public slots:
     void libDirContextMenu();
     void favoritesDirContextMenu();
     void historyDirContextMenu();
+    void downloadFiles(QString const& remoteSrc,
+                       QStringList const& fileNames,
+                       QString const& targetFilePath);
 
 private slots:
     void viewClick(QModelIndex const& index);
@@ -92,6 +99,7 @@ private:
     DirFavorite* dirFavorite;
     DirHistory* dirHistory;
     QString name_;
+    QString remoteID_;
 };
 
 #endif // REMOTEDOCKWIDGET_H

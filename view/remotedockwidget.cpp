@@ -23,7 +23,9 @@
 #include <QFileDialog>
 #include <QApplication>
 #include <QMessageBox>
+#include <QDrag>
 #include <QMimeData>
+#include <QUuid>
 
 RemoteDockWidget::RemoteDockWidget(QWidget *parent)
     : QDockWidget(parent)
@@ -33,6 +35,7 @@ RemoteDockWidget::RemoteDockWidget(QWidget *parent)
     , sftp(new SFtpSession(this))
     , dirFavorite(new DirFavorite())
     , dirHistory(new DirHistory())
+    , remoteID_(QUuid::createUuid().toString())
 {
     ui->setupUi(this);
     ui->treeView->setModel(model_);
@@ -283,12 +286,15 @@ void RemoteDockWidget::beginDragFile(QPoint const& point)
     QModelIndex index = ui->treeView->indexAt(point);
     if(!index.isValid())
         return;
-//    QDrag *drag = new QDrag(ui->treeView);
-//    QStringList fileNames = selectedileNames("file:///");
-//    QMimeData* mimeData = WinShell::dropMimeData(fileNames);
-//    drag->setMimeData(mimeData);
-//    drag->setPixmap(QPixmap(":/image/copy.png"));
-//    drag->exec();
+    QDrag *drag = new QDrag(ui->treeView);
+    QStringList fileNames = selectedileNames();
+    QMimeData* mimeData = new QMimeData();
+
+    mimeData->setText(fileNames.join("\n"));
+    mimeData->setData("RemoteSrc", remoteID_.toUtf8());
+    drag->setMimeData(mimeData);
+    drag->setPixmap(QPixmap(":/image/copy.png"));
+    drag->exec(Qt::CopyAction);
 }
 
 void RemoteDockWidget::dragEnter(QDragEnterEvent * event)
@@ -440,7 +446,15 @@ void RemoteDockWidget::download()
     if(filePath.isEmpty())
         return;
 
-    fileTransfer(selectedileNames(), model_->dirName(), filePath, Download);
+    fileTransfer(fileNames, model_->dirName(), filePath, Download);
+}
+
+void RemoteDockWidget::downloadFiles(QString const& remoteSrc,
+                                     QStringList const& fileNames,
+                                     QString const& targetFilePath)
+{
+    if(remoteSrc == remoteID_)
+        fileTransfer(fileNames, model_->dirName(), targetFilePath, Download);
 }
 
 void RemoteDockWidget::deleteFiles()

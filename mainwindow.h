@@ -9,6 +9,7 @@ QT_END_NAMESPACE
 class PanelWidget;
 class LocalDirDockWidget;
 class ToolButtons;
+class SSHSettings;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -19,16 +20,6 @@ public:
 
 protected:
     bool nativeEvent(const QByteArray &eventType, void *message, long *result);
-private:
-    void save();
-    void load();
-    void saveSettings();
-    void loadSettings();
-    void loadStyleSheet();
-    void createConnects();
-    void createMenuConnect();
-    void createViewConnect();
-    void createButtonsConnect();
 private slots:
     void newFolder();
     void newFile();
@@ -42,6 +33,20 @@ private slots:
     void uncompressFiles();
     void searchFiles();
     void diffFiles();
+    void connectSftp();
+private:
+    void save();
+    void load();
+    void saveSettings();
+    void loadSettings();
+    void loadStyleSheet();
+    void createConnects();
+    void createMenuConnect();
+    void createViewConnect();
+    void createButtonsConnect();
+    void createHelpMenu();
+    void createConnectButton();
+    void createRemoteDirWidget(SSHSettings const& settings);
 private:
     Ui::MainWindow *ui;
     PanelWidget* leftPanelWidget;
