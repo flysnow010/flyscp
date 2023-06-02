@@ -46,11 +46,6 @@
     <addaction name="separator"/>
     <addaction name="actionSelectAll"/>
    </widget>
-   <widget class="QMenu" name="menuOptions">
-    <property name="title">
-     <string>&amp;Options</string>
-    </property>
-   </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
      <string>&amp;View</string>
@@ -64,11 +59,20 @@
     </property>
     <addaction name="actionConnect"/>
    </widget>
+   <widget class="QMenu" name="menuTool">
+    <property name="title">
+     <string>&amp;Tool</string>
+    </property>
+    <addaction name="actionControlPanel"/>
+    <addaction name="separator"/>
+    <addaction name="actionCalc"/>
+    <addaction name="actionOption"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuView"/>
    <addaction name="menuNetwork"/>
-   <addaction name="menuOptions"/>
+   <addaction name="menuTool"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -79,7 +83,7 @@
     <string/>
    </property>
    <property name="statusTip">
-    <string>Connect a tftp</string>
+    <string/>
    </property>
    <property name="iconSize">
     <size>
@@ -112,6 +116,9 @@
    </property>
    <property name="text">
     <string>Connect</string>
+   </property>
+   <property name="statusTip">
+    <string>Connect a sftp</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
@@ -256,6 +263,9 @@
    <property name="text">
     <string>Refresh</string>
    </property>
+   <property name="statusTip">
+    <string>Refresh current folder</string>
+   </property>
   </action>
   <action name="actionNext">
    <property name="icon">
@@ -264,6 +274,9 @@
    </property>
    <property name="text">
     <string>Next</string>
+   </property>
+   <property name="statusTip">
+    <string>Next a folder</string>
    </property>
   </action>
   <action name="actionPrevious">
@@ -274,6 +287,9 @@
    <property name="text">
     <string>Previous</string>
    </property>
+   <property name="statusTip">
+    <string>Previous a folder</string>
+   </property>
   </action>
   <action name="actionSearch">
    <property name="icon">
@@ -282,6 +298,9 @@
    </property>
    <property name="text">
     <string>Search</string>
+   </property>
+   <property name="statusTip">
+    <string>Search file and folder</string>
    </property>
   </action>
   <action name="actionDiff">
@@ -292,6 +311,9 @@
    <property name="text">
     <string>Diff</string>
    </property>
+   <property name="statusTip">
+    <string>Diff tow folders</string>
+   </property>
   </action>
   <action name="actionCompress">
    <property name="icon">
@@ -301,6 +323,9 @@
    <property name="text">
     <string>Compress files</string>
    </property>
+   <property name="statusTip">
+    <string>Compress files and folders</string>
+   </property>
   </action>
   <action name="actionUncompress">
    <property name="icon">
@@ -309,6 +334,30 @@
    </property>
    <property name="text">
     <string>Uncompress files</string>
+   </property>
+   <property name="statusTip">
+    <string>Uncompress files</string>
+   </property>
+  </action>
+  <action name="actionControlPanel">
+   <property name="text">
+    <string>Control panel</string>
+   </property>
+   <property name="statusTip">
+    <string>Run control panel</string>
+   </property>
+  </action>
+  <action name="actionOption">
+   <property name="text">
+    <string>Options...</string>
+   </property>
+  </action>
+  <action name="actionCalc">
+   <property name="text">
+    <string>Calculator</string>
+   </property>
+   <property name="statusTip">
+    <string>Run calculator</string>
    </property>
   </action>
  </widget>
