@@ -258,13 +258,12 @@ void SFtpFileManager::mkdirs(FileNames const& fileNames, QString const& dstFileP
     foreach(auto const& dirname, dirnames)
     {
         QString name = dirname;
-        do
+        while(name != dstFilePath)
         {
             if(!newdirnames.contains(name))
                 newdirnames << name;
             name = QFileInfo(name).path();
-        }while(name != dstFilePath);
-
+        }
     }
     newdirnames.sort();
     foreach(auto const& dirname, newdirnames)
