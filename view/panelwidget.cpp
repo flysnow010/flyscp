@@ -312,6 +312,11 @@ void PanelWidget::updateDrivers(bool isAdded)
     }
 }
 
+int PanelWidget::tabCount() const
+{
+    return ui->tabWidget->count();
+}
+
 void PanelWidget::buttonClicked(QAbstractButton* button)
 {
     updateDir(button->text().toUpper());

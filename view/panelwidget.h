@@ -29,6 +29,7 @@ public:
     void nextDir();
 
     void updateDrivers(bool isAdded);
+    int tabCount() const;
 signals:
     void tabCountChanged(int count);
 public slots:
