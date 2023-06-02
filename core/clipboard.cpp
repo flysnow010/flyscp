@@ -75,3 +75,8 @@ QStringList ClipBoard::fileNames()
     return fileNames(QApplication::clipboard()->mimeData());
 }
 
+QString ClipBoard::remoteSrc(const QMimeData *mimeData)
+{
+    return QString::fromUtf8(mimeData->data("RemoteSrc"));
+}
+
