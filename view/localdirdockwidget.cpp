@@ -228,7 +228,7 @@ void LocalDirDockWidget::sortIndicatorChanged(int logicalIndex, Qt::SortOrder or
     else
         model_->sortItems(logicalIndex, true);
 }
-
+#include <QDebug>
 void LocalDirDockWidget::customContextMenuRequested(const QPoint & pos)
 {
     QModelIndex index = ui->treeView->indexAt(pos);
@@ -237,6 +237,7 @@ void LocalDirDockWidget::customContextMenuRequested(const QPoint & pos)
     QString fileName;
     QFileInfo fileInfo;
 
+    qDebug() << WinShell::sendToMenuItem();
     if(!index.isValid())
     {
         fileInfo.setFile(model_->dir());

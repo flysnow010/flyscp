@@ -11,6 +11,7 @@ struct ContextMenuItem
     QString iconName;
     QString command;
     QString parameters;
+    void *data = 0;
     void exec(QString const& fileName) const;
     void exec(QStringList const& fileNames) const;
     bool operator == (ContextMenuItem const& r)

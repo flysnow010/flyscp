@@ -8,6 +8,7 @@
 #endif
 #include <Shlobj.h>
 #include <knownfolders.h>
+#include <shlwapi.h> //for StrRetToStr
 
 #include <QString>
 #include <QMimeData>
@@ -24,6 +25,7 @@ struct ShellHelper
         , pDataObject(0)
         , size(0)
     {
+        SHGetDesktopFolder(&pDesktop);
     }
 
     ~ShellHelper()
@@ -41,9 +43,7 @@ struct ShellHelper
 
     inline bool open(QStringList const& fileNames)
     {
-        HRESULT hr = SHGetDesktopFolder(&pDesktop);
-        if(FAILED(hr))
-            return  false;
+        HRESULT hr;
 
         pidlDrives = (LPITEMIDLIST *)malloc(sizeof(LPITEMIDLIST)*fileNames.size());
         size = fileNames.size();
@@ -133,6 +133,68 @@ struct ShellHelper
         }
         return bytes;
     }
+
+    QStringList GetSendToMenuItems()
+    {
+        QStringList items;
+        LPSHELLFOLDER psf = GetSpecialFolder(CSIDL_SENDTO);
+        if(psf)
+        {
+            LPENUMIDLIST peidl;
+            HRESULT hr = psf->EnumObjects(0, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &peidl);
+            if (SUCCEEDED(hr))
+            {
+                LPITEMIDLIST pidl;
+                STRRET str;
+                while(peidl->Next(1, &pidl, 0) == S_OK)
+                {
+                    hr = psf->GetDisplayNameOf(pidl, SHGDN_NORMAL, &str);//  SHGDN_FORPARSING
+                    if (SUCCEEDED(hr))
+                    {
+                        LPTSTR pszName;
+                        hr = StrRetToStr(&str, pidl, &pszName);
+                        if (SUCCEEDED(hr))
+                        {
+                            items << QString::fromStdWString(pszName);
+                            CoTaskMemFree(pszName);
+                        }
+                    }
+                    CoTaskMemFree(pidl);
+                }
+            }
+            psf->Release();
+        }
+        items.sort();
+        return items;
+    }
+
+    LPITEMIDLIST pidlFromPath(QString const& fileName)
+    {
+        LPITEMIDLIST pidl;
+        ULONG ulEaten;
+        DWORD dwAttributes;
+        HRESULT hr = pDesktop->ParseDisplayName(0, 0,
+                                (WCHAR *)fileName.toStdWString().c_str(),
+                                &ulEaten, &pidl, &dwAttributes);
+        if (FAILED(hr))
+            return 0;
+        return pidl;
+    }
+
+    LPSHELLFOLDER GetSpecialFolder(int idFolder)
+    {
+        LPITEMIDLIST pidl;
+        LPSHELLFOLDER psf = NULL;
+
+        HRESULT hr = SHGetSpecialFolderLocation(0, idFolder, &pidl);//SHGetFolderLocation
+        if (SUCCEEDED(hr))
+        {
+            pDesktop->BindToObject(pidl, NULL, IID_IShellFolder, (LPVOID *)&psf);
+            CoTaskMemFree(pidl);
+        }
+        return psf;
+    }
+
 
     IShellFolder* pDesktop;
     LPITEMIDLIST* pidlDrives;
@@ -274,6 +336,11 @@ bool WinShell::CreateShortcut(QString const& linkFilePath,
     return SUCCEEDED(hr);
 }
 
+QStringList WinShell::sendToMenuItem()
+{
+    return ShellHelper().GetSendToMenuItems();
+}
+
 QList<WinLibDir> WinShell::winLibDirs()
 {
    QList<WinLibDir> dirs;
@@ -283,7 +350,8 @@ QList<WinLibDir> WinShell::winLibDirs()
        FOLDERID_Documents,
        FOLDERID_Pictures,
        FOLDERID_Music,
-       FOLDERID_Videos
+       FOLDERID_Videos,
+       FOLDERID_SendTo
    };
    for(unsigned int i = 0; i < sizeof(folders) / sizeof(folders[0]); i++)
    {

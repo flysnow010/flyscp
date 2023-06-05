@@ -233,7 +233,6 @@ void LocalDirModel::setupModelData(TreeItem *parent)
 
             if(!iconMap.contains(suffix))
                 iconMap.insert(suffix, Utils::fileIcon(suffix));
-
         }
         else if(fileInfos_[i].isDir())
         {
