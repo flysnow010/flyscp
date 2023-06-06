@@ -228,7 +228,7 @@ void LocalDirDockWidget::sortIndicatorChanged(int logicalIndex, Qt::SortOrder or
     else
         model_->sortItems(logicalIndex, true);
 }
-#include <QDebug>
+
 void LocalDirDockWidget::customContextMenuRequested(const QPoint & pos)
 {
     QModelIndex index = ui->treeView->indexAt(pos);
@@ -237,7 +237,7 @@ void LocalDirDockWidget::customContextMenuRequested(const QPoint & pos)
     QString fileName;
     QFileInfo fileInfo;
 
-    qDebug() << WinShell::sendToMenuItem();
+    ContextMenuItems sendtoItems = ContextMenu::SendTo();
     if(!index.isValid())
     {
         fileInfo.setFile(model_->dir());
@@ -296,7 +296,21 @@ void LocalDirDockWidget::customContextMenuRequested(const QPoint & pos)
             item.exec(fileNames);
         });
     }
+    menu.addAction("Copy File Path", this, [=](bool){
+        QStringList fileNames = selectedFileNames(false, true);
+        ClipBoard::copy(fileNames.join("\n"));
+    });
 
+    QMenu *sendTo = new QMenu("Send to");
+    foreach(auto sendItem, sendtoItems)
+    {
+        sendTo->addAction(sendItem.icon, sendItem.name, this, [=](bool){
+            QStringList fileNames = selectedFileNames();
+            sendItem.exec(fileNames);
+        });
+    }
+    menu.addSeparator();
+    menu.addMenu(sendTo);
     menu.addSeparator();
     menu.addAction("Cut", this, SLOT(cut()));
     menu.addAction("Copy", this, SLOT(copy()));
@@ -316,7 +330,7 @@ void LocalDirDockWidget::customContextMenuRequested(const QPoint & pos)
             model_->refresh();
         });
     menu.addSeparator();
-    menu.addAction("Create shortcut", this, SLOT(createShortcut()));
+    menu.addAction("Create Shortcut", this, SLOT(createShortcut()));
     if(index.isValid())
     {
         if(!model_->isParent(index.row()))
@@ -327,8 +341,8 @@ void LocalDirDockWidget::customContextMenuRequested(const QPoint & pos)
     }
     else
     {
-        menu.addAction("New folder", this, SLOT(newFolder()));
-        menu.addAction("New txt file", this, SLOT(newTxtFile()));
+        menu.addAction("New Folder", this, SLOT(newFolder()));
+        menu.addAction("New Txt File", this, SLOT(newTxtFile()));
     }
     menu.addSeparator();
     menu.addAction("Properties", this, [&](bool) {
@@ -510,7 +524,7 @@ void LocalDirDockWidget::newFolder()
     QString path = Utils::getText("New folder");
     if(path.isEmpty())
         return;
-    if(model_->mkdir(path))
+    if(model_->mkdirs(path))
         model_->refresh();
 }
 
