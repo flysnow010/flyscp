@@ -142,9 +142,9 @@ QString LocalDirModel::dir() const
     return dir_.path();
 }
 
-bool LocalDirModel::mkdir(QString const& dir)
+bool LocalDirModel::mkdirs(QString const& dir)
 {
-    return dir_.mkdir(dir);
+    return dir_.mkpath(dir);
 }
 
 bool LocalDirModel::rename(QString const& original, QString const& newname)
