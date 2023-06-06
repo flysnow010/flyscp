@@ -11,12 +11,16 @@ struct ContextMenuItem
     QString iconName;
     QString command;
     QString parameters;
-    void *data = 0;
     void exec(QString const& fileName) const;
     void exec(QStringList const& fileNames) const;
     bool operator == (ContextMenuItem const& r)
     {
         return this->name == r.name;
+    }
+
+    bool operator < (ContextMenuItem const& r)
+    {
+        return this->name < r.name;
     }
 };
 
@@ -28,6 +32,7 @@ public:
 
     static ContextMenuItems FileCommands();
     static ContextMenuItems DirCommands();
+    static ContextMenuItems SendTo();
     static void PrintCommand(ContextMenuItems const& items);
 private:
     static void GetShellContextItems(QString const& fileName, ContextMenuItems & items, bool isSort = false);

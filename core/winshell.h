@@ -33,7 +33,6 @@ public:
     static bool CreateShortcut(QString const& linkFilePath,
                                QString const& targetFilePath);
     static QList<WinLibDir> winLibDirs();
-    static QStringList sendToMenuItem();
 };
 
 #endif // WINSHELL_H

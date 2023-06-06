@@ -1,10 +1,192 @@
 #include "contextmenu.h"
 #include "util/utils.h"
+#include <Shlobj.h>
+#include <shlwapi.h>
 #include <windows.h>
+
 #include <QSettings>
 #include <QDebug>
 #include <QAxObject>
+#include <QFileIconProvider>
+
 #include <algorithm>
+
+struct ContextMenuHelper
+{
+    static ContextMenuHelper* Instatnce()
+    {
+        static ContextMenuHelper helper;
+        return &helper;
+    }
+
+    ~ContextMenuHelper()
+    {
+        close();
+        if(pDesktop)
+            pDesktop->Release();
+    }
+
+    inline bool open(QStringList const& fileNames)
+    {
+        HRESULT hr;
+
+        pidlDrives = (LPITEMIDLIST *)malloc(sizeof(LPITEMIDLIST)*fileNames.size());
+        size = fileNames.size();
+        for(int i = 0; i < fileNames.size(); i++)
+        {
+            QString fileName = fileNames[i].split("/").join("\\");
+            hr = pDesktop->ParseDisplayName(0, 0, (LPWSTR)(fileName.toStdWString().c_str()),
+                                         0, (LPITEMIDLIST*)&pidlDrives[i], 0);
+            if(FAILED(hr))
+                return false;
+        }
+        hr = pDesktop->GetUIObjectOf(0, fileNames.size(), (PCUITEMID_CHILD_ARRAY)pidlDrives,
+                                       IID_IDataObject, 0, (void **)&pDataObject);
+        if(FAILED(hr))
+            return false;
+        return true;
+    }
+
+    inline void close()
+    {
+        if(pDataObject)
+        {
+            pDataObject->Release();
+            pDataObject = 0;
+        }
+        if(pidlDrives)
+        {
+            for(int i = 0; i < size; i++)
+                ILFree(pidlDrives[i]);
+            pidlDrives = 0;
+        }
+    }
+
+    ContextMenuItems sendToMenuItems()
+    {
+        ContextMenuItems items;
+        LPSHELLFOLDER psf = getSpecialFolder(CSIDL_SENDTO);
+        if(psf)
+        {
+            LPENUMIDLIST peidl;
+            HRESULT hr = psf->EnumObjects(0, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &peidl);
+            if (SUCCEEDED(hr))
+            {
+                LPITEMIDLIST pidl;
+                STRRET str;
+                while(peidl->Next(1, &pidl, 0) == S_OK)
+                {
+                    ContextMenuItem item;
+                    psf->GetDisplayNameOf(pidl, SHGDN_NORMAL, &str);
+                    item.name = strToString(pidl, &str);
+                    psf->GetDisplayNameOf(pidl, SHGDN_FORPARSING, &str);
+                    item.iconName = strToString(pidl, &str);
+                    item.icon = getICon(item.iconName);
+                    items << item;
+                    CoTaskMemFree(pidl);
+                }
+            }
+            psf->Release();
+        }
+        std::sort(items.begin(), items.end());
+        return items;
+    }
+
+    void execSendToCmd(QStringList const& fileNames, QString const& name)
+    {
+        if(!open(fileNames))
+            return;
+
+        LPSHELLFOLDER psf = getSpecialFolder(CSIDL_SENDTO);
+        if(!psf)
+            return;
+        LPENUMIDLIST peidl;
+        HRESULT hr = psf->EnumObjects(0, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &peidl);
+        if (SUCCEEDED(hr))
+        {
+            LPITEMIDLIST pidl = 0;
+            STRRET str;
+            while(peidl->Next(1, &pidl, 0) == S_OK)
+            {
+                psf->GetDisplayNameOf(pidl, SHGDN_NORMAL, &str);
+                if(strToString(pidl, &str) == name)
+                    break;
+                CoTaskMemFree(pidl);
+                pidl = 0;
+            }
+            if(pidl)
+            {
+                LPDROPTARGET pdt;
+                hr = psf->GetUIObjectOf(0, 1, (PCUITEMID_CHILD_ARRAY)&pidl,
+                                        IID_IDropTarget, 0, (LPVOID *)&pdt);
+                if (SUCCEEDED(hr))
+                {
+                    doDrop(pDataObject, pdt);
+                    pdt->Release();
+                }
+            }
+        }
+        close();
+    }
+
+    void doDrop(LPDATAOBJECT pdto, LPDROPTARGET pdt)
+    {
+        POINTL pt = { 0, 0 };
+        DWORD dwEffect = DROPEFFECT_COPY | DROPEFFECT_MOVE | DROPEFFECT_LINK;
+        HRESULT hr = pdt->DragEnter(pdto, MK_LBUTTON, pt, &dwEffect);
+
+        if (SUCCEEDED(hr) && dwEffect)
+            pdt->Drop(pdto, MK_LBUTTON, pt, &dwEffect);
+        else
+            pdt->DragLeave();
+    }
+
+    QIcon getICon(QString const& fileName)
+    {
+        QFileInfo fileInfo(fileName.toLower());
+        return QFileIconProvider().icon(fileInfo);
+    }
+    LPSHELLFOLDER getSpecialFolder(int idFolder)
+    {
+        LPITEMIDLIST pidl;
+        LPSHELLFOLDER psf = NULL;
+
+        HRESULT hr = SHGetSpecialFolderLocation(0, idFolder, &pidl);//SHGetFolderLocation
+        if (SUCCEEDED(hr))
+        {
+            pDesktop->BindToObject(pidl, NULL, IID_IShellFolder, (LPVOID *)&psf);
+            CoTaskMemFree(pidl);
+        }
+        return psf;
+    }
+
+private:
+    ContextMenuHelper()
+        : pDesktop(0)
+        , pidlDrives(0)
+        , pDataObject(0)
+        , size(0)
+    {
+        SHGetDesktopFolder(&pDesktop);
+    }
+
+    QString strToString(LPITEMIDLIST pidl, STRRET *str)
+    {
+        LPTSTR pszText;
+        QString text;
+        HRESULT hr = StrRetToStr(str, pidl, &pszText);
+        if (SUCCEEDED(hr))
+        {
+            text = QString::fromStdWString(pszText);
+            CoTaskMemFree(pszText);
+        }
+        return text;
+    }
+    IShellFolder* pDesktop;
+    LPITEMIDLIST* pidlDrives;
+    IDataObject* pDataObject;
+    int size;
+};
 
 ContextMenu::ContextMenu()
 {
@@ -29,6 +211,11 @@ ContextMenuItems ContextMenu::DirCommands()
     ContextMenuItems items;
     GetShellContextItems("HKEY_CLASSES_ROOT\\Directory\\shell", items);
     return items;
+}
+
+ContextMenuItems ContextMenu::SendTo()
+{
+    return ContextMenuHelper::Instatnce()->sendToMenuItems();
 }
 
 void ContextMenu::GetShellContextItems(QString const& fileName,
@@ -209,6 +396,11 @@ QIcon ContextMenu::GetIcon(QString const& name)
 
 void ContextMenuItem::exec(QString const& fileName) const
 {
+    if(command.isEmpty())
+    {
+        ContextMenuHelper::Instatnce()->execSendToCmd(QStringList() << fileName, name);
+        return;
+    }
     QString params = parameters;
     QString newFileName = QString("\"%1\"").arg(fileName);
     params.replace("\"%1\"", newFileName)
@@ -225,6 +417,12 @@ void ContextMenuItem::exec(QStringList const& fileNames) const
 {
     if(fileNames.isEmpty())
         return;
+
+    if(command.isEmpty())
+    {
+        ContextMenuHelper::Instatnce()->execSendToCmd(fileNames, name);
+        return;
+    }
 
     QStringList newFileNames;
     foreach(auto const& fileName, fileNames)
