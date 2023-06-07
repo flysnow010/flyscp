@@ -107,6 +107,9 @@
    <addaction name="actionSearch"/>
    <addaction name="actionDiff"/>
    <addaction name="separator"/>
+   <addaction name="actionControlPanel"/>
+   <addaction name="actionCalc"/>
+   <addaction name="separator"/>
   </widget>
   <action name="actionConnect">
    <property name="icon">
@@ -339,6 +342,10 @@
    </property>
   </action>
   <action name="actionControlPanel">
+   <property name="icon">
+    <iconset resource="FlyScp.qrc">
+     <normaloff>:/image/control.png</normaloff>:/image/control.png</iconset>
+   </property>
    <property name="text">
     <string>Control panel</string>
    </property>
@@ -352,6 +359,10 @@
    </property>
   </action>
   <action name="actionCalc">
+   <property name="icon">
+    <iconset resource="FlyScp.qrc">
+     <normaloff>:/image/calculator.png</normaloff>:/image/calculator.png</iconset>
+   </property>
    <property name="text">
     <string>Calculator</string>
    </property>

@@ -24,5 +24,8 @@
         <file>image/unzip.png</file>
         <file>image/filezip.png</file>
         <file>image/fileunzip.png</file>
+        <file>image/calculator.png</file>
+        <file>image/control.png</file>
+        <file>image/home2.png</file>
     </qresource>
 </RCC>
