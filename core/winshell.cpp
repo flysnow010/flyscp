@@ -283,8 +283,7 @@ QList<WinLibDir> WinShell::winLibDirs()
        FOLDERID_Documents,
        FOLDERID_Pictures,
        FOLDERID_Music,
-       FOLDERID_Videos,
-       FOLDERID_SendTo
+       FOLDERID_Videos
    };
    for(unsigned int i = 0; i < sizeof(folders) / sizeof(folders[0]); i++)
    {
