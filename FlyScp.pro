@@ -24,6 +24,7 @@ SOURCES += \
     core/remotefilemanager.cpp \
     core/remotefiletransfer.cpp \
     core/sftpfilemanager.cpp \
+    core/sshsettings.cpp \
     core/winshell.cpp \
     dialog/aboutdialog.cpp \
     dialog/compressconfirmdialog.cpp \

@@ -10,6 +10,7 @@
 #include "dialog/aboutdialog.h"
 #include "util/utils.h"
 #include "core/winshell.h"
+#include "core/sshsettings.h"
 #include <QSplitter>
 #include <QTabWidget>
 #include <QSettings>
@@ -23,6 +24,8 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , sshSettingsMangaer_(new SSHSettingsManager)
+    , connectMenu(new QMenu)
     , leftPanelWidget(new PanelWidget(this))
     , rightPanelWidget(new PanelWidget(this))
     , leftDirView(new LocalDirDockWidget(this))
@@ -42,6 +45,7 @@ MainWindow::MainWindow(QWidget *parent)
     createHelpMenu();
     createConnectButton();
     load();
+    updateConnectMenu();
     loadStyleSheet();
     createConnects();
 }
@@ -49,6 +53,8 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     save();
+    delete sshSettingsMangaer_;
+    delete connectMenu;
     delete ui;
 }
 
@@ -62,29 +68,31 @@ void MainWindow::createHelpMenu()
 
     ui->statusbar->addWidget(toolButtons, 1);
 }
+
 void MainWindow::createConnectButton()
 {
-    QMenu *menu = new QMenu();
-    QStringList historyConnects;
-    historyConnects << "james@13.13.13.159" << "root@192.168.40.80";
-    menu->setIcon(QIcon(":/image/connect.png"));
-    foreach(auto con, historyConnects)
-    {
-        menu->addAction(con, this, [=](){
-            QStringList params = con.split("@");
-            if(params.size() > 1)
-            {
-                SSHSettings settings;
-                settings.hostName = params[1];
-                settings.userName = params[0];
-                settings.passWord = Utils::getPassword(QString("Input Password for %1").arg(con));
-                createRemoteDirWidget(settings);
-            }
-        });
-    }
-    QAction* action = menu->menuAction();
+    connectMenu->setIcon(QIcon(":/image/connect.png"));
+    QAction* action = connectMenu->menuAction();
     connect(action, SIGNAL(triggered(bool)), this, SLOT(connectSftp()));
     ui->toolBar->addAction(action);
+}
+
+void MainWindow::updateConnectMenu()
+{
+    connectMenu->clear();
+    for(int i = 0; i < sshSettingsMangaer_->size(); i++)
+    {
+        SSHSettings::Ptr settings = sshSettingsMangaer_->settings(i);
+        connectMenu->addAction(settings->name, this, [=](){
+                settings->passWord = Utils::getPassword(QString("Input Password for %1").arg(settings->name));
+                if(settings->passWord.isEmpty())
+                    return;
+                createRemoteDirWidget(*settings);
+        });
+    }
+    if(sshSettingsMangaer_->size() > 0)
+        connectMenu->addSeparator();
+    connectMenu->addAction("Settings", this, [=](){});
 }
 
 bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, long *result)
@@ -250,6 +258,7 @@ void MainWindow::save()
     rightDirView->saveSettings("RightDirView");
     leftPanelWidget->saveSettings("LeftPanel");
     rightPanelWidget->saveSettings("RightPane");
+    sshSettingsMangaer_->save(QString("%1/settings.json").arg(Utils::sshSettingsPath()));
 }
 
 void MainWindow::load()
@@ -261,6 +270,7 @@ void MainWindow::load()
     rightPanelWidget->loadSettings("RightPane");
     leftPanelWidget->updateTexts(leftDirView);
     rightPanelWidget->updateTexts(rightDirView);
+    sshSettingsMangaer_->load(QString("%1/settings.json").arg(Utils::sshSettingsPath()));
     leftDirView->setActived(true);
 }
 
@@ -434,9 +444,13 @@ void MainWindow::connectSftp()
     dialog.setType(ConnectType::SSH);
     if(dialog.exec() == QDialog::Accepted)
     {
-        SSHSettings settings = dialog.sshSettings();
-        settings.passWord = Utils::getPassword("Input password:");
-        createRemoteDirWidget(settings);
+        SSHSettings::Ptr settings = dialog.sshSettings();
+        sshSettingsMangaer_->addSettings(settings);
+        updateConnectMenu();
+        settings->passWord = Utils::getPassword(QString("Input Password for %1").arg(settings->name));
+        if(settings->passWord.isEmpty())
+            return;
+        createRemoteDirWidget(*settings);
     }
 }
 

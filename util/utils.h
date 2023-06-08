@@ -8,6 +8,7 @@ class Utils
 {
 public:
     static QString currentPath();
+    static QString sshSettingsPath();
     static QString compressApp();
     static QString viewApp();
     static QString editApp();

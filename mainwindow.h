@@ -10,6 +10,7 @@ class PanelWidget;
 class LocalDirDockWidget;
 class ToolButtons;
 class SSHSettings;
+class SSHSettingsManager;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -47,8 +48,11 @@ private:
     void createHelpMenu();
     void createConnectButton();
     void createRemoteDirWidget(SSHSettings const& settings);
+    void updateConnectMenu();
 private:
     Ui::MainWindow *ui;
+    SSHSettingsManager *sshSettingsMangaer_;
+    QMenu* connectMenu;
     PanelWidget* leftPanelWidget;
     PanelWidget* rightPanelWidget;
     LocalDirDockWidget* leftDirView;

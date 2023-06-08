@@ -20,8 +20,8 @@ public:
     ConnectType type() const;
     void setType(ConnectType t);
 
-    SSHSettings sshSettings() const;
-    void setSshSettings(SSHSettings const& settings);
+    SSHSettings::Ptr sshSettings() const;
+    void setSshSettings(SSHSettings::Ptr const& settings);
 
 private slots:
     void selectPrivateKeyFileName();

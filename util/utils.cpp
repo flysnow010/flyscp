@@ -19,7 +19,19 @@
 
 QString Utils::currentPath()
 {
-    return QApplication::applicationDirPath();
+    QString filePath = QApplication::applicationDirPath();
+    if(filePath.startsWith("C:") ||filePath.startsWith("c:"))
+        return QString("%1/FlyScp").arg(QDir::homePath());
+    return filePath;
+}
+
+QString Utils::sshSettingsPath()
+{
+    QString path = QString("%1/sshSettings").arg(currentPath());
+    QDir dir(path);
+    if(!dir.exists(path))
+        dir.mkpath(path);
+    return path;
 }
 
 QString Utils::compressApp()
