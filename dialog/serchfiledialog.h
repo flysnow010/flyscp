@@ -26,6 +26,7 @@ private slots:
 private:
     void setSeearchState(bool isSearching);
     void startSearch(bool isStart);
+    void insertText(int row,  QString const& text);
 private:
     Ui::SerchFileDialog *ui;
     QStringListModel* model;

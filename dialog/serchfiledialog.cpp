@@ -5,6 +5,7 @@
 #include "core/filetransfer.h"
 #include <QApplication>
 #include <QStringListModel>
+#include <QDebug>
 
 SerchFileDialog::SerchFileDialog(QWidget *parent)
     : QDialog(parent)
@@ -82,6 +83,7 @@ void SerchFileDialog::searchFiles()
     bool isFinished = false;
     int fileCount = 0;
     int dirCount = 0;
+    int index = 0;
     isSearching = true;
 
     setSeearchState(isSearching);
@@ -102,18 +104,14 @@ void SerchFileDialog::searchFiles()
     });
 
     fileSearcher.searchFiles(ui->cbFolder->currentText(), ui->cbFileName->currentText());
-    bool isFirst = true;
     while(!isFinished)
     {
         if(!isSearching)
             fileSearcher.cancel();
-        if(isFirst)
+        if(index < fileNames.size())
         {
-            if(fileNames.size() > 100)
-            {
-                model->setStringList(fileNames);
-                isFirst = false;
-            }
+            insertText(index, fileNames[index]);
+            index++;
         }
         QApplication::processEvents();
     }
@@ -122,9 +120,16 @@ void SerchFileDialog::searchFiles()
     if(!isSearching)
         result += " - Search is stoped";
     ui->labelCurentPath->setText(result);
+    qDebug() << index << fileNames.size();
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    while(index < fileNames.size())
+    {
+        insertText(index, fileNames[index]);
+        index++;
+    }
     fileNames.push_front(result);
-    model->setStringList(fileNames);
-
+    insertText(index, result);
+    QApplication::restoreOverrideCursor();
     isSearching = false;
     setSeearchState(isSearching);
 }
@@ -147,4 +152,10 @@ void SerchFileDialog::startSearch(bool isStart)
     ui->widgetButtons->setVisible(isStart);
     ui->frameCurrentDir->setVisible(isStart);
     adjustSize();
+}
+
+void SerchFileDialog::insertText(int row,  QString const& text)
+{
+    model->insertRows(row, 1);
+    model->setData(model->index(row), text);
 }
