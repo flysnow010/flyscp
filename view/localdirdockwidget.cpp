@@ -204,14 +204,14 @@ void LocalDirDockWidget::viewClick(QModelIndex const& index)
          WinShell::Open(model_->filePath(index.row()));
     else
     {
-        if(fileInfo.isSymLink())
+        if(!fileInfo.isSymLink())
+            cd(fileInfo.fileName());
+        else
         {
             QString dir = QFile::symLinkTarget(fileInfo.filePath());
             model_->setDir(dir);
             updateCurrentDir(model_->dir());
         }
-        else if(model_->cd(fileInfo.fileName()))
-            updateCurrentDir(model_->dir());
     }
 }
 
@@ -279,8 +279,7 @@ void LocalDirDockWidget::customContextMenuRequested(const QPoint & pos)
             QString name = fileInfo.fileName();
             QAction* action = menu.addAction(name, this, [=]()
             {
-                if(model_->cd(name))
-                    updateCurrentDir(model_->dir());
+                cd(name);
             });
             QFont font = action->font();
             font.setBold(true);
@@ -859,7 +858,7 @@ void LocalDirDockWidget::goToFile(QString const& fileName)
     QString filePath = fileInfo.dir().path();
     QString baseName = fileInfo.fileName();
     if(model_->dir() != filePath)
-        model_->setDir(filePath);
+        setDir(filePath);
     int index = model_->indexOfFile(baseName);
     if(index != -1)
     {
