@@ -58,13 +58,13 @@ void FileManager::findFiles(QString const& filePath, QString const& filter)
         if(singled())
             break;
 
-        QString fileName = fileInfo.filePath();
-        if(isMatch || regExp.exactMatch(fileName))
+        QString filePath = fileInfo.filePath();
+        if(isMatch || regExp.exactMatch(fileInfo.fileName()))
         {
             if(fileInfo.isDir())
-                emit foundFolder(fileName);
+                emit foundFolder(filePath);
             else
-                emit foundFile(fileName);
+                emit foundFile(filePath);
         }
         if(fileInfo.isDir())
             findFiles(fileInfo.filePath(), filter);
