@@ -219,10 +219,19 @@ void LocalDirModel::setupModelData(TreeItem *parent)
         else if(fileInfos_[i].isDir())
             rowData << fileInfos_[i].fileName();
         else
-            rowData << fileInfos_[i].completeBaseName();
+        {
+            QString baseName = fileInfos_[i].completeBaseName();
+            if(baseName.isEmpty())
+                rowData << fileInfos_[i].fileName();
+            else
+                rowData << baseName;
+        }
         if(fileInfos_[i].isFile() || fileInfos_[i].isSymLink())
         {
-            QString suffix = fileInfos_[i].suffix();
+            QString suffix;
+            if(!fileInfos_[i].completeBaseName().isEmpty())
+                suffix = fileInfos_[i].suffix();
+
             qint64 size = fileInfos_[i].size();
             rowData << suffix;
             if(size == 0 && fileInfos_[i].isSymLink())
