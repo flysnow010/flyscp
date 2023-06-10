@@ -75,6 +75,7 @@ bool TitleBarWidget::eventFilter(QObject *obj, QEvent *event)
         QMouseEvent *mounseEvent = static_cast<QMouseEvent *>(event);
         if(mounseEvent->x() > 6)
             selectDir(mounseEvent->x() - 6);
+        emit actived();
     }
     return QWidget::eventFilter(obj, event);
 }

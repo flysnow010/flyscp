@@ -23,6 +23,7 @@ signals:
     void favoritesDirButtonCLicked();
     void historyDirButtonClicked();
     void dirSelected(QString const& dir);
+    void actived();
 protected:
      bool eventFilter(QObject *obj, QEvent *event) override;
 private slots:

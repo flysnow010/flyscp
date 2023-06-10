@@ -32,6 +32,7 @@ LocalDirDockWidget::LocalDirDockWidget(QWidget *parent)
     ui->setupUi(this);
     ui->treeView->setModel(model_);
     ui->treeView->installEventFilter(this);
+    titleBarWidget->installEventFilter(this);
     setTitleBarWidget(titleBarWidget);
 
     connect(ui->treeView, SIGNAL(doubleClicked(QModelIndex)),
@@ -57,6 +58,10 @@ LocalDirDockWidget::LocalDirDockWidget(QWidget *parent)
                     this, SIGNAL(favoritesDirContextMenuRequested()));
     connect(titleBarWidget, SIGNAL(historyDirButtonClicked()),
                     this, SIGNAL(historyDirContextMenuRequested()));
+    connect(titleBarWidget, &TitleBarWidget::actived, this, [=](){
+        setActived(true);
+        emit actived();
+    });
     connect(titleBarWidget, &TitleBarWidget::dirSelected, this, [&](QString const& dir)
     {
         setDir(dir);
@@ -76,6 +81,11 @@ void LocalDirDockWidget::setDir(QString const& dir, QString const& caption, bool
     model_->setDir(dir);
     fileSystemWatcher->addPath(dir);
     updateCurrentDir(dir, caption, isNavigation);
+    if(!isActived())
+    {
+        setActived(true);
+        emit actived();
+    }
 }
 
 QString LocalDirDockWidget::dir() const
