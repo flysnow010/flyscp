@@ -40,6 +40,7 @@ SOURCES += \
     mainwindow.cpp \
     model/localdirmodel.cpp \
     model/remotedirmodel.cpp \
+    model/stringlistmodel.cpp \
     model/treeitem.cpp \
     model/treemodel.cpp \
     sftp/sftpsession.cpp \
@@ -88,6 +89,7 @@ HEADERS += \
     mainwindow.h \
     model/localdirmodel.h \
     model/remotedirmodel.h \
+    model/stringlistmodel.h \
     model/treeitem.h \
     model/treemodel.h \
     sftp/sftpsession.h \
