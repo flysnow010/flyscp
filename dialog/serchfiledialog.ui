@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>698</width>
+    <width>734</width>
     <height>508</height>
    </rect>
   </property>
@@ -53,13 +53,6 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="4">
-          <widget class="QPushButton" name="btnDrivers">
-           <property name="text">
-            <string>Drivers</string>
-           </property>
-          </widget>
-         </item>
          <item row="1" column="0">
           <widget class="QLabel" name="label_2">
            <property name="text">
@@ -77,6 +70,16 @@
            </property>
            <property name="editable">
             <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="4">
+          <widget class="QPushButton" name="btnDrivers">
+           <property name="text">
+            <string>Drivers</string>
+           </property>
+           <property name="flat">
+            <bool>false</bool>
            </property>
           </widget>
          </item>
@@ -152,7 +155,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QListView" name="lwResult"/>
+       <widget class="QListView" name="lwResult">
+        <property name="editTriggers">
+         <set>QAbstractItemView::NoEditTriggers</set>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

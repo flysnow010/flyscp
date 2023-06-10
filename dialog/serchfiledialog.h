@@ -7,7 +7,9 @@ namespace Ui {
 class SerchFileDialog;
 }
 
-class QStringListModel;
+class StringListModel;
+class QMenu;
+class QComboBox;
 class SerchFileDialog : public QDialog
 {
     Q_OBJECT
@@ -27,9 +29,14 @@ private:
     void setSeearchState(bool isSearching);
     void startSearch(bool isStart);
     void insertText(int row,  QString const& text);
+    void createDriverMenu();
+    void saveSettings();
+    void loadSettings();
+    void addCurentItem(QComboBox* cb);
 private:
     Ui::SerchFileDialog *ui;
-    QStringListModel* model;
+    QMenu* dirverMenu;
+    StringListModel* model;
     QStringList fileNames;
     bool isSearching;
 };

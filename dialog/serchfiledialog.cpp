@@ -3,21 +3,34 @@
 #include "util/utils.h"
 
 #include "core/filetransfer.h"
+#include "model/stringlistmodel.h"
 #include <QApplication>
-#include <QStringListModel>
+#include <QFileInfo>
+#include <QFileIconProvider>
+#include <QMenu>
+#include <QSettings>
 #include <QDebug>
 
 SerchFileDialog::SerchFileDialog(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::SerchFileDialog)
-    , model(new QStringListModel(this))
+    , dirverMenu(new QMenu(this))
+    , model(new StringListModel(this))
     , isSearching(false)
 {
     ui->setupUi(this);
+    ui->btnDrivers->setMenu(dirverMenu);
     setWindowFlags(Qt::Widget);
     startSearch(false);
+    createDriverMenu();
 
-
+    connect(ui->lwResult, &QListView::doubleClicked, this, [=](QModelIndex const& index){
+        if(index.isValid() && index.row() > 0)
+        {
+            emit goToFile(fileNames[index.row()]);
+            accept();
+        }
+    });
     connect(ui->btnView, &QPushButton::clicked, this, [=](bool){
         QModelIndex index = ui->lwResult->currentIndex();
         if(index.isValid() && index.row() > 0)
@@ -59,10 +72,12 @@ SerchFileDialog::SerchFileDialog(QWidget *parent)
     });
 
     connect(ui->btnStartSearch, &QPushButton::clicked, this, &SerchFileDialog::searchFiles);
+    loadSettings();
 }
 
 SerchFileDialog::~SerchFileDialog()
 {
+    saveSettings();
     delete ui;
 }
 
@@ -104,13 +119,15 @@ void SerchFileDialog::searchFiles()
     });
 
     fileSearcher.searchFiles(ui->cbFolder->currentText(), ui->cbFileName->currentText());
+    addCurentItem(ui->cbFileName);
+    addCurentItem(ui->cbFolder);
     while(!isFinished)
     {
         if(!isSearching)
             fileSearcher.cancel();
         if(index < fileNames.size())
         {
-            insertText(index, fileNames[index]);
+            model->insertRow(index, fileNames[index]);
             index++;
         }
         QApplication::processEvents();
@@ -118,20 +135,27 @@ void SerchFileDialog::searchFiles()
 
     QString result = QString("Found %1 files, %2 folders").arg(fileCount).arg(dirCount);
     if(!isSearching)
-        result += " - Search is stoped";
-    ui->labelCurentPath->setText(result);
-    qDebug() << index << fileNames.size();
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-    while(index < fileNames.size())
     {
-        insertText(index, fileNames[index]);
-        index++;
+        result += " - Search is stoped";
+        setSeearchState(isSearching);
     }
-    fileNames.push_front(result);
-    insertText(index, result);
-    QApplication::restoreOverrideCursor();
-    isSearching = false;
-    setSeearchState(isSearching);
+    ui->labelCurentPath->setText(result);
+    if(isSearching)
+    {
+        qDebug() << index << fileNames.size();
+        QApplication::setOverrideCursor(Qt::WaitCursor);
+        while(index < fileNames.size())
+        {
+            model->insertRow(index, fileNames[index]);
+            index++;
+        }
+        qDebug() << index << fileNames.size();
+        fileNames.push_front(result);
+        insertText(0, result);
+        QApplication::restoreOverrideCursor();
+        isSearching = false;
+        setSeearchState(isSearching);
+    }
 }
 
 void SerchFileDialog::setSeearchState(bool isSearching)
@@ -158,4 +182,90 @@ void SerchFileDialog::insertText(int row,  QString const& text)
 {
     model->insertRows(row, 1);
     model->setData(model->index(row), text);
+}
+
+void SerchFileDialog::createDriverMenu()
+{
+    QFileInfoList fileInfos = QDir::drives();
+    QFileIconProvider iconProvider;
+    foreach(auto fileInfo, fileInfos)
+    {
+        dirverMenu->addAction(iconProvider.icon(fileInfo),
+                              fileInfo.filePath().at(0),
+                              this, [=](){
+            ui->cbFolder->setCurrentText(fileInfo.filePath());
+        });
+    }
+}
+
+#define MAX_ITEM_COUNT 10
+void SerchFileDialog::addCurentItem(QComboBox* cb)
+{
+    QString text = cb->currentText();
+    int index = cb->findText(text);
+    if(index < 0)
+        cb->insertItem(0, text);
+    else if(index > 0)
+    {
+        cb->removeItem(index);
+        cb->insertItem(0, text);
+    }
+
+    if(cb->count() > MAX_ITEM_COUNT)
+        cb->removeItem(cb->count() - 1);
+}
+
+void SerchFileDialog::saveSettings()
+{
+    QSettings settings(QCoreApplication::applicationName(),
+                       QCoreApplication::applicationVersion());
+    settings.beginGroup("SerchFileDialog");
+    settings.setValue("currentFileName", ui->cbFileName->currentText());
+    settings.setValue("currentFilePath", ui->cbFolder->currentText());
+    settings.beginWriteArray("fileNames", ui->cbFileName->count());
+    for(int i = 0; i < ui->cbFileName->count(); i++)
+    {
+        settings.setArrayIndex(i);
+        settings.setValue("fileName", ui->cbFileName->itemText(i));
+    }
+    settings.endArray();
+    settings.beginWriteArray("filePaths", ui->cbFolder->count());
+    for(int i = 0; i < ui->cbFolder->count(); i++)
+    {
+        settings.setArrayIndex(i);
+        settings.setValue("filePath", ui->cbFolder->itemText(i));
+    }
+    settings.endArray();
+    settings.endGroup();
+}
+
+void SerchFileDialog::loadSettings()
+{
+    QSettings settings(QCoreApplication::applicationName(),
+                       QCoreApplication::applicationVersion());
+    settings.beginGroup("SerchFileDialog");
+
+    int size = settings.beginReadArray("fileNames");
+    for(int i = 0; i < size; i++)
+    {
+        settings.setArrayIndex(i);
+        ui->cbFileName->addItem(settings.value("fileName").toString());
+    }
+    settings.endArray();
+
+    size = settings.beginReadArray("filePaths");
+    for(int i = 0; i < size; i++)
+    {
+        settings.setArrayIndex(i);
+        ui->cbFolder->addItem(settings.value("filePath").toString());
+    }
+    settings.endArray();
+
+    QString currentFileName = settings.value("currentFileName").toString();
+    QString currentFilePath = settings.value("currentFilePath").toString();
+    if(currentFileName.isEmpty())
+        currentFileName = "*";
+    ui->cbFileName->setCurrentText(currentFileName);
+    ui->cbFolder->setCurrentText(currentFilePath);
+    settings.endGroup();
 }
