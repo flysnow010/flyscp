@@ -21,6 +21,7 @@ public:
     bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
     bool insertRow(int row, QString const& text);
+    bool appendRows(int row, QStringList const& texts);
 
     void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;
 

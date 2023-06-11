@@ -142,14 +142,8 @@ void SerchFileDialog::searchFiles()
     ui->labelCurentPath->setText(result);
     if(isSearching)
     {
-        qDebug() << index << fileNames.size();
         QApplication::setOverrideCursor(Qt::WaitCursor);
-        while(index < fileNames.size())
-        {
-            model->insertRow(index, fileNames[index]);
-            index++;
-        }
-        qDebug() << index << fileNames.size();
+        model->appendRows(index, fileNames);
         fileNames.push_front(result);
         insertText(0, result);
         QApplication::restoreOverrideCursor();
@@ -213,6 +207,7 @@ void SerchFileDialog::addCurentItem(QComboBox* cb)
 
     if(cb->count() > MAX_ITEM_COUNT)
         cb->removeItem(cb->count() - 1);
+    cb->setCurrentText(text);
 }
 
 void SerchFileDialog::saveSettings()

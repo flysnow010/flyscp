@@ -1,4 +1,5 @@
 #include "stringlistmodel.h"
+#include <QDebug>
 
 StringListModel::StringListModel(QObject *parent)
     : QAbstractListModel(parent)
@@ -29,9 +30,6 @@ QModelIndex StringListModel::sibling(int row, int column, const QModelIndex &idx
 
 QVariant StringListModel::data(const QModelIndex &index, int role) const
 {
-    if (index.row() < 0 || index.row() >= lst.size())
-        return QVariant();
-
     if (role == Qt::DisplayRole || role == Qt::EditRole)
         return lst.at(index.row());
 
@@ -86,6 +84,17 @@ bool StringListModel::insertRow(int row, QString const& text)
     beginInsertRows(QModelIndex(), row, row);
 
     lst.insert(row, text);
+    endInsertRows();
+
+    return true;
+}
+
+bool StringListModel::appendRows(int row, QStringList const& texts)
+{
+    beginInsertRows(QModelIndex(), row, texts.count() -1);
+
+    for(int i = row; i < texts.size(); i++)
+        lst << texts[i];
     endInsertRows();
 
     return true;
