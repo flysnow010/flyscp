@@ -1,0 +1,5 @@
+;!@Install@!UTF-8!
+Title="FlyScp 1.00"
+BeginPrompt="Do you want to install the FlyScp 1.00?"
+RunProgram="FlyScp1.0-win-x64.exe"
+;!@InstallEnd@!
