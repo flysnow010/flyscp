@@ -2,11 +2,10 @@
 #define WINSHELL_H
 #include <QIcon>
 #include <QList>
+#include "shellitem.h"
 
-class QString;
 class QMimeData;
 class QStringList;
-
 class WinLibDir
 {
 public:
@@ -16,6 +15,24 @@ public:
     QIcon   icon() const;
 };
 
+class ShellMenuItem
+{
+public:
+    QString caption;
+    QString filePath;
+    QIcon   icon;
+    ShellItem::Ptr pItem;
+    QString showPath() const { return QString("\\\\%1\\").arg(caption); }
+    bool isDir() const { return filePath.startsWith("::") == false; }
+
+    bool operator < (ShellMenuItem const& r)
+    {
+        return *pItem < *(r.pItem);
+    }
+    void exec() const { pItem->exec(); }
+};
+
+typedef QList<ShellMenuItem> ShellMenuItems;
 class WinShell
 {
 public:
@@ -33,6 +50,9 @@ public:
     static bool CreateShortcut(QString const& linkFilePath,
                                QString const& targetFilePath);
     static QList<WinLibDir> winLibDirs();
+    static ShellMenuItems shellMenuItems();
+    static void shellSubMenuItems(ShellMenuItem const& item,
+                                  ShellMenuItems & menuItems, bool isOnlyDir = true);
 };
 
 #endif // WINSHELL_H

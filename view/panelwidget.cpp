@@ -133,17 +133,62 @@ void PanelWidget::addDirToHistory(QString const& dir, bool isNavigation)
 
 void PanelWidget::libDirContextMenu()
 {
-    QMenu menu;
     BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
     if(!dir)
         return;
+
+    QMenu menu;
+
+#if 0
     QList<WinLibDir> libDirs = WinShell::winLibDirs();
     foreach(auto const& libDir, libDirs)
     {
-        menu.addAction(libDir.icon(), libDir.caption, this, [&](bool){
+        menu.addAction(libDir.icon(), libDir.caption, this, [=](bool){
             dir->setDir(libDir.filePath, libDir.showPath());
         });
     }
+#else
+    ShellMenuItems menuItems = WinShell::shellMenuItems();
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    foreach(auto const& menuItem, menuItems)
+    {
+        if(menuItem.isDir())
+            menu.addAction(menuItem.icon, menuItem.caption, this, [=](bool){
+                dir->setDir(menuItem.filePath, menuItem.showPath());
+            });
+        else
+        {
+            QMenu* subMenu = new QMenu(menuItem.caption);
+            QAction* menuAction = subMenu->menuAction();
+            menuAction->setIcon(menuItem.icon);
+            connect(menuAction,  &QAction::triggered, this, [=](){
+                menuItem.exec();
+            });
+            connect(menuAction,  &QAction::hovered, this, [=](){
+                if(subMenu->isEmpty())
+                {
+                    ShellMenuItems childMenuItems;
+                    WinShell::shellSubMenuItems(menuItem, childMenuItems);
+                    if(childMenuItems.isEmpty())
+                        menuAction->setMenu(0);
+                    foreach(auto const& childMenuItem, childMenuItems)
+                    {
+                        if(childMenuItem.isDir())
+                            subMenu->addAction(childMenuItem.icon, childMenuItem.caption, this, [=](bool){
+                                dir->setDir(childMenuItem.filePath, childMenuItem.showPath());
+                            });
+                       else
+                            subMenu->addAction(childMenuItem.icon, childMenuItem.caption, this, [=](bool){
+                                childMenuItem.exec();
+                            });
+                    }
+                }
+            });
+            menu.addAction(menuAction);
+        }
+    }
+#endif
+    QApplication::restoreOverrideCursor();
     menu.exec(QCursor::pos());
 }
 
