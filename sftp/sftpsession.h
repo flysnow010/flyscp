@@ -8,12 +8,15 @@
 #include "ssh/session.h"
 
 #include <QObject>
+#include <QThread>
 
+class SSHSession;
 class SFtpSession : public QObject
 {
     Q_OBJECT
 public:
     explicit SFtpSession(QObject *parent = nullptr);
+    ~SFtpSession();
 
     inline ssh::DirPtr home() const
     {
@@ -42,15 +45,22 @@ public slots:
     void stop();
 
 signals:
+    void startSession(SSHSettings const& settings);
+    void stopSession();
     void connected();
     void unconnected();
     void connectionError(QString const& error);
+
+private slots:
+    void onConnected();
 private:
     ssh::File::Ptr createFile();
     bool createDir(std::string const& path);
 
 private:
-    ssh::Session::Ptr sessioin;
+    QThread sessionThread;
+    SSHSession* sessioin_;
+
     ssh::SFtp::Ptr sftp;
     ssh::Scp::Ptr scp;
     std::string username_;

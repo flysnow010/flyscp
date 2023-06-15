@@ -1,38 +1,55 @@
 #include "sftpsession.h"
 #include "ssh/channel.h"
 #include "ssh/dir.h"
+#include "core/sshsession.h"
 #include <fcntl.h>
 
 SFtpSession::SFtpSession(QObject *parent)
     : QObject(parent)
-    , sessioin(new ssh::Session())
+    , sessioin_(0)
 {
+    qRegisterMetaType<SSHSettings>("SSHSettings");
+
+    SSHSession* worker = new SSHSession();
+    worker->moveToThread(&sessionThread);
+    connect(&sessionThread, &QThread::finished, worker, &QObject::deleteLater);
+
+    connect(this, &SFtpSession::startSession, worker, &SSHSession::start);
+    connect(this, &SFtpSession::stopSession, worker, &SSHSession::stop);
+
+    connect(worker, &SSHSession::connected, this, &SFtpSession::onConnected);
+    connect(worker, &SSHSession::unconnected, this, &SFtpSession::unconnected);
+    connect(worker, &SSHSession::connectionError, this, &SFtpSession::connectionError);
+
+    sessioin_= worker;
+
+    sessionThread.start();
+}
+
+SFtpSession::~SFtpSession()
+{
+    if(sftp)
+        sftp.reset();
+    if(scp)
+        scp.reset();
+    stop();
+    sessionThread.quit();
+    sessionThread.wait();
 }
 
 void SFtpSession::start(SSHSettings const& settings)
 {
-    sessioin->set_host(settings.hostName.toStdString().c_str());
-    sessioin->set_port(settings.port);
-    username_ = settings.userName.toStdString();
-    sessioin->set_user(username_.c_str());
+    emit startSession(settings);
+}
 
-    if(!sessioin->connect())
-    {
-        emit connectionError(sessioin->error());
-        return;
-    }
+void SFtpSession::stop()
+{
+    emit stopSession();
+}
 
-    if(!sessioin->verify())
-    {
-        emit connectionError("verify is failed");
-        return;
-    }
-
-    if(!sessioin->login(settings.passWord.toStdString().c_str()))
-    {
-        emit connectionError("login is failed");
-        return;
-    }
+void SFtpSession::onConnected()
+{
+    ssh::Session::Ptr sessioin = sessioin_->sessioin();
     if(!sftp)
         sftp = ssh::SFtp::Ptr(new ssh::SFtp(*sessioin));
     if(!sftp->init())
@@ -41,12 +58,6 @@ void SFtpSession::start(SSHSettings const& settings)
         scp = ssh::Scp::Ptr(new ssh::Scp(*sessioin));
     }
     emit connected();
-}
-
-void SFtpSession::stop()
-{
-    sessioin->disconnect();
-    emit unconnected();
 }
 
 ssh::File::Ptr SFtpSession::openForRead(const char* filename)
@@ -68,6 +79,7 @@ ssh::File::Ptr SFtpSession::openForWrite(const char* filename, uint64_t filesize
 
 ssh::File::Ptr SFtpSession::createFile()
 {
+    ssh::Session::Ptr sessioin = sessioin_->sessioin();
     if(sftp)
         return ssh::File::Ptr(new ssh::File(*sftp));
     else
@@ -94,6 +106,7 @@ std::string SFtpSession::homeDir()
 {
     if(!homedir_.empty())
         return homedir_;
+    ssh::Session::Ptr sessioin = sessioin_->sessioin();
     ssh::Channel channel(*sessioin);
     if(!channel.open()
         || !channel.exec("pwd")
