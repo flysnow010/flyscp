@@ -1,16 +1,18 @@
-#ifndef SSHSECTION_H
-#define SSHSECTION_H
+#ifndef SSHSESSION_H
+#define SSHSESSION_H
 #include "sshsettings.h"
 #include "ssh/session.h"
 
 #include <QObject>
 
-class SSHSection : public QObject
+class SSHSession : public QObject
 {
     Q_OBJECT
 public:
-    explicit SSHSection(QObject *parent = nullptr);
+    explicit SSHSession(QObject *parent = nullptr);
 
+    std::string userName() const { return username_; }
+    ssh::Session::Ptr sessioin() const { return sessioin_; }
 public slots:
     void start(SSHSettings const& settings);
     void stop();
@@ -20,8 +22,8 @@ signals:
     void unconnected();
     void connectionError(QString const& error);
 private:
-    ssh::Session::Ptr sessioin;
+    ssh::Session::Ptr sessioin_;
     std::string username_;
 };
 
-#endif // SSHSECTION_H
+#endif // SSHSESSION_H
