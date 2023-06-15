@@ -1,7 +1,9 @@
 #include "remotefiletransfer.h"
 #include "remotefilemanager.h"
 
-RemoteFileTransfer::RemoteFileTransfer(RemoteFileManager* worker, QObject *parent) : QObject(parent)
+RemoteFileTransfer::RemoteFileTransfer(RemoteFileManager* worker, QObject *parent)
+    : QObject(parent)
+    , worker_(0)
 {
     qRegisterMetaType<FileNames>("FileNames");
     worker->moveToThread(&workerThread);
