@@ -3,7 +3,7 @@
 
 FileTransfer::FileTransfer(QObject *parent)
     : QObject(parent)
-    , worker_(new FileManager())
+    , worker_(0)
 {
     qRegisterMetaType<FileNames>("FileNames");
     FileManager* worker = new FileManager();
