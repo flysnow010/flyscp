@@ -1,0 +1,4 @@
+QString Utils::formatFileSizeB(qint64 byte)
+{
+    return QString("%L1").arg(byte);
+}
