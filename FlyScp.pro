@@ -26,6 +26,7 @@ SOURCES += \
     core/sftpfilemanager.cpp \
     core/shellitem.cpp \
     core/shellmemmanager.cpp \
+    core/sshsection.cpp \
     core/sshsettings.cpp \
     core/winshell.cpp \
     dialog/aboutdialog.cpp \
@@ -78,6 +79,7 @@ HEADERS += \
     core/sftpfilemanager.h \
     core/shellitem.h \
     core/shellmemmanager.h \
+    core/sshsection.h \
     core/sshsettings.h \
     core/winshell.h \
     dialog/aboutdialog.h \
