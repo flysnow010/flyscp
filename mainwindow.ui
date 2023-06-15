@@ -20,7 +20,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>25</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -105,11 +105,6 @@
    <addaction name="actionUncompress"/>
    <addaction name="separator"/>
    <addaction name="actionSearch"/>
-   <addaction name="actionDiff"/>
-   <addaction name="separator"/>
-   <addaction name="actionControlPanel"/>
-   <addaction name="actionCalc"/>
-   <addaction name="separator"/>
   </widget>
   <action name="actionConnect">
    <property name="icon">
@@ -303,18 +298,6 @@
    </property>
    <property name="statusTip">
     <string>Search file and folder</string>
-   </property>
-  </action>
-  <action name="actionDiff">
-   <property name="icon">
-    <iconset resource="FlyScp.qrc">
-     <normaloff>:/image/diff.png</normaloff>:/image/diff.png</iconset>
-   </property>
-   <property name="text">
-    <string>Diff</string>
-   </property>
-   <property name="statusTip">
-    <string>Diff tow folders</string>
    </property>
   </action>
   <action name="actionCompress">

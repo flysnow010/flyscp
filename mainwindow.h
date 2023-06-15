@@ -33,6 +33,7 @@ private slots:
     void compressFiles();
     void uncompressFiles();
     void searchFiles();
+    void diffFolders();
     void diffFiles();
     void connectSftp();
 private:
@@ -46,13 +47,15 @@ private:
     void createViewConnect();
     void createButtonsConnect();
     void createHelpMenu();
-    void createConnectButton();
+    void createDiffMenu();
+    void createToolButtons();
     void createRemoteDirWidget(SSHSettings const& settings);
     void updateConnectMenu();
 private:
     Ui::MainWindow *ui;
     SSHSettingsManager *sshSettingsMangaer_;
     QMenu* connectMenu;
+    QMenu* diffMenu;
     PanelWidget* leftPanelWidget;
     PanelWidget* rightPanelWidget;
     LocalDirDockWidget* leftDirView;

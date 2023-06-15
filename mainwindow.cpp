@@ -25,7 +25,8 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , sshSettingsMangaer_(new SSHSettingsManager)
-    , connectMenu(new QMenu)
+    , connectMenu(new QMenu(this))
+    , diffMenu(new QMenu(this))
     , leftPanelWidget(new PanelWidget(this))
     , rightPanelWidget(new PanelWidget(this))
     , leftDirView(new LocalDirDockWidget(this))
@@ -43,7 +44,8 @@ MainWindow::MainWindow(QWidget *parent)
     setCentralWidget(spliter);
 
     createHelpMenu();
-    createConnectButton();
+    createDiffMenu();
+    createToolButtons();
     load();
     updateConnectMenu();
     loadStyleSheet();
@@ -54,7 +56,6 @@ MainWindow::~MainWindow()
 {
     save();
     delete sshSettingsMangaer_;
-    delete connectMenu;
     delete ui;
 }
 
@@ -69,12 +70,30 @@ void MainWindow::createHelpMenu()
     ui->statusbar->addWidget(toolButtons, 1);
 }
 
-void MainWindow::createConnectButton()
+void MainWindow::createDiffMenu()
 {
+    diffMenu->addAction("Diff files", this, [=](){
+        diffFiles();
+    });
+}
+
+void MainWindow::createToolButtons()
+{
+    diffMenu->setIcon(QIcon(":/image/diff.png"));
     connectMenu->setIcon(QIcon(":/image/connect.png"));
-    QAction* action = connectMenu->menuAction();
-    connect(action, SIGNAL(triggered(bool)), this, SLOT(connectSftp()));
-    ui->toolBar->addAction(action);
+    QAction* diffAction = diffMenu->menuAction();
+    QAction* connectAction = connectMenu->menuAction();
+    diffAction->setStatusTip("Diff tow folders");
+    connectAction->setStatusTip("Connect a stfp");
+
+    connect(diffAction, SIGNAL(triggered(bool)), this, SLOT(diffFolders()));
+    connect(connectAction, SIGNAL(triggered(bool)), this, SLOT(connectSftp()));
+    ui->toolBar->addAction(diffAction);
+    ui->toolBar->addSeparator();
+    ui->toolBar->addAction(ui->actionControlPanel);
+    ui->toolBar->addAction(ui->actionCalc);
+    ui->toolBar->addSeparator();
+    ui->toolBar->addAction(connectAction);
 }
 
 void MainWindow::updateConnectMenu()
@@ -146,7 +165,6 @@ void MainWindow::createMenuConnect()
     connect(ui->actionCompress, SIGNAL(triggered(bool)), this, SLOT(compressFiles()));
     connect(ui->actionUncompress, SIGNAL(triggered(bool)), this, SLOT(uncompressFiles()));
     connect(ui->actionSearch, SIGNAL(triggered(bool)), this, SLOT(searchFiles()));
-    connect(ui->actionDiff, SIGNAL(triggered(bool)), this, SLOT(diffFiles()));
     connect(ui->actionControlPanel, &QAction::triggered, this, [&](){
         WinShell::Exec("control");
     });
@@ -428,11 +446,20 @@ void MainWindow::searchFiles()
         rightDirView->searchFiles(rightDirView->dir());
 }
 
-void MainWindow::diffFiles()
+void MainWindow::diffFolders()
 {
     QStringList params;
     params << "-contextdiff"
            << leftDirView->dir() << rightDirView->dir();
+    FileNames::MakeFileNamesAsParams(params);
+    WinShell::Exec(Utils::diffApp(), params);
+}
+
+void MainWindow::diffFiles()
+{
+    QStringList params;
+    params << "-contextdiff"
+           << leftDirView->currentFileName() << rightDirView->currentFileName();
     FileNames::MakeFileNamesAsParams(params);
     WinShell::Exec(Utils::diffApp(), params);
 }

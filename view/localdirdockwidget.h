@@ -25,7 +25,7 @@ public:
     void cd(QString const& dir) override;
     QString home() const override;
     QString root() const override;
-
+    QString currentFileName() const { return selectedFileName(); }
     void resizeSection(int logicalIndex, int size);
     void saveSettings(QString const& name);
     void loadSettings(QString const& name);
@@ -80,7 +80,7 @@ private:
     bool isMultiSelected();
     bool isCompressFiles(QStringList const& fileNames);
     QStringList selectedFileNames(bool isOnlyFilename = false, bool isParent = false);
-    QString selectedFileName(bool isOnlyFilename = false);
+    QString selectedFileName(bool isOnlyFilename = false) const;
 
     void copyFilels(QStringList const& fileNames, QString const& dstFilePath);
     void cutFiles(QStringList const& fileNames, QString const& dstFilePath);

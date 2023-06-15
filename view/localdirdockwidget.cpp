@@ -808,7 +808,7 @@ QStringList LocalDirDockWidget::selectedFileNames(bool isOnlyFilename, bool isPa
     return names;
 }
 
-QString LocalDirDockWidget::selectedFileName(bool isOnlyFilename)
+QString LocalDirDockWidget::selectedFileName(bool isOnlyFilename) const
 {
     QModelIndex index = ui->treeView->currentIndex();
     if(!index.isValid())
