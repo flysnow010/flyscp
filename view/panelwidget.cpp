@@ -407,6 +407,14 @@ void PanelWidget::currentChanged(int index)
      }
 }
 
+void PanelWidget::closeTab(QWidget *w)
+{
+   int index = ui->tabWidget->indexOf(w);
+   if(index < 0)
+       return;
+   tabCloseRequested(index);
+}
+
 void PanelWidget::tabCloseRequested(int index)
 {
     QWidget* w = ui->tabWidget->widget(index);

@@ -38,6 +38,7 @@ public slots:
     void libDirContextMenu();
     void favoritesDirContextMenu();
     void historyDirContextMenu();
+    void closeTab(QWidget *w);
 
 private slots:
     void buttonClicked(QAbstractButton* button);

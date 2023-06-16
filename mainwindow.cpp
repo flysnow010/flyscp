@@ -485,9 +485,11 @@ void MainWindow::createRemoteDirWidget(SSHSettings const& settings)
 {
     RemoteDockWidget* remoteDockWidget = new RemoteDockWidget(this);
     remoteDockWidget->start(settings);
+
     if(rightPanelWidget->tabCount() <= leftPanelWidget->tabCount())
     {
         rightPanelWidget->addDirTab(remoteDockWidget, Utils::networkIcon(), remoteDockWidget->name());
+        connect(remoteDockWidget, &RemoteDockWidget::closeRequest, rightPanelWidget, &PanelWidget::closeTab);
         connect(leftDirView, &LocalDirDockWidget::remoteDownload, this, [=](
                 QString const& remoteSrc, QStringList const& fileNames,
                 QString const& targetFilePath) {
@@ -498,6 +500,7 @@ void MainWindow::createRemoteDirWidget(SSHSettings const& settings)
     else
     {
         leftPanelWidget->addDirTab(remoteDockWidget, Utils::networkIcon(), remoteDockWidget->name());
+        connect(remoteDockWidget, &RemoteDockWidget::closeRequest, leftPanelWidget, &PanelWidget::closeTab);
         connect(rightDirView, &LocalDirDockWidget::remoteDownload, this, [=](
                 QString const& remoteSrc, QStringList const& fileNames,
                 QString const& targetFilePath) {

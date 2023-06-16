@@ -41,6 +41,9 @@ public:
     void start(SSHSettings const& settings);
     QString const& name() const { return name_; }
 
+signals:
+    void closeRequest(QWidget* widget);
+
 public slots:
     void libDirContextMenu();
     void favoritesDirContextMenu();

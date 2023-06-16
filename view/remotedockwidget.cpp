@@ -364,7 +364,8 @@ void RemoteDockWidget::unconnected()
 
 void RemoteDockWidget::connectionError(QString const& error)
 {
-    qDebug() << "error: " << error;
+    Utils::warring(error);
+    emit closeRequest(this);
 }
 
 void RemoteDockWidget::parentDirectory()
