@@ -35,8 +35,9 @@ void Session::set_user(const char* user)
     ssh_options_set(d->session, SSH_OPTIONS_USER, user);
 }
 
-bool Session::connect()
+bool Session::connect(int timeout)
 {
+    ssh_options_set(d->session, SSH_OPTIONS_TIMEOUT, &timeout);
     return ssh_connect(d->session) == SSH_OK;
 }
 

@@ -16,7 +16,7 @@ public:
     void set_port(const char* port);
     void set_user(const char* user);
 
-    bool connect();
+    bool connect(int timeout = 5);
     void disconnect();
     bool verify();
     bool login(const char* password);
