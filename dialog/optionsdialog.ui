@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>787</width>
-    <height>544</height>
+    <height>607</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,15 +17,192 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1">
      <item>
-      <widget class="QTreeWidget" name="treeWidget"/>
+      <widget class="QTreeWidget" name="treeWidget">
+       <property name="rootIsDecorated">
+        <bool>false</bool>
+       </property>
+       <property name="uniformRowHeights">
+        <bool>true</bool>
+       </property>
+       <attribute name="headerVisible">
+        <bool>false</bool>
+       </attribute>
+       <column>
+        <property name="text">
+         <string>Options</string>
+        </property>
+       </column>
+       <item>
+        <property name="text">
+         <string>Layout</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Display</string>
+        </property>
+        <item>
+         <property name="text">
+          <string>Icons</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Font</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Color</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Language</string>
+         </property>
+        </item>
+       </item>
+       <item>
+        <property name="text">
+         <string>Operation</string>
+        </property>
+       </item>
+      </widget>
      </item>
      <item>
       <widget class="QStackedWidget" name="stackedWidget">
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
-       <widget class="QWidget" name="page"/>
-       <widget class="QWidget" name="page_2"/>
+       <widget class="QWidget" name="layoutPage">
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <property name="leftMargin">
+          <number>4</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QGroupBox" name="groupBox">
+           <property name="title">
+            <string>Screen layout</string>
+           </property>
+           <property name="checkable">
+            <bool>false</bool>
+           </property>
+           <property name="checked">
+            <bool>false</bool>
+           </property>
+           <layout class="QGridLayout" name="gridLayout">
+            <property name="leftMargin">
+             <number>11</number>
+            </property>
+            <item row="0" column="0" colspan="2">
+             <widget class="QCheckBox" name="checkBox_5">
+              <property name="text">
+               <string>Show tool bar</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0" colspan="2">
+             <widget class="QCheckBox" name="checkBox_4">
+              <property name="text">
+               <string>Show drive buttons</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0" colspan="2">
+             <widget class="QCheckBox" name="checkBox_3">
+              <property name="text">
+               <string>Show current directory</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <spacer name="horizontalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="3" column="1">
+             <widget class="QCheckBox" name="checkBox_8">
+              <property name="text">
+               <string>Show left button</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="1">
+             <widget class="QCheckBox" name="checkBox_9">
+              <property name="text">
+               <string>Show right button</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="0" colspan="2">
+             <widget class="QCheckBox" name="checkBox_6">
+              <property name="text">
+               <string>Show sort header</string>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="0" colspan="2">
+             <widget class="QCheckBox" name="checkBox_7">
+              <property name="text">
+               <string>Show command line</string>
+              </property>
+             </widget>
+            </item>
+            <item row="7" column="0" colspan="2">
+             <widget class="QCheckBox" name="checkBox_2">
+              <property name="text">
+               <string>Show status bar</string>
+              </property>
+             </widget>
+            </item>
+            <item row="8" column="0" colspan="3">
+             <widget class="QCheckBox" name="checkBox">
+              <property name="text">
+               <string>Show function key buttons</string>
+              </property>
+             </widget>
+            </item>
+            <item row="9" column="2">
+             <spacer name="verticalSpacer">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>235</width>
+                <height>225</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="displayPage"/>
+       <widget class="QWidget" name="iconsPage"/>
+       <widget class="QWidget" name="fontPage"/>
       </widget>
      </item>
     </layout>
