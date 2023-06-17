@@ -55,9 +55,11 @@ SOURCES += \
     ssh/session.cpp \
     ssh/sftp.cpp \
     util/utils.cpp \
+    view/commandbar.cpp \
     view/localdirdockwidget.cpp \
     view/panelwidget.cpp \
     view/remotedockwidget.cpp \
+    view/statusbar.cpp \
     view/titlebarwidget.cpp \
     view/toolbuttons.cpp \
     view/treeview.cpp
@@ -108,9 +110,11 @@ HEADERS += \
     ssh/sftp.h \
     ssh/sshprivate.h \
     util/utils.h \
+    view/commandbar.h \
     view/localdirdockwidget.h \
     view/panelwidget.h \
     view/remotedockwidget.h \
+    view/statusbar.h \
     view/titlebarwidget.h \
     view/toolbuttons.h \
     view/treeview.h
@@ -127,9 +131,11 @@ FORMS += \
     dialog/serchfiledialog.ui \
     dialog/uncompressconfirmdialog.ui \
     mainwindow.ui \
+    view/commandbar.ui \
     view/localdirdockwidget.ui \
     view/panelwidget.ui \
     view/remotedockwidget.ui \
+    view/statusbar.ui \
     view/titlebarwidget.ui \
     view/toolbuttons.ui
 

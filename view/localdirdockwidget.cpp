@@ -51,6 +51,9 @@ LocalDirDockWidget::LocalDirDockWidget(QWidget *parent)
             this, SLOT(sortIndicatorChanged(int,Qt::SortOrder)));
     connect(ui->treeView->header(), SIGNAL(sectionResized(int,int,int)),
             this, SIGNAL(sectionResized(int,int,int)));
+    connect(ui->treeView->selectionModel(), &QItemSelectionModel::selectionChanged, this, [=](){
+            emit statusTextChanged(getStatusText());
+    });
 
     connect(titleBarWidget, SIGNAL(libDirButtonClicked()),
                     this, SIGNAL(libDirContextMenuRequested()));
@@ -80,7 +83,7 @@ void LocalDirDockWidget::setDir(QString const& dir, QString const& caption, bool
     fileSystemWatcher->removePath(model_->dir());
     model_->setDir(dir);
     fileSystemWatcher->addPath(dir);
-    updateCurrentDir(dir, caption, isNavigation);
+    (dir, caption, isNavigation);
     if(!isActived())
     {
         setActived(true);
@@ -759,6 +762,20 @@ void LocalDirDockWidget::searchFiles(QString const& dstFilePath)
     dialog.exec();
 }
 
+void LocalDirDockWidget::execCommand(QString const& command)
+{
+    QStringList args = command.split(" ");
+    if(args.size() < 2)
+    {
+        ;
+    }
+    else
+    {
+        if(args[0] == "cd")
+            cd(args[1]);
+    }
+}
+
 void LocalDirDockWidget::newTxtFile()
 {
     QString fileName = Utils::getText("New File", "*.txt");
@@ -878,6 +895,34 @@ void LocalDirDockWidget::goToFile(QString const& fileName)
             ui->treeView->selectionModel()->select(modeIndex, QItemSelectionModel::Select);
         }
     }
+    emit statusTextChanged(getStatusText());
+}
+
+QString LocalDirDockWidget::getStatusText()
+{
+    QModelIndexList indexs = ui->treeView->selectionModel()->selectedRows(0);
+    QStringList names;
+    int files = 0;
+    int dirs = 0;
+    qint64 fileSize = 0;
+    for(int i = 0; i < indexs.size(); i++)
+    {
+        if(model_->isParent(indexs[i].row()))
+            continue;
+
+        QFileInfo const& fileInfo = model_->fileInfo(indexs[i].row());
+        if(fileInfo.isDir())
+            dirs++;
+        else
+        {
+            files++;
+            fileSize += fileInfo.size();
+        }
+    }
+    return  QString("%1/%2,%3/%4 files,%5/%6 dirs(s)")
+            .arg(Utils::formatFileSizeKB(fileSize), Utils::formatFileSizeKB(model_->fileSizes()))
+            .arg(files).arg(model_->fileCount())
+            .arg(dirs).arg(model_->dirCount());
 }
 
 void LocalDirDockWidget::updateCurrentDir(QString const& dir, QString const& caption, bool isNavigation)
@@ -887,4 +932,5 @@ void LocalDirDockWidget::updateCurrentDir(QString const& dir, QString const& cap
     else
         titleBarWidget->setTitle(caption);
     emit dirChanged(dir, isNavigation);
+    emit statusTextChanged(getStatusText());
 }

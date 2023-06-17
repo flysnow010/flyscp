@@ -25,6 +25,9 @@ LocalDirModel::LocalDirModel(QObject *parent)
     , dirIcon(Utils::dirIcon())
     , backIcon(":/image/back.png")
     , sortIndex(NONE_INDEX)
+    , fileCount_(0)
+    , dirCount_(0)
+    , fileSizes_(0)
 {
     setupData();
 }
@@ -207,8 +210,9 @@ QVariant LocalDirModel::foreColor(const QModelIndex &index) const
 
 void LocalDirModel::setupModelData(TreeItem *parent)
 {
-    iconMap.clear();
-
+    fileCount_ = 0;
+    dirCount_ = 0;
+    fileSizes_ = 0;
     for(int i = 0; i < fileInfos_.size();i++)
     {
         QList<QVariant> rowData;
@@ -242,11 +246,15 @@ void LocalDirModel::setupModelData(TreeItem *parent)
 
             if(!iconMap.contains(suffix))
                 iconMap.insert(suffix, Utils::fileIcon(suffix));
+            fileCount_++;
+            fileSizes_ += size;
         }
         else if(fileInfos_[i].isDir())
         {
             rowData << QString() << QString("<DIR>")
                     << fileInfos_[i].lastModified().toString("yyyy-MM-dd HH:mm:ss");
+            if(!isParent(i))
+                dirCount_++;
         }
         TreeItem* item = new TreeItem(rowData, parent);
         parent->appendChild(item);

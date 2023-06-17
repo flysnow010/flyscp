@@ -20,7 +20,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -52,6 +52,8 @@
     </property>
     <addaction name="actionToolBar"/>
     <addaction name="actionStatusBar"/>
+    <addaction name="actionCommandBar"/>
+    <addaction name="actionButtonsBar"/>
    </widget>
    <widget class="QMenu" name="menuNetwork">
     <property name="title">
@@ -74,7 +76,7 @@
    <addaction name="menuNetwork"/>
    <addaction name="menuTool"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QStatusBar" name="buttonsBar"/>
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
     <string>toolBar</string>
@@ -351,6 +353,28 @@
    </property>
    <property name="statusTip">
     <string>Run calculator</string>
+   </property>
+  </action>
+  <action name="actionCommandBar">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Command bar</string>
+   </property>
+  </action>
+  <action name="actionButtonsBar">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Buttons bar</string>
    </property>
   </action>
  </widget>

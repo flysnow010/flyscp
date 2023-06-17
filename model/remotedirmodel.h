@@ -30,6 +30,9 @@ public:
     bool rename(std::string const& original, std::string const& newname);
     bool chmod(const char* file, uint16_t mode);
     void refresh();
+    int fileCount () const { return fileCount_; }
+    int dirCount() const { return dirCount_; }
+    qint64 fileSizes() const { return fileSizes_; }
 protected:
     virtual TreeItem *createRootItem();
     virtual QVariant textAlignment(const QModelIndex &index) const;
@@ -44,6 +47,9 @@ private:
     QMap<QString, QIcon> iconMap;
     QIcon dirIcon;
     QIcon backIcon;
+    int fileCount_;
+    int dirCount_;
+    qint64 fileSizes_;
 };
 
 #endif // REMOTEDIRMODEL_H

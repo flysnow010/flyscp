@@ -26,6 +26,9 @@ public:
     QString filePath(QString const& fileName);
     int indexOfFile(QString const& fileName);
     bool isParent(int index) const;
+    int fileCount () const { return fileCount_; }
+    int dirCount() const { return dirCount_; }
+    qint64 fileSizes() const { return fileSizes_; }
 protected:
     virtual TreeItem *createRootItem();
     virtual QVariant textAlignment(const QModelIndex &index) const;
@@ -46,6 +49,9 @@ private:
     QIcon backIcon;
     int sortIndex;
     bool isDescending;
+    int fileCount_;
+    int dirCount_;
+    qint64 fileSizes_;
 };
 
 #endif // LOCALDIRMODEL_H

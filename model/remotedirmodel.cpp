@@ -15,6 +15,9 @@ RemoteDirModel::RemoteDirModel(QObject *parent)
     : TreeModel(parent)
     , dirIcon(Utils::dirIcon())
     , backIcon(":/image/back.png")
+    , fileCount_(0)
+    , dirCount_(0)
+    , fileSizes_(0)
 {
     setupData();
 }
@@ -259,6 +262,9 @@ QVariant RemoteDirModel::foreColor(const QModelIndex &index) const
 
 void RemoteDirModel::setupModelData(TreeItem *parent)
 {
+    fileCount_ = 0;
+    dirCount_ = 0;
+    fileSizes_ = 0;
     for(auto const& fileInfo : fileInfos_)
     {
         QList<QVariant> rowData;
@@ -273,6 +279,8 @@ void RemoteDirModel::setupModelData(TreeItem *parent)
 
             if(!iconMap.contains(suffix))
                 iconMap.insert(suffix, Utils::fileIcon(suffix));
+            fileCount_++;
+            fileSizes_ += fileInfo->size();
 
         }
         else if(fileInfo->is_dir())
@@ -280,6 +288,7 @@ void RemoteDirModel::setupModelData(TreeItem *parent)
             rowData << QString() << QString("<DIR>")
                     << QDateTime::fromSecsSinceEpoch(fileInfo->time()).toString("yyyy-MM-dd HH:mm:ss")
                     << Utils::permissionsText(fileInfo->permissions(), true);
+            dirCount_++;
         }
         TreeItem* item = new TreeItem(rowData, parent);
         parent->appendChild(item);

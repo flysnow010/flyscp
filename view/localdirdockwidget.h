@@ -42,6 +42,7 @@ public:
     void compressFiles(QString const& dstFilePath);
     void uncompressFiles(QString const& dstFilePath);
     void searchFiles(QString const& dstFilePath);
+    void execCommand(QString const& command);
 public slots:
     void newFolder();
     void newTxtFile();
@@ -49,6 +50,7 @@ public slots:
 signals:
     void sectionResized(int logicalIndex, int oldSize, int newSize);
     void dirChanged(QString const& dir, bool isNavigation);
+    void statusTextChanged(QString const& text);
     void libDirContextMenuRequested();
     void favoritesDirContextMenuRequested();
     void historyDirContextMenuRequested();
@@ -86,7 +88,10 @@ private:
     void cutFiles(QStringList const& fileNames, QString const& dstFilePath);
     void fileTransfer(FileNames const& fileNames, bool isMove);
     void goToFile(QString const& fileName);
-    void updateCurrentDir(QString const& dir, QString const& caption = QString(), bool isNavigation = false);
+    QString getStatusText();
+    void updateCurrentDir(QString const& dir,
+                          QString const& caption = QString(),
+                          bool isNavigation = false);
 private:
     Ui::LocalDirDockWidget *ui;
     LocalDirModel* model_;

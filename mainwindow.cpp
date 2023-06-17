@@ -4,6 +4,8 @@
 #include "view/panelwidget.h"
 #include "view/localdirdockwidget.h"
 #include "view/remotedockwidget.h"
+#include "view/statusbar.h"
+#include "view/commandbar.h"
 #include "view/toolbuttons.h"
 #include "dialog/connectdialog.h"
 #include "dialog/optionsdialog.h"
@@ -15,6 +17,7 @@
 #include <QTabWidget>
 #include <QSettings>
 #include <QDesktopWidget>
+#include <QVBoxLayout>
 #include <QDebug>
 #include <QScreen>
 
@@ -34,22 +37,38 @@ MainWindow::MainWindow(QWidget *parent)
     , toolButtons(new ToolButtons(this))
 {
     ui->setupUi(this);
+    QWidget* centerWidget = new QWidget(this);
+    QVBoxLayout* layout = new QVBoxLayout();
     QSplitter *spliter = new QSplitter(this);
+    statusBar = new StatusBar(this);
+    commandBar = new CommandBar(this);
     spliter->setHandleWidth(0);
     spliter->addWidget(leftPanelWidget);
     spliter->addWidget(rightPanelWidget);
+    layout->addWidget(spliter);
+    layout->addWidget(statusBar);
+    layout->addWidget(commandBar);
+    layout->setMargin(0);
+    layout->setSpacing(0);
+    layout->setStretch(0, 1);
+    layout->setStretch(1, 0);
+    layout->setStretch(2, 0);
+    centerWidget->setLayout(layout);
+    connect(spliter, &QSplitter::splitterMoved, this, [=](int pos, int){
+       statusBar->setLeftWidth(pos);
+    });
 
     leftPanelWidget->addDirTab(leftDirView, Utils::driverIcon(), "Local of left");
     rightPanelWidget->addDirTab(rightDirView, Utils::driverIcon(), "Local of right");
-    setCentralWidget(spliter);
+    setCentralWidget(centerWidget);
 
     createHelpMenu();
     createDiffMenu();
     createToolButtons();
+    createConnects();
     load();
     updateConnectMenu();
     loadStyleSheet();
-    createConnects();
 }
 
 MainWindow::~MainWindow()
@@ -67,7 +86,7 @@ void MainWindow::createHelpMenu()
     menuHelp->addAction(ui->actionAbout);
     ui->menubar->setCornerWidget(bar);
 
-    ui->statusbar->addWidget(toolButtons, 1);
+    ui->buttonsBar->addWidget(toolButtons, 1);
 }
 
 void MainWindow::createDiffMenu()
@@ -202,7 +221,13 @@ void MainWindow::createMenuConnect()
         ui->toolBar->setVisible(on);
     });
     connect(ui->actionStatusBar,  &QAction::triggered, this, [&](bool on){
-        ui->statusbar->setVisible(on);
+        statusBar->setVisible(on);
+    });
+    connect(ui->actionCommandBar,  &QAction::triggered, this, [&](bool on){
+        commandBar->setVisible(on);
+    });
+    connect(ui->actionButtonsBar,  &QAction::triggered, this, [&](bool on){
+        ui->buttonsBar->setVisible(on);
     });
 
     connect(ui->actionAbout,  &QAction::triggered, this, [](bool){ AboutDialog().exec(); });
@@ -255,6 +280,21 @@ void MainWindow::createViewConnect()
     connect(leftDirView, &LocalDirDockWidget::actived, this, [&](){
         rightDirView->setActived(false);
     });
+    connect(leftDirView, &LocalDirDockWidget::statusTextChanged, this, [&](QString const& text){
+        statusBar->setLeftStatusText(text);
+    });
+    connect(rightDirView, &LocalDirDockWidget::statusTextChanged, this, [&](QString const& text){
+        statusBar->setRightStatusText(text);
+    });
+    connect(leftDirView, &LocalDirDockWidget::dirChanged, this, [&](QString const& dir, bool){
+        commandBar->setDir(dir);
+    });
+    connect(commandBar, &CommandBar::commanded, this, [&](QString const& commnad){
+        if(leftDirView->isActived())
+            leftDirView->execCommand(commnad);
+        else
+            rightDirView->execCommand(commnad);
+    });
 }
 
 void MainWindow::createButtonsConnect()
@@ -300,6 +340,8 @@ void MainWindow::saveSettings()
     settings.setValue("windowState", saveState());
     settings.setValue("toolBarIsVisible", ui->actionToolBar->isChecked());
     settings.setValue("statusBarIsVisible", ui->actionStatusBar->isChecked());
+    settings.setValue("commandBarIsVisible", ui->actionCommandBar->isChecked());
+    settings.setValue("ButtonsBarIsVisible", ui->actionButtonsBar->isChecked());
 }
 
 void MainWindow::loadSettings()
@@ -320,10 +362,16 @@ void MainWindow::loadSettings()
         restoreState(windowState);
     bool toolBarIsVisible = settings.value("toolBarIsVisible", true).toBool();
     bool statusBarIsVisible = settings.value("statusBarIsVisible", true).toBool();
+    bool commandBarIsVisible = settings.value("commandBarIsVisible", true).toBool();
+    bool buttonsBarIsVisible = settings.value("ButtonsBarIsVisible", true).toBool();
     ui->actionToolBar->setChecked(toolBarIsVisible);
     ui->actionStatusBar->setChecked(statusBarIsVisible);
+    ui->actionCommandBar->setChecked(commandBarIsVisible);
+    ui->actionButtonsBar->setChecked(buttonsBarIsVisible);
     ui->toolBar->setVisible(toolBarIsVisible);
-    ui->statusbar->setVisible(statusBarIsVisible);
+    statusBar->setVisible(statusBarIsVisible);
+    commandBar->setVisible(commandBarIsVisible);
+    ui->buttonsBar->setVisible(buttonsBarIsVisible);
 }
 
 void MainWindow::loadStyleSheet()

@@ -11,6 +11,8 @@ class LocalDirDockWidget;
 class ToolButtons;
 class SSHSettings;
 class SSHSettingsManager;
+class StatusBar;
+class CommandBar;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -60,6 +62,8 @@ private:
     PanelWidget* rightPanelWidget;
     LocalDirDockWidget* leftDirView;
     LocalDirDockWidget* rightDirView;
+    StatusBar* statusBar;
+    CommandBar* commandBar;
     ToolButtons* toolButtons;
 };
 #endif // MAINWINDOW_H
