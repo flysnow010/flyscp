@@ -34,6 +34,7 @@ SOURCES += \
     dialog/connectdialog.cpp \
     dialog/fileoperateconfirmdialog.cpp \
     dialog/fileprogressdialog.cpp \
+    dialog/networksettingsdialog.cpp \
     dialog/optionsdialog.cpp \
     dialog/permissionsdialog.cpp \
     dialog/propertydialog.cpp \
@@ -89,6 +90,7 @@ HEADERS += \
     dialog/connectdialog.h \
     dialog/fileoperateconfirmdialog.h \
     dialog/fileprogressdialog.h \
+    dialog/networksettingsdialog.h \
     dialog/optionsdialog.h \
     dialog/permissionsdialog.h \
     dialog/propertydialog.h \
@@ -125,6 +127,7 @@ FORMS += \
     dialog/connectdialog.ui \
     dialog/fileoperateconfirmdialog.ui \
     dialog/fileprogressdialog.ui \
+    dialog/networksettingsdialog.ui \
     dialog/optionsdialog.ui \
     dialog/permissionsdialog.ui \
     dialog/propertydialog.ui \
