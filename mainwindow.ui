@@ -60,6 +60,8 @@
      <string>&amp;Network</string>
     </property>
     <addaction name="actionConnect"/>
+    <addaction name="separator"/>
+    <addaction name="actionSettings"/>
    </widget>
    <widget class="QMenu" name="menuTool">
     <property name="title">
@@ -92,6 +94,9 @@
      <width>20</width>
      <height>20</height>
     </size>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonIconOnly</enum>
    </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
@@ -375,6 +380,11 @@
    </property>
    <property name="text">
     <string>Buttons bar</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="text">
+    <string>Settings...</string>
    </property>
   </action>
  </widget>

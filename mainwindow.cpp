@@ -9,6 +9,7 @@
 #include "view/toolbuttons.h"
 #include "dialog/connectdialog.h"
 #include "dialog/optionsdialog.h"
+#include "dialog/networksettingsdialog.h"
 #include "dialog/aboutdialog.h"
 #include "util/utils.h"
 #include "core/winshell.h"
@@ -130,7 +131,10 @@ void MainWindow::updateConnectMenu()
     }
     if(sshSettingsMangaer_->size() > 0)
         connectMenu->addSeparator();
-    connectMenu->addAction("Settings", this, [=](){});
+    connectMenu->addAction("Settings", this, [=](){
+        NetworkSettingsDialog dialog(this);
+        dialog.exec();
+    });
 }
 
 bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, long *result)
@@ -189,6 +193,13 @@ void MainWindow::createMenuConnect()
     });
     connect(ui->actionCalc, &QAction::triggered, this, [&](){
         WinShell::Exec("calc");
+    });
+    connect(ui->actionSettings, &QAction::triggered, this, [&](){
+        NetworkSettingsDialog dialog;
+        if(dialog.exec() == QDialog::Accepted)
+        {
+            ;
+        }
     });
     connect(ui->actionOption, &QAction::triggered, this, [&](){
         OptionsDialog dialog;
