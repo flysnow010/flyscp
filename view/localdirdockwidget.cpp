@@ -83,7 +83,7 @@ void LocalDirDockWidget::setDir(QString const& dir, QString const& caption, bool
     fileSystemWatcher->removePath(model_->dir());
     model_->setDir(dir);
     fileSystemWatcher->addPath(dir);
-    (dir, caption, isNavigation);
+    updateCurrentDir(dir, caption, isNavigation);
     if(!isActived())
     {
         setActived(true);
