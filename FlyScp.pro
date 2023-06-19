@@ -21,6 +21,7 @@ SOURCES += \
     core/filename.cpp \
     core/filetransfer.cpp \
     core/fileuncompresser.cpp \
+    core/optionsmanager.cpp \
     core/remotefilemanager.cpp \
     core/remotefiletransfer.cpp \
     core/sftpfilemanager.cpp \
@@ -77,6 +78,7 @@ HEADERS += \
     core/filename.h \
     core/filetransfer.h \
     core/fileuncompresser.h \
+    core/optionsmanager.h \
     core/remotefilemanager.h \
     core/remotefiletransfer.h \
     core/sftpfilemanager.h \
