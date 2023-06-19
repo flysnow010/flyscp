@@ -42,7 +42,7 @@ private:
     void save();
     void load();
     void saveSettings();
-    void loadSettings();
+    bool loadSettings();
     void loadStyleSheet();
     void createConnects();
     void createMenuConnect();

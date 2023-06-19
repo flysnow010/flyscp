@@ -287,9 +287,11 @@ void MainWindow::createViewConnect()
 
     connect(rightDirView, &LocalDirDockWidget::actived, this, [&](){
         leftDirView->setActived(false);
+        commandBar->setDir(rightDirView->dir());
     });
     connect(leftDirView, &LocalDirDockWidget::actived, this, [&](){
         rightDirView->setActived(false);
+        commandBar->setDir(leftDirView->dir());
     });
     connect(leftDirView, &LocalDirDockWidget::statusTextChanged, this, [&](QString const& text){
         statusBar->setLeftStatusText(text);
@@ -298,6 +300,9 @@ void MainWindow::createViewConnect()
         statusBar->setRightStatusText(text);
     });
     connect(leftDirView, &LocalDirDockWidget::dirChanged, this, [&](QString const& dir, bool){
+        commandBar->setDir(dir);
+    });
+    connect(rightDirView, &LocalDirDockWidget::dirChanged, this, [&](QString const& dir, bool){
         commandBar->setDir(dir);
     });
     connect(commandBar, &CommandBar::commanded, this, [&](QString const& commnad){
@@ -332,7 +337,7 @@ void MainWindow::save()
 
 void MainWindow::load()
 {
-    loadSettings();
+    bool leftDirViewIsActived = loadSettings();
     leftDirView->loadSettings("LeftDirView");
     rightDirView->loadSettings("RightDirView");
     leftPanelWidget->loadSettings("LeftPanel");
@@ -340,7 +345,16 @@ void MainWindow::load()
     leftPanelWidget->updateTexts(leftDirView);
     rightPanelWidget->updateTexts(rightDirView);
     sshSettingsMangaer_->load(QString("%1/settings.json").arg(Utils::sshSettingsPath()));
-    leftDirView->setActived(true);
+    if(leftDirViewIsActived)
+    {
+        emit leftDirView->actived();
+        leftDirView->setActived(true);
+    }
+    else
+    {
+        emit rightDirView->actived();
+        rightDirView->setActived(true);
+    }
 }
 
 void MainWindow::saveSettings()
@@ -353,9 +367,10 @@ void MainWindow::saveSettings()
     settings.setValue("statusBarIsVisible", ui->actionStatusBar->isChecked());
     settings.setValue("commandBarIsVisible", ui->actionCommandBar->isChecked());
     settings.setValue("ButtonsBarIsVisible", ui->actionButtonsBar->isChecked());
+    settings.setValue("LeftDirViewIsActived", leftDirView->isActived());
 }
 
-void MainWindow::loadSettings()
+bool MainWindow::loadSettings()
 {
     QSettings settings(QCoreApplication::applicationName(),
                        QCoreApplication::applicationVersion());
@@ -383,6 +398,8 @@ void MainWindow::loadSettings()
     statusBar->setVisible(statusBarIsVisible);
     commandBar->setVisible(commandBarIsVisible);
     ui->buttonsBar->setVisible(buttonsBarIsVisible);
+
+    return settings.value("LeftDirViewIsActived", true).toBool();
 }
 
 void MainWindow::loadStyleSheet()
