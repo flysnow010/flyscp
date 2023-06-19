@@ -1,6 +1,7 @@
 #ifndef OPTIONSMANAGER_H
 #define OPTIONSMANAGER_H
 #include <QString>
+#include <QFont>
 #include <QSettings>
 
 struct LayoutOption
@@ -46,7 +47,7 @@ struct IconsOption
     bool isShowIconForFilesystem = true;
     bool isShowIconForVirtualFolder = true;
     bool isShowOverlayIcon = true;
-    int fileIconSize = 16;//16,32
+    int fileIconSize = 24;//16,24,32
     int toolbarIconSize = 20;//16,20,24,32
 
     void save(QSettings & settings);
@@ -55,10 +56,28 @@ struct IconsOption
 
 struct FontInfo
 {
-    QString name = "Agency FB";
+    QString name = "SimSun";
     int size = 9;
     bool isBold = false;
     bool isItalic = false;
+
+    inline void setFont(QFont const& font)
+    {
+        name = font.family();
+        size = font.pointSize();
+        isBold = font.bold();
+        isItalic = font.italic();
+    }
+
+    inline QFont font() const
+    {
+        QFont font(name);
+        font.setPointSize(size);
+        font.setBold(isBold);
+        font.setItalic(isItalic);
+        return font;
+    }
+    inline QString caption() const { return QString("%1,%2").arg(name).arg(size); }
 
     void save(QSettings & settings, QString const& type);
     void load(QSettings & settings, QString const& type);
@@ -127,6 +146,8 @@ public:
     inline OperationOption const& operationOption() const { return operationOption_; }
 private:
     OptionsManager();
+    OptionsManager(OptionsManager const&);
+    void operator =(OptionsManager const&);
     LayoutOption layoutOption_;
     DisplayOption displayOption_;
     IconsOption  iconOption_;
