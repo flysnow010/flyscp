@@ -40,7 +40,7 @@
      <item>
       <widget class="QStackedWidget" name="stackedWidget">
        <property name="currentIndex">
-        <number>6</number>
+        <number>2</number>
        </property>
        <widget class="QWidget" name="layoutPage">
         <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -95,7 +95,7 @@
              <number>11</number>
             </property>
             <item row="2" column="0">
-             <widget class="QGroupBox" name="groupBox_2">
+             <widget class="QGroupBox" name="gbShowCurrentDir">
               <property name="title">
                <string>Show current directory</string>
               </property>
@@ -110,21 +110,21 @@
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_3">
                <item>
-                <widget class="QCheckBox" name="checkBox_8">
+                <widget class="QCheckBox" name="cbShowDeskNavigationButton">
                  <property name="text">
-                  <string>Show desk items button</string>
+                  <string>Show desk navigation button</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QCheckBox" name="checkBox_9">
+                <widget class="QCheckBox" name="cbShowFavoriteButton">
                  <property name="text">
                   <string>Show favorite button</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QCheckBox" name="checkBox_3">
+                <widget class="QCheckBox" name="cbShowHistoryButton">
                  <property name="text">
                   <string>Shhow history button</string>
                  </property>
@@ -134,42 +134,42 @@
              </widget>
             </item>
             <item row="5" column="0" colspan="2">
-             <widget class="QCheckBox" name="checkBox_2">
+             <widget class="QCheckBox" name="cbShowStatusBar">
               <property name="text">
                <string>Show status bar</string>
               </property>
              </widget>
             </item>
             <item row="0" column="0" colspan="2">
-             <widget class="QCheckBox" name="checkBox_5">
+             <widget class="QCheckBox" name="cbShowToolBar">
               <property name="text">
                <string>Show tool bar</string>
               </property>
              </widget>
             </item>
             <item row="6" column="0" colspan="3">
-             <widget class="QCheckBox" name="checkBox">
+             <widget class="QCheckBox" name="cbShowFunctionKeyButtons">
               <property name="text">
                <string>Show function key buttons</string>
               </property>
              </widget>
             </item>
             <item row="3" column="0" colspan="2">
-             <widget class="QCheckBox" name="checkBox_6">
+             <widget class="QCheckBox" name="cbShowSortHeader">
               <property name="text">
                <string>Show sort header</string>
               </property>
              </widget>
             </item>
             <item row="1" column="0" colspan="2">
-             <widget class="QCheckBox" name="checkBox_4">
+             <widget class="QCheckBox" name="cbShowDriveButtons">
               <property name="text">
                <string>Show drive buttons</string>
               </property>
              </widget>
             </item>
             <item row="4" column="0" colspan="2">
-             <widget class="QCheckBox" name="checkBox_7">
+             <widget class="QCheckBox" name="cbShowCommandLine">
               <property name="text">
                <string>Show command line</string>
               </property>
@@ -185,7 +185,7 @@
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_3">
             <item>
-             <widget class="QRadioButton" name="radioButton">
+             <widget class="QRadioButton" name="rbVista">
               <property name="text">
                <string>WindowsVista</string>
               </property>
@@ -195,14 +195,14 @@
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="radioButton_2">
+             <widget class="QRadioButton" name="rbWindow">
               <property name="text">
                <string>Windows</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="radioButton_3">
+             <widget class="QRadioButton" name="rbFusion">
               <property name="text">
                <string>Fusion</string>
               </property>
@@ -283,16 +283,16 @@
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_5">
             <item>
-             <widget class="QCheckBox" name="checkBox_10">
+             <widget class="QCheckBox" name="cbShowHideAndSystemFile">
               <property name="text">
                <string>Show hidden/system files</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QCheckBox" name="checkBox_11">
+             <widget class="QCheckBox" name="cbShowParentDirInRootDrive">
               <property name="text">
-               <string>Show parent dir also in root driver</string>
+               <string>Show parent dir also in root drive</string>
               </property>
              </widget>
             </item>
@@ -306,16 +306,19 @@
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_4">
             <item>
-             <widget class="QRadioButton" name="radioButton_4">
+             <widget class="QRadioButton" name="rbDirSortByName">
               <property name="text">
                <string>Always by name</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="radioButton_5">
+             <widget class="QRadioButton" name="rbDirSortByTime">
               <property name="text">
                <string>Like files(also by time)</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -342,23 +345,23 @@
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_4">
             <item>
-             <widget class="QCheckBox" name="checkBox_12">
+             <widget class="QCheckBox" name="cbShowToolbarTooltips">
               <property name="text">
                <string>Show help texts for buttons(tooltips)</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QCheckBox" name="checkBox_13">
+             <widget class="QCheckBox" name="cbShowDriveTooltips">
               <property name="text">
                <string>Show volume labels/network paths for drives</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QCheckBox" name="checkBox_14">
+             <widget class="QCheckBox" name="cbShowFilenameTooltips">
               <property name="text">
-               <string>Showfilename in file list as tooltips if truncated</string>
+               <string>Show filename in file list as tooltips if truncated</string>
               </property>
              </widget>
             </item>
@@ -424,63 +427,63 @@
            </property>
            <layout class="QGridLayout" name="gridLayout_2">
             <item row="0" column="0" colspan="2">
-             <widget class="QRadioButton" name="radioButton_6">
+             <widget class="QRadioButton" name="rbShowAllIconIncludeExeAndLink">
               <property name="text">
                <string>All associated + EXE/LINK(slow))</string>
               </property>
              </widget>
             </item>
             <item row="1" column="0">
-             <widget class="QRadioButton" name="radioButton_7">
+             <widget class="QRadioButton" name="rbShowAllIcon">
               <property name="text">
                <string>All</string>
               </property>
              </widget>
             </item>
             <item row="1" column="1">
-             <widget class="QCheckBox" name="checkBox_18">
+             <widget class="QCheckBox" name="cbShowExeLinkNotOnUDisk">
               <property name="text">
-               <string>CheckBox</string>
+               <string>EXE/LINK not on u-disk</string>
               </property>
              </widget>
             </item>
             <item row="2" column="1">
-             <widget class="QCheckBox" name="checkBox_19">
+             <widget class="QCheckBox" name="cbShowExeLinkNotOnNet">
               <property name="text">
-               <string>CheckBox</string>
+               <string>EXE/LINK not on net</string>
               </property>
              </widget>
             </item>
             <item row="4" column="0" colspan="2">
-             <widget class="QRadioButton" name="radioButton_9">
+             <widget class="QRadioButton" name="rbNoShowIcon">
               <property name="text">
                <string>No icons</string>
               </property>
              </widget>
             </item>
             <item row="5" column="0" colspan="2">
-             <widget class="QCheckBox" name="checkBox_15">
+             <widget class="QCheckBox" name="cbShowIconForFilesystem">
               <property name="text">
                <string>Show icons for special folders:Normal file system</string>
               </property>
              </widget>
             </item>
             <item row="6" column="0" colspan="2">
-             <widget class="QCheckBox" name="checkBox_16">
+             <widget class="QCheckBox" name="cbShowIconForVirtualFolder">
               <property name="text">
                <string>Show icons for special folders:Virtual folders(e.g. Network)</string>
               </property>
              </widget>
             </item>
             <item row="7" column="0" colspan="2">
-             <widget class="QCheckBox" name="checkBox_17">
+             <widget class="QCheckBox" name="cbShowOverlayIcon">
               <property name="text">
                <string>Show overlay icons.e.g. for links</string>
               </property>
              </widget>
             </item>
             <item row="2" column="0">
-             <widget class="QRadioButton" name="radioButton_8">
+             <widget class="QRadioButton" name="rbShowStandardIcon">
               <property name="text">
                <string>Only standard icons</string>
               </property>
@@ -498,18 +501,7 @@
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_7">
               <item>
-               <widget class="QComboBox" name="cbbFileIconSize">
-                <item>
-                 <property name="text">
-                  <string>16x16</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>32x32</string>
-                 </property>
-                </item>
-               </widget>
+               <widget class="QComboBox" name="cbbFileIconSize"/>
               </item>
               <item>
                <spacer name="verticalSpacer_3">
@@ -595,28 +587,8 @@
                 <item>
                  <widget class="QComboBox" name="cbbToolBarIconSize">
                   <property name="currentIndex">
-                   <number>1</number>
+                   <number>-1</number>
                   </property>
-                  <item>
-                   <property name="text">
-                    <string>16x16</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>20x20</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>24x24</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>32x32</string>
-                   </property>
-                  </item>
                  </widget>
                 </item>
                 <item>
@@ -744,7 +716,7 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_7">
               <item>
-               <widget class="QLabel" name="label_3">
+               <widget class="QLabel" name="labelFileListFont">
                 <property name="text">
                  <string>Agency FB,9</string>
                 </property>
@@ -764,7 +736,7 @@
                </spacer>
               </item>
               <item>
-               <widget class="QPushButton" name="pushButton_3">
+               <widget class="QPushButton" name="btnFileList">
                 <property name="text">
                  <string>Change font</string>
                 </property>
@@ -791,7 +763,7 @@ abcdefghijklmnopqrstuvwxyz</string>
           </widget>
          </item>
          <item>
-          <widget class="QGroupBox" name="groupBox_11">
+          <widget class="QGroupBox" name="labeMainWindow">
            <property name="title">
             <string>Main window font</string>
            </property>
@@ -819,7 +791,7 @@ abcdefghijklmnopqrstuvwxyz</string>
                </spacer>
               </item>
               <item>
-               <widget class="QPushButton" name="pushButton_4">
+               <widget class="QPushButton" name="btnMainWindow">
                 <property name="text">
                  <string>Change font</string>
                 </property>
@@ -846,7 +818,7 @@ abcdefghijklmnopqrstuvwxyz</string>
           </widget>
          </item>
          <item>
-          <widget class="QGroupBox" name="groupBox_12">
+          <widget class="QGroupBox" name="labeDialog">
            <property name="title">
             <string>Dialog font</string>
            </property>
@@ -874,7 +846,7 @@ abcdefghijklmnopqrstuvwxyz</string>
                </spacer>
               </item>
               <item>
-               <widget class="QPushButton" name="pushButton_5">
+               <widget class="QPushButton" name="btnDialog">
                 <property name="text">
                  <string>Change font</string>
                 </property>
@@ -978,7 +950,7 @@ abcdefghijklmnopqrstuvwxyz</string>
                <number>2</number>
               </property>
               <item>
-               <widget class="QComboBox" name="comboBox_10"/>
+               <widget class="QComboBox" name="cbbFontColor"/>
               </item>
               <item>
                <widget class="QToolButton" name="toolButton_7">
@@ -1035,7 +1007,7 @@ p, li { white-space: pre-wrap; }
             <item row="2" column="0" colspan="2">
              <widget class="QLabel" name="label_10">
               <property name="text">
-               <string>Background:</string>
+               <string>Background1:</string>
               </property>
              </widget>
             </item>
@@ -1045,7 +1017,7 @@ p, li { white-space: pre-wrap; }
                <number>2</number>
               </property>
               <item>
-               <widget class="QComboBox" name="comboBox_4"/>
+               <widget class="QComboBox" name="cbbBackgroud1"/>
               </item>
               <item>
                <widget class="QToolButton" name="toolButton_2">
@@ -1069,7 +1041,7 @@ p, li { white-space: pre-wrap; }
                <number>2</number>
               </property>
               <item>
-               <widget class="QComboBox" name="comboBox_7"/>
+               <widget class="QComboBox" name="cbbBackgroud2"/>
               </item>
               <item>
                <widget class="QToolButton" name="toolButton_4">
@@ -1093,7 +1065,7 @@ p, li { white-space: pre-wrap; }
                <number>2</number>
               </property>
               <item>
-               <widget class="QComboBox" name="comboBox_8"/>
+               <widget class="QComboBox" name="cbbMarkColor"/>
               </item>
               <item>
                <widget class="QToolButton" name="toolButton_5">
@@ -1117,7 +1089,7 @@ p, li { white-space: pre-wrap; }
                <number>2</number>
               </property>
               <item>
-               <widget class="QComboBox" name="comboBox_9"/>
+               <widget class="QComboBox" name="cbbCursorColor"/>
               </item>
               <item>
                <widget class="QToolButton" name="toolButton_6">
@@ -1304,21 +1276,21 @@ p, li { white-space: pre-wrap; }
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_17">
             <item>
-             <widget class="QCheckBox" name="checkBox_20">
+             <widget class="QCheckBox" name="cbOnlyOneMainProgramRun">
               <property name="text">
                <string>Allow only 1 copy of FlyScp at a time</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QCheckBox" name="checkBox_21">
+             <widget class="QCheckBox" name="cbGoToRootWhenChangeDrive">
               <property name="text">
-               <string>Always go to the root of a driver when changing dirvers</string>
+               <string>Always go to the root of a driver when changing dirves</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QCheckBox" name="checkBox_22">
+             <widget class="QCheckBox" name="cbSelectFileNameWhenRenaming">
               <property name="text">
                <string>Select only the file name when renaming (not the extension)</string>
               </property>
@@ -1334,14 +1306,14 @@ p, li { white-space: pre-wrap; }
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_20">
             <item>
-             <widget class="QRadioButton" name="radioButton_23">
+             <widget class="QRadioButton" name="rbRightButtonSelect">
               <property name="text">
                <string>Use right mouse button - context menu after 1 second</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="radioButton_24">
+             <widget class="QRadioButton" name="rbLeftButtonSelect">
               <property name="text">
                <string>Left mouse button(Windows standard)</string>
               </property>
@@ -1385,14 +1357,14 @@ p, li { white-space: pre-wrap; }
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="btnOK">
        <property name="text">
         <string>OK</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_2">
+      <widget class="QPushButton" name="btnCancel">
        <property name="text">
         <string>Cancel</string>
        </property>
@@ -1414,7 +1386,7 @@ p, li { white-space: pre-wrap; }
  </resources>
  <connections>
   <connection>
-   <sender>pushButton</sender>
+   <sender>btnOK</sender>
    <signal>clicked()</signal>
    <receiver>OptionsDialog</receiver>
    <slot>accept()</slot>
@@ -1430,7 +1402,7 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>pushButton_2</sender>
+   <sender>btnCancel</sender>
    <signal>clicked()</signal>
    <receiver>OptionsDialog</receiver>
    <slot>reject()</slot>
