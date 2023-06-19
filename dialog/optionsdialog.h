@@ -1,5 +1,6 @@
 #ifndef OPTIONSDIALOG_H
 #define OPTIONSDIALOG_H
+#include "core/optionsmanager.h"
 
 #include <QDialog>
 
@@ -18,40 +19,41 @@ public:
     void updateUIToOption();
 
 signals:
-    void layoutOptionChanged();
-    void displayOptionChanged();
-    void iconsOptionChanged();
-    void fontOptionChanged();
-    void colorOptionChanged();
-    void langOptionChanged();
-    void operationOptionChanged();
-
+    void layoutOptionChanged(LayoutOption const&);
+    void displayOptionChanged(DisplayOption const&);
+    void iconsOptionChanged(IconsOption const&);
+    void fontOptionChanged(FontOption const&);
+    void colorOptionChanged(ColorOption const&);
+    void langOptionChanged(LanguageOption const&);
+    void operationOptionChanged(OperationOption const&);
+private slots:
+    void setFileIconSize(int index);
+    void setToolBarIconSize(int index);
 private:
     void createConnects();
     void setStyleForLabel(QLabel* label);
     void updateOptionToUI();
 
     void updateLayoutOptionToUI();
-    void updateUIToLayoutOption();
+    LayoutOption updateUIToLayoutOption();
 
     void updateDisplayOptionToUI();
-    void updateUIToDisplayOption();
+    DisplayOption updateUIToDisplayOption();
 
     void updateIconsOptionToUI();
-    void updateUIToIconsOption();
+    IconsOption updateUIToIconsOption();
 
     void updateFontOptionToUI();
-    void updateUIToFontOption();
+    FontOption updateUIToFontOption();
 
     void updateColorOptionToUI();
-    void updateUIToColorOption();
+    ColorOption updateUIToColorOption();
 
     void updateLanguageOptionToUI();
-    void updateUIToLanguageOption();
+    LanguageOption updateUIToLanguageOption();
 
     void updateOperationOptionToUI();
-    void updateUIToOperationOption();
-
+    OperationOption updateUIToOperationOption();
 private:
     Ui::OptionsDialog *ui;
 };

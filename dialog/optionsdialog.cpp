@@ -1,9 +1,10 @@
 #include "optionsdialog.h"
 #include "util/utils.h"
-#include "core/optionsmanager.h"
+
 #include "ui_optionsdialog.h"
 #include <QPixmap>
 #include <QIcon>
+#include <QFontDialog>
 
 int const LayoutPage    = 0;
 int const DisplayPage   = 1;
@@ -19,6 +20,13 @@ OptionsDialog::OptionsDialog(QWidget *parent) :
 {
     ui->setupUi(this);
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+    qRegisterMetaType<LayoutOption>("LayoutOption");
+    qRegisterMetaType<DisplayOption>("DisplayOption");
+    qRegisterMetaType<IconsOption>("IconsOption");
+    qRegisterMetaType<FontOption>("FontOption");
+    qRegisterMetaType<ColorOption>("ColorOption");
+    qRegisterMetaType<LanguageOption>("LanguageOption");
+    qRegisterMetaType<OperationOption>("OperationOption");
     ui->treeWidget->clear();
 
     QTreeWidgetItem* layout = new QTreeWidgetItem(QStringList() << "Layout");
@@ -57,7 +65,6 @@ OptionsDialog::OptionsDialog(QWidget *parent) :
     setStyleForLabel(ui->labelOperation);
 
     updateOptionToUI();
-
     createConnects();
 }
 
@@ -85,34 +92,69 @@ void OptionsDialog::createConnects()
     });
     connect(ui->btnApply, &QPushButton::clicked, this, [=](){
         if(ui->stackedWidget->currentIndex() == LayoutPage) {
-            updateUIToLayoutOption();
-            emit layoutOptionChanged();
+            emit layoutOptionChanged(updateUIToLayoutOption());
         }
         else if(ui->stackedWidget->currentIndex() == DisplayPage) {
-            updateUIToDisplayOption();
-            emit displayOptionChanged();
+            emit displayOptionChanged(updateUIToDisplayOption());
         }
         else if(ui->stackedWidget->currentIndex() == IconsPage) {
-            updateUIToIconsOption();
-            emit iconsOptionChanged();
+            emit iconsOptionChanged(updateUIToIconsOption());
         }
         else if(ui->stackedWidget->currentIndex() == FontPage) {
-            updateUIToFontOption();
-            emit fontOptionChanged();
+            emit fontOptionChanged(updateUIToFontOption());
         }
         else if(ui->stackedWidget->currentIndex() == ColorPage) {
-            updateUIToColorOption();
-            emit colorOptionChanged();
+            emit colorOptionChanged(updateUIToColorOption());
         }
         else if(ui->stackedWidget->currentIndex() == LangPage) {
-            updateUIToLanguageOption();
-            emit langOptionChanged();
+            emit langOptionChanged(updateUIToLanguageOption());
         }
         else if(ui->stackedWidget->currentIndex() == OperationPage) {
-            updateUIToOperationOption();
-            emit langOptionChanged();
+            emit operationOptionChanged(updateUIToOperationOption());
         }
     });
+
+    connect(ui->cbbFileIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(setFileIconSize(int)));
+    connect(ui->cbbToolBarIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(setToolBarIconSize(int)));
+    connect(ui->btnFileList, &QPushButton::clicked, this, [=](){
+        bool ok;
+        QFont font = QFontDialog::getFont(&ok, ui->labelFileListText->font(), this);
+        if (ok)
+        {
+            ui->labelFileListText->setFont(font);
+            ui->labelFileListFont->setText(QString("%1,%2").arg(font.family()).arg(font.pointSize()));
+        }
+    });
+    connect(ui->btnMainWindow, &QPushButton::clicked, this, [=](){
+        bool ok;
+        QFont font = QFontDialog::getFont(&ok, ui->labelMainWindowText->font(), this);
+        if (ok)
+        {
+            ui->labelMainWindowText->setFont(font);
+            ui->labelMainWindowFont->setText(QString("%1,%2").arg(font.family()).arg(font.pointSize()));
+        }
+    });
+    connect(ui->btnDialog, &QPushButton::clicked, this, [=](){
+        bool ok;
+        QFont font = QFontDialog::getFont(&ok, ui->labelDialogText->font(), this);
+        if (ok)
+        {
+            ui->labelDialogText->setFont(font);
+            ui->labelDialogFont->setText(QString("%1,%2").arg(font.family()).arg(font.pointSize()));
+        }
+    });
+}
+
+void OptionsDialog::setFileIconSize(int index)
+{
+    int size = ui->cbbFileIconSize->itemData(index).toInt();
+    ui->labelFileIcon->setPixmap(Utils::dirIcon().pixmap(QSize(size, size)));
+}
+
+void OptionsDialog::setToolBarIconSize(int index)
+{
+    int size = ui->cbbToolBarIconSize->itemData(index).toInt();
+    ui->labelToolBarIcon->setPixmap(QIcon(":/image/control.png").pixmap(QSize(size, size)));
 }
 
 void OptionsDialog::updateOptionToUI()
@@ -120,7 +162,7 @@ void OptionsDialog::updateOptionToUI()
     updateLayoutOptionToUI();
     updateDisplayOptionToUI();
     updateIconsOptionToUI();
-    updateUIToFontOption();
+    updateFontOptionToUI();
     updateColorOptionToUI();
     updateLanguageOptionToUI();
     updateOperationOptionToUI();
@@ -128,13 +170,13 @@ void OptionsDialog::updateOptionToUI()
 
 void OptionsDialog::updateUIToOption()
 {
-    updateUIToLayoutOption();
-    updateUIToDisplayOption();
-    updateUIToIconsOption();
-    updateUIToFontOption();
-    updateUIToColorOption();
-    updateUIToLanguageOption();
-    updateUIToOperationOption();
+    emit layoutOptionChanged(updateUIToLayoutOption());
+    emit displayOptionChanged(updateUIToDisplayOption());
+    emit iconsOptionChanged(updateUIToIconsOption());
+    emit fontOptionChanged(updateUIToFontOption());
+    emit colorOptionChanged(updateUIToColorOption());
+    emit langOptionChanged(updateUIToLanguageOption());
+    emit operationOptionChanged(updateUIToOperationOption());
 }
 
 void OptionsDialog::updateLayoutOptionToUI()
@@ -159,7 +201,7 @@ void OptionsDialog::updateLayoutOptionToUI()
         ui->rbFusion->setChecked(true);
 }
 
-void OptionsDialog::updateUIToLayoutOption()
+LayoutOption OptionsDialog::updateUIToLayoutOption()
 {
     LayoutOption option;
 
@@ -179,7 +221,7 @@ void OptionsDialog::updateUIToLayoutOption()
     else if(ui->rbFusion->isChecked())
         option.showStyle = "Fusion";
 
-    theOptionManager.setLayoutOption(option);
+    return option;
 }
 
 void OptionsDialog::updateDisplayOptionToUI()
@@ -194,7 +236,7 @@ void OptionsDialog::updateDisplayOptionToUI()
     ui->cbShowFilenameTooltips->setChecked(option.isShowFilenameTooltips);
 }
 
-void OptionsDialog::updateUIToDisplayOption()
+DisplayOption OptionsDialog::updateUIToDisplayOption()
 {
     DisplayOption option;
 
@@ -205,7 +247,7 @@ void OptionsDialog::updateUIToDisplayOption()
     option.isShowDriveTooltips = ui->cbShowDriveTooltips->isChecked();
     option.isShowFilenameTooltips = ui->cbShowFilenameTooltips->isChecked();
 
-    theOptionManager.setDialayOption(option);
+    return option;
 }
 
 void OptionsDialog::updateIconsOptionToUI()
@@ -222,20 +264,22 @@ void OptionsDialog::updateIconsOptionToUI()
     ui->cbShowIconForVirtualFolder->setChecked(option.isShowIconForVirtualFolder);
     ui->cbShowOverlayIcon->setChecked(option.isShowOverlayIcon);
 
-    ui->cbbFileIconSize->clear();
-    ui->cbbFileIconSize->addItem("16x16", 16);
-    ui->cbbFileIconSize->addItem("32x32", 32);
+    QList<int> fileIconSize({16, 24, 32}) ;
+    int fileIconSizeIndex = fileIconSize.indexOf(option.fileIconSize);
+    foreach(auto size, fileIconSize)
+         ui->cbbFileIconSize->addItem(QString("%1x%1").arg(size), size);
+    ui->cbbFileIconSize->setCurrentIndex(fileIconSizeIndex);
+    setFileIconSize(fileIconSizeIndex);
 
-    ui->cbbToolBarIconSize->clear();
-    ui->cbbToolBarIconSize->addItem("16x16", 16);
-    ui->cbbToolBarIconSize->addItem("20x20", 20);
-    ui->cbbToolBarIconSize->addItem("24x24", 24);
-    ui->cbbToolBarIconSize->addItem("32x32", 32);
-    ui->labelFileIcon->setPixmap(Utils::dirIcon().pixmap(QSize(32, 32)));
-    ui->labelToolBarIcon->setPixmap(QIcon(":/image/control.png").pixmap(QSize(32, 32)));
+    QList<int> toolBarIconSize({16, 20, 24, 32});
+    int toolbarIconSizeIndex = toolBarIconSize.indexOf(option.toolbarIconSize);
+    foreach(auto size, toolBarIconSize)
+         ui->cbbToolBarIconSize->addItem(QString("%1x%1").arg(size), size);
+    ui->cbbToolBarIconSize->setCurrentIndex(toolbarIconSizeIndex);
+    setToolBarIconSize(toolbarIconSizeIndex);
 }
 
-void OptionsDialog::updateUIToIconsOption()
+IconsOption OptionsDialog::updateUIToIconsOption()
 {
     IconsOption option;
 
@@ -252,18 +296,28 @@ void OptionsDialog::updateUIToIconsOption()
     option.fileIconSize = ui->cbbFileIconSize->currentData().toInt();
     option.toolbarIconSize = ui->cbbToolBarIconSize->currentData().toInt();
 
-    theOptionManager.setIconsOption(option);
+    return option;
 }
 
 void OptionsDialog::updateFontOptionToUI()
 {
     FontOption const& option = theOptionManager.fontOption();
+
+    ui->labelFileListFont->setText(option.fileList.caption());
+    ui->labelMainWindowFont->setText(option.mainWindow.caption());
+    ui->labelDialogFont->setText(option.dialog.caption());
+    ui->labelFileListText->setFont(option.fileList.font());
+    ui->labelMainWindowText->setFont(option.mainWindow.font());
+    ui->labelDialogText->setFont(option.dialog.font());
 }
 
-void OptionsDialog::updateUIToFontOption()
+FontOption OptionsDialog::updateUIToFontOption()
 {
     FontOption option;
-    theOptionManager.setFontOption(option);
+    option.fileList.setFont(ui->labelFileListText->font());
+    option.mainWindow.setFont(ui->labelMainWindowText->font());
+    option.dialog.setFont(ui->labelDialogText->font());
+    return option;
 }
 
 void OptionsDialog::updateColorOptionToUI()
@@ -271,10 +325,10 @@ void OptionsDialog::updateColorOptionToUI()
     ColorOption const& option = theOptionManager.colorOption();
 }
 
-void OptionsDialog::updateUIToColorOption()
+ColorOption OptionsDialog::updateUIToColorOption()
 {
     ColorOption option;
-    theOptionManager.setColorOption(option);
+    return option;
 }
 
 void OptionsDialog::updateLanguageOptionToUI()
@@ -282,10 +336,10 @@ void OptionsDialog::updateLanguageOptionToUI()
     LanguageOption const& option = theOptionManager.languageOption();
 }
 
-void OptionsDialog::updateUIToLanguageOption()
+LanguageOption OptionsDialog::updateUIToLanguageOption()
 {
     LanguageOption option;
-    theOptionManager.setLanguageOption(option);
+    return option;
 }
 
 void OptionsDialog::updateOperationOptionToUI()
@@ -299,7 +353,7 @@ void OptionsDialog::updateOperationOptionToUI()
     ui->rbRightButtonSelect->setChecked(!option.isLeftButtonSelect);
 }
 
-void OptionsDialog::updateUIToOperationOption()
+OperationOption OptionsDialog::updateUIToOperationOption()
 {
     OperationOption option;
 
@@ -307,6 +361,5 @@ void OptionsDialog::updateUIToOperationOption()
     option.isGoToRootWhenChangeDrive = ui->cbGoToRootWhenChangeDrive->isChecked();
     option.isSelectFileNameWhenRenaming = ui->cbSelectFileNameWhenRenaming->isChecked();
     option.isLeftButtonSelect = ui->rbLeftButtonSelect->isChecked();
-    theOptionManager.setOperationOption(option);
+    return option;
 }
-

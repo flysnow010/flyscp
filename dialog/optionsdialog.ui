@@ -40,7 +40,7 @@
      <item>
       <widget class="QStackedWidget" name="stackedWidget">
        <property name="currentIndex">
-        <number>2</number>
+        <number>4</number>
        </property>
        <widget class="QWidget" name="layoutPage">
         <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -738,7 +738,7 @@
               <item>
                <widget class="QPushButton" name="btnFileList">
                 <property name="text">
-                 <string>Change font</string>
+                 <string> Change font </string>
                 </property>
                </widget>
               </item>
@@ -752,7 +752,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="label_4">
+             <widget class="QLabel" name="labelFileListText">
               <property name="text">
                <string>ABCDEFGHIJKLMNOPQRSTUVWXYZ
 abcdefghijklmnopqrstuvwxyz</string>
@@ -771,7 +771,7 @@ abcdefghijklmnopqrstuvwxyz</string>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_8">
               <item>
-               <widget class="QLabel" name="label_6">
+               <widget class="QLabel" name="labelMainWindowFont">
                 <property name="text">
                  <string>Agency FB,9</string>
                 </property>
@@ -793,7 +793,7 @@ abcdefghijklmnopqrstuvwxyz</string>
               <item>
                <widget class="QPushButton" name="btnMainWindow">
                 <property name="text">
-                 <string>Change font</string>
+                 <string> Change font </string>
                 </property>
                </widget>
               </item>
@@ -807,7 +807,7 @@ abcdefghijklmnopqrstuvwxyz</string>
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="label_5">
+             <widget class="QLabel" name="labelMainWindowText">
               <property name="text">
                <string>ABCDEFGHIJKLMNOPQRSTUVWXYZ
 abcdefghijklmnopqrstuvwxyz</string>
@@ -826,7 +826,7 @@ abcdefghijklmnopqrstuvwxyz</string>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_9">
               <item>
-               <widget class="QLabel" name="label_8">
+               <widget class="QLabel" name="labelDialogFont">
                 <property name="text">
                  <string>Agency FB,9</string>
                 </property>
@@ -848,7 +848,7 @@ abcdefghijklmnopqrstuvwxyz</string>
               <item>
                <widget class="QPushButton" name="btnDialog">
                 <property name="text">
-                 <string>Change font</string>
+                 <string> Change font </string>
                 </property>
                </widget>
               </item>
@@ -862,7 +862,7 @@ abcdefghijklmnopqrstuvwxyz</string>
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="label_7">
+             <widget class="QLabel" name="labelDialogText">
               <property name="text">
                <string>ABCDEFGHIJKLMNOPQRSTUVWXYZ
 abcdefghijklmnopqrstuvwxyz</string>
@@ -930,6 +930,73 @@ abcdefghijklmnopqrstuvwxyz</string>
             <string>Color</string>
            </property>
            <layout class="QGridLayout" name="gridLayout_3">
+            <item row="2" column="0" colspan="2">
+             <widget class="QLabel" name="label_10">
+              <property name="text">
+               <string>Background1:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="0" colspan="2">
+             <widget class="QLabel" name="label_11">
+              <property name="text">
+               <string>Mark color:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="2">
+             <layout class="QHBoxLayout" name="horizontalLayout_14">
+              <property name="spacing">
+               <number>2</number>
+              </property>
+              <item>
+               <widget class="QToolButton" name="toolButton_6">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>25</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>     Mark     </string>
+                </property>
+                <property name="popupMode">
+                 <enum>QToolButton::MenuButtonPopup</enum>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="3" column="2">
+             <layout class="QHBoxLayout" name="horizontalLayout_13">
+              <property name="spacing">
+               <number>2</number>
+              </property>
+              <item>
+               <widget class="QToolButton" name="toolButton_8">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>25</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>     Text     </string>
+                </property>
+                <property name="popupMode">
+                 <enum>QToolButton::MenuButtonPopup</enum>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="3" column="0" colspan="2">
+             <widget class="QLabel" name="label_15">
+              <property name="text">
+               <string>Background2:</string>
+              </property>
+             </widget>
+            </item>
             <item row="0" column="3">
              <widget class="QLabel" name="label_13">
               <property name="text">
@@ -937,25 +1004,31 @@ abcdefghijklmnopqrstuvwxyz</string>
               </property>
              </widget>
             </item>
-            <item row="1" column="0" colspan="2">
-             <widget class="QLabel" name="label_9">
+            <item row="5" column="0" colspan="2">
+             <widget class="QLabel" name="label_14">
               <property name="text">
-               <string>Font color:</string>
+               <string>Cursor color:</string>
               </property>
              </widget>
             </item>
-            <item row="1" column="2">
-             <layout class="QHBoxLayout" name="horizontalLayout_16">
+            <item row="2" column="2">
+             <layout class="QHBoxLayout" name="horizontalLayout_12">
               <property name="spacing">
                <number>2</number>
               </property>
               <item>
-               <widget class="QComboBox" name="cbbFontColor"/>
-              </item>
-              <item>
-               <widget class="QToolButton" name="toolButton_7">
+               <widget class="QToolButton" name="toolButton_9">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>25</height>
+                 </size>
+                </property>
                 <property name="text">
-                 <string>&gt;&gt;</string>
+                 <string>     Text     </string>
+                </property>
+                <property name="popupMode">
+                 <enum>QToolButton::MenuButtonPopup</enum>
                 </property>
                </widget>
               </item>
@@ -1004,142 +1077,56 @@ p, li { white-space: pre-wrap; }
               </layout>
              </widget>
             </item>
-            <item row="2" column="0" colspan="2">
-             <widget class="QLabel" name="label_10">
-              <property name="text">
-               <string>Background1:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="2">
-             <layout class="QHBoxLayout" name="horizontalLayout_12">
-              <property name="spacing">
-               <number>2</number>
-              </property>
-              <item>
-               <widget class="QComboBox" name="cbbBackgroud1"/>
-              </item>
-              <item>
-               <widget class="QToolButton" name="toolButton_2">
-                <property name="text">
-                 <string>&gt;&gt;</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item row="3" column="0" colspan="2">
-             <widget class="QLabel" name="label_15">
-              <property name="text">
-               <string>Background2:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="2">
-             <layout class="QHBoxLayout" name="horizontalLayout_13">
-              <property name="spacing">
-               <number>2</number>
-              </property>
-              <item>
-               <widget class="QComboBox" name="cbbBackgroud2"/>
-              </item>
-              <item>
-               <widget class="QToolButton" name="toolButton_4">
-                <property name="text">
-                 <string>&gt;&gt;</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item row="4" column="0" colspan="2">
-             <widget class="QLabel" name="label_11">
-              <property name="text">
-               <string>Mark color:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="2">
-             <layout class="QHBoxLayout" name="horizontalLayout_14">
-              <property name="spacing">
-               <number>2</number>
-              </property>
-              <item>
-               <widget class="QComboBox" name="cbbMarkColor"/>
-              </item>
-              <item>
-               <widget class="QToolButton" name="toolButton_5">
-                <property name="text">
-                 <string>&gt;&gt;</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item row="5" column="0" colspan="2">
-             <widget class="QLabel" name="label_14">
-              <property name="text">
-               <string>Cursor color:</string>
-              </property>
-             </widget>
-            </item>
             <item row="5" column="2">
              <layout class="QHBoxLayout" name="horizontalLayout_15">
               <property name="spacing">
                <number>2</number>
               </property>
               <item>
-               <widget class="QComboBox" name="cbbCursorColor"/>
-              </item>
-              <item>
-               <widget class="QToolButton" name="toolButton_6">
+               <widget class="QToolButton" name="toolButton_3">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>25</height>
+                 </size>
+                </property>
                 <property name="text">
-                 <string>&gt;&gt;</string>
+                 <string>    Cursor    </string>
+                </property>
+                <property name="popupMode">
+                 <enum>QToolButton::MenuButtonPopup</enum>
                 </property>
                </widget>
               </item>
              </layout>
             </item>
-            <item row="6" column="0">
-             <widget class="QLabel" name="label_12">
+            <item row="1" column="0" colspan="2">
+             <widget class="QLabel" name="label_9">
               <property name="text">
-               <string>Others</string>
+               <string>Font color:</string>
               </property>
              </widget>
             </item>
-            <item row="6" column="1" colspan="2">
-             <widget class="QComboBox" name="comboBox_6"/>
-            </item>
-            <item row="6" column="3">
-             <layout class="QHBoxLayout" name="horizontalLayout_10">
+            <item row="1" column="2">
+             <layout class="QHBoxLayout" name="horizontalLayout_16" stretch="0">
               <property name="spacing">
                <number>2</number>
               </property>
-              <property name="rightMargin">
-               <number>0</number>
-              </property>
               <item>
-               <widget class="QComboBox" name="comboBox_5"/>
-              </item>
-              <item>
-               <widget class="QToolButton" name="toolButton_3">
-                <property name="text">
-                 <string>&gt;&gt;</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer_9">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
+               <widget class="QToolButton" name="toolButton_10">
+                <property name="minimumSize">
                  <size>
-                  <width>40</width>
-                  <height>20</height>
+                  <width>0</width>
+                  <height>25</height>
                  </size>
                 </property>
-               </spacer>
+                <property name="text">
+                 <string>     Text     </string>
+                </property>
+                <property name="popupMode">
+                 <enum>QToolButton::MenuButtonPopup</enum>
+                </property>
+               </widget>
               </item>
              </layout>
             </item>
