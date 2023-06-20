@@ -5,6 +5,8 @@
 #include <QPixmap>
 #include <QIcon>
 #include <QFontDialog>
+#include <QPainter>
+#include <QMenu>
 
 int const LayoutPage    = 0;
 int const DisplayPage   = 1;
@@ -14,12 +16,13 @@ int const ColorPage     = 4;
 int const LangPage      = 5;
 int const OperationPage = 6;
 
-OptionsDialog::OptionsDialog(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::OptionsDialog)
+OptionsDialog::OptionsDialog(QWidget *parent)
+    : QDialog(parent)
+    , ui(new Ui::OptionsDialog)
 {
     ui->setupUi(this);
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+    colorSize = ui->tbFontColor->iconSize();
     qRegisterMetaType<LayoutOption>("LayoutOption");
     qRegisterMetaType<DisplayOption>("DisplayOption");
     qRegisterMetaType<IconsOption>("IconsOption");
@@ -91,27 +94,20 @@ void OptionsDialog::createConnects()
             ui->stackedWidget->setCurrentIndex(item->data(0, Qt::UserRole).toInt());
     });
     connect(ui->btnApply, &QPushButton::clicked, this, [=](){
-        if(ui->stackedWidget->currentIndex() == LayoutPage) {
-            emit layoutOptionChanged(updateUIToLayoutOption());
-        }
-        else if(ui->stackedWidget->currentIndex() == DisplayPage) {
-            emit displayOptionChanged(updateUIToDisplayOption());
-        }
-        else if(ui->stackedWidget->currentIndex() == IconsPage) {
-            emit iconsOptionChanged(updateUIToIconsOption());
-        }
-        else if(ui->stackedWidget->currentIndex() == FontPage) {
-            emit fontOptionChanged(updateUIToFontOption());
-        }
-        else if(ui->stackedWidget->currentIndex() == ColorPage) {
-            emit colorOptionChanged(updateUIToColorOption());
-        }
-        else if(ui->stackedWidget->currentIndex() == LangPage) {
-            emit langOptionChanged(updateUIToLanguageOption());
-        }
-        else if(ui->stackedWidget->currentIndex() == OperationPage) {
-            emit operationOptionChanged(updateUIToOperationOption());
-        }
+        if(ui->stackedWidget->currentIndex() == LayoutPage)
+            updateUIToLayoutOption();
+        else if(ui->stackedWidget->currentIndex() == DisplayPage)
+            updateUIToDisplayOption();
+        else if(ui->stackedWidget->currentIndex() == IconsPage)
+            updateUIToIconsOption();
+        else if(ui->stackedWidget->currentIndex() == FontPage)
+            updateUIToFontOption();
+        else if(ui->stackedWidget->currentIndex() == ColorPage)
+            updateUIToColorOption();
+        else if(ui->stackedWidget->currentIndex() == LangPage)
+            updateUIToLanguageOption();
+        else if(ui->stackedWidget->currentIndex() == OperationPage)
+            updateUIToOperationOption();
     });
 
     connect(ui->cbbFileIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(setFileIconSize(int)));
@@ -143,6 +139,27 @@ void OptionsDialog::createConnects()
             ui->labelDialogFont->setText(QString("%1,%2").arg(font.family()).arg(font.pointSize()));
         }
     });
+    connect(ui->tbFontColor, &ColorToolButton::selectedColor, this, [=](QColor const& color){
+        colorOption.fontColor = color.name();
+        updateColorOptionToUI(colorOption);
+    });
+
+    connect(ui->tbBackgroud1, &ColorToolButton::selectedColor, this, [=](QColor const& color){
+        colorOption.background1Color = color.name();
+        updateColorOptionToUI(colorOption);
+    });
+    connect(ui->tbBackgroud2, &ColorToolButton::selectedColor, this, [=](QColor const& color){
+        colorOption.background2Color = color.name();
+        updateColorOptionToUI(colorOption);
+    });
+    connect(ui->tbMarkColor, &ColorToolButton::selectedColor, this, [=](QColor const& color){
+        colorOption.markColor = color.name();
+        updateColorOptionToUI(colorOption);
+    });
+    connect(ui->tbCursorColor, &ColorToolButton::selectedColor, this, [=](QColor const& color){
+        colorOption.cursorColor = color.name();
+        updateColorOptionToUI(colorOption);
+    });
 }
 
 void OptionsDialog::setFileIconSize(int index)
@@ -170,13 +187,13 @@ void OptionsDialog::updateOptionToUI()
 
 void OptionsDialog::updateUIToOption()
 {
-    emit layoutOptionChanged(updateUIToLayoutOption());
-    emit displayOptionChanged(updateUIToDisplayOption());
-    emit iconsOptionChanged(updateUIToIconsOption());
-    emit fontOptionChanged(updateUIToFontOption());
-    emit colorOptionChanged(updateUIToColorOption());
-    emit langOptionChanged(updateUIToLanguageOption());
-    emit operationOptionChanged(updateUIToOperationOption());
+    updateUIToLayoutOption();
+    updateUIToDisplayOption();
+    updateUIToIconsOption();
+    updateUIToFontOption();
+    updateUIToColorOption();
+    updateUIToLanguageOption();
+    updateUIToOperationOption();
 }
 
 void OptionsDialog::updateLayoutOptionToUI()
@@ -193,7 +210,7 @@ void OptionsDialog::updateLayoutOptionToUI()
     ui->cbShowSortHeader->setChecked(option.isShowSortHeader);
     ui->cbShowCommandLine->setChecked(option.isShowCommandLine);
     ui->cbShowFunctionKeyButtons->setChecked(option.isShowFunctionKeyButtons);
-    if(option.showStyle == "WindowsVista")
+    if(option.showStyle == "windowsvista")
         ui->rbVista->setChecked(true);
     else if(option.showStyle == "Windows")
         ui->rbWindow->setChecked(true);
@@ -201,7 +218,7 @@ void OptionsDialog::updateLayoutOptionToUI()
         ui->rbFusion->setChecked(true);
 }
 
-LayoutOption OptionsDialog::updateUIToLayoutOption()
+void OptionsDialog::updateUIToLayoutOption()
 {
     LayoutOption option;
 
@@ -212,16 +229,18 @@ LayoutOption OptionsDialog::updateUIToLayoutOption()
     option.isShowDeskNavigationButton = ui->cbShowDeskNavigationButton->isChecked();
     option.isShowFavoriteButton = ui->cbShowFavoriteButton->isChecked();
     option.isShowHistoryButton = ui->cbShowHistoryButton->isChecked();
+    option.isShowCommandLine = ui->cbShowCommandLine->isChecked();
     option.isShowSortHeader = ui->cbShowSortHeader->isChecked();
     option.isShowFunctionKeyButtons = ui->cbShowFunctionKeyButtons->isChecked();
     if(ui->rbVista->isChecked())
-        option.showStyle = "WindowsVista";
+        option.showStyle = "windowsvista";
     else if(ui->rbWindow->isChecked())
         option.showStyle = "Windows";
     else if(ui->rbFusion->isChecked())
         option.showStyle = "Fusion";
 
-    return option;
+    if(option != theOptionManager.layoutOption())
+        emit layoutOptionChanged(option);
 }
 
 void OptionsDialog::updateDisplayOptionToUI()
@@ -236,7 +255,7 @@ void OptionsDialog::updateDisplayOptionToUI()
     ui->cbShowFilenameTooltips->setChecked(option.isShowFilenameTooltips);
 }
 
-DisplayOption OptionsDialog::updateUIToDisplayOption()
+void OptionsDialog::updateUIToDisplayOption()
 {
     DisplayOption option;
 
@@ -247,7 +266,8 @@ DisplayOption OptionsDialog::updateUIToDisplayOption()
     option.isShowDriveTooltips = ui->cbShowDriveTooltips->isChecked();
     option.isShowFilenameTooltips = ui->cbShowFilenameTooltips->isChecked();
 
-    return option;
+    if(option != theOptionManager.displayOption())
+        emit displayOptionChanged(option);
 }
 
 void OptionsDialog::updateIconsOptionToUI()
@@ -279,7 +299,7 @@ void OptionsDialog::updateIconsOptionToUI()
     setToolBarIconSize(toolbarIconSizeIndex);
 }
 
-IconsOption OptionsDialog::updateUIToIconsOption()
+void OptionsDialog::updateUIToIconsOption()
 {
     IconsOption option;
 
@@ -296,7 +316,8 @@ IconsOption OptionsDialog::updateUIToIconsOption()
     option.fileIconSize = ui->cbbFileIconSize->currentData().toInt();
     option.toolbarIconSize = ui->cbbToolBarIconSize->currentData().toInt();
 
-    return option;
+    if(option != theOptionManager.iconOption())
+        emit iconsOptionChanged(option);
 }
 
 void OptionsDialog::updateFontOptionToUI()
@@ -311,35 +332,59 @@ void OptionsDialog::updateFontOptionToUI()
     ui->labelDialogText->setFont(option.dialog.font());
 }
 
-FontOption OptionsDialog::updateUIToFontOption()
+void OptionsDialog::updateUIToFontOption()
 {
     FontOption option;
     option.fileList.setFont(ui->labelFileListText->font());
     option.mainWindow.setFont(ui->labelMainWindowText->font());
     option.dialog.setFont(ui->labelDialogText->font());
-    return option;
+
+    if(option != theOptionManager.fontOption())
+        emit fontOptionChanged(option);
 }
 
 void OptionsDialog::updateColorOptionToUI()
 {
-    ColorOption const& option = theOptionManager.colorOption();
+    colorOption = theOptionManager.colorOption();
+    ui->tbFontColor->setDefaultColor(QColor(colorOption.fontColor));
+    ui->tbBackgroud1->setDefaultColor(QColor(colorOption.background1Color));
+    ui->tbBackgroud2->setDefaultColor(QColor(colorOption.background2Color));
+    ui->tbMarkColor->setDefaultColor(QColor(colorOption.markColor));
+    ui->tbCursorColor->setDefaultColor(QColor(colorOption.cursorColor));
+    updateColorOptionToUI(colorOption);
 }
 
-ColorOption OptionsDialog::updateUIToColorOption()
+void OptionsDialog::updateColorOptionToUI(ColorOption const& option)
 {
-    ColorOption option;
-    return option;
+    ui->tbFontColor->setIcon(createFontIcon(option, ui->tbFontColor->text()));
+    ui->tbBackgroud1->setIcon(createBack1Icon(option, ui->tbBackgroud1->text()));
+    ui->tbBackgroud2->setIcon(createBack2Icon(option, ui->tbBackgroud2->text()));
+    ui->tbMarkColor->setIcon(createMarkIcon(option, ui->tbMarkColor->text()));
+    ui->tbCursorColor->setIcon(createCursorIcon(option, ui->tbCursorColor->text()));
+}
+
+void OptionsDialog::updateUIToColorOption()
+{
+    if(colorOption != theOptionManager.colorOption())
+        emit colorOptionChanged(colorOption);
 }
 
 void OptionsDialog::updateLanguageOptionToUI()
 {
     LanguageOption const& option = theOptionManager.languageOption();
+    ui->lwLanguage->addItem(option.language);
 }
 
-LanguageOption OptionsDialog::updateUIToLanguageOption()
+void OptionsDialog::updateUIToLanguageOption()
 {
     LanguageOption option;
-    return option;
+    QListWidgetItem *item = ui->lwLanguage->currentItem();\
+    if(item)
+    {
+        option.language = item->text();
+        if(option != theOptionManager.languageOption())
+        emit langOptionChanged(option);
+    }
 }
 
 void OptionsDialog::updateOperationOptionToUI()
@@ -353,7 +398,7 @@ void OptionsDialog::updateOperationOptionToUI()
     ui->rbRightButtonSelect->setChecked(!option.isLeftButtonSelect);
 }
 
-OperationOption OptionsDialog::updateUIToOperationOption()
+void OptionsDialog::updateUIToOperationOption()
 {
     OperationOption option;
 
@@ -361,5 +406,70 @@ OperationOption OptionsDialog::updateUIToOperationOption()
     option.isGoToRootWhenChangeDrive = ui->cbGoToRootWhenChangeDrive->isChecked();
     option.isSelectFileNameWhenRenaming = ui->cbSelectFileNameWhenRenaming->isChecked();
     option.isLeftButtonSelect = ui->rbLeftButtonSelect->isChecked();
-    return option;
+
+    if(option != theOptionManager.operationOption())
+        emit operationOptionChanged(option);
+}
+
+QIcon OptionsDialog::createFontIcon(ColorOption const& option, QString const& text)
+{
+    QPixmap pixmap(colorSize);
+    QPainter painter(&pixmap);
+    painter.setPen(Qt::NoPen);
+    painter.fillRect(0, 0, colorSize.width(), colorSize.height() / 2, QColor(option.background1Color));
+    painter.fillRect(0, colorSize.height() / 2, colorSize.width(), colorSize.height() /2, QColor(option.background2Color));
+    painter.setPen(QColor(option.fontColor));
+    painter.drawText(QRect(QPoint(0, 0), colorSize), Qt::AlignHCenter | Qt::AlignVCenter, text);
+
+    return QIcon(pixmap);
+}
+
+QIcon OptionsDialog::createBack1Icon(ColorOption const& option, QString const& text)
+{
+    QPixmap pixmap(colorSize);
+    QPainter painter(&pixmap);
+    painter.setPen(Qt::NoPen);
+    painter.fillRect(QRect(QPoint(0, 0), colorSize), QColor(option.background1Color));
+    painter.setPen(QColor(option.fontColor));
+    painter.drawText(QRect(QPoint(0, 0), colorSize), Qt::AlignHCenter | Qt::AlignVCenter, text);
+
+    return QIcon(pixmap);
+}
+
+QIcon OptionsDialog::createBack2Icon(ColorOption const& option, QString const& text)
+{
+    QPixmap pixmap(colorSize);
+    QPainter painter(&pixmap);
+    painter.setPen(Qt::NoPen);
+    painter.fillRect(QRect(QPoint(0, 0), colorSize), QColor(option.background2Color));
+    painter.setPen(QColor(option.fontColor));
+    painter.drawText(QRect(QPoint(0, 0), colorSize), Qt::AlignHCenter | Qt::AlignVCenter, text);
+
+    return QIcon(pixmap);
+}
+
+QIcon OptionsDialog::createMarkIcon(ColorOption const& option, QString const& text)
+{
+    QPixmap pixmap(colorSize);
+    QPainter painter(&pixmap);
+    painter.setPen(Qt::NoPen);
+    painter.fillRect(QRect(QPoint(0, 0), colorSize), QColor(option.markColor));
+    painter.setPen(QColor(option.fontColor));
+    painter.drawText(QRect(QPoint(0, 0), colorSize), Qt::AlignHCenter | Qt::AlignVCenter, text);
+
+    return QIcon(pixmap);
+}
+
+QIcon OptionsDialog::createCursorIcon(ColorOption const& option, QString const& text)
+{
+    QPixmap pixmap(colorSize);
+    QPainter painter(&pixmap);
+    painter.setPen(Qt::NoPen);
+    painter.fillRect(QRect(QPoint(0, 0), colorSize), QColor(option.markColor));
+    painter.setPen(QColor(option.cursorColor));
+    painter.drawRect(QRect(QPoint(0, 0), colorSize - QSize(1, 1)));
+    painter.setPen(QColor(option.fontColor));
+    painter.drawText(QRect(QPoint(0, 0), colorSize), Qt::AlignHCenter | Qt::AlignVCenter, text);
+
+    return QIcon(pixmap);
 }

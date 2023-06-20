@@ -35,27 +35,37 @@ private:
     void updateOptionToUI();
 
     void updateLayoutOptionToUI();
-    LayoutOption updateUIToLayoutOption();
+    void updateUIToLayoutOption();
 
     void updateDisplayOptionToUI();
-    DisplayOption updateUIToDisplayOption();
+    void updateUIToDisplayOption();
 
     void updateIconsOptionToUI();
-    IconsOption updateUIToIconsOption();
+    void updateUIToIconsOption();
 
     void updateFontOptionToUI();
-    FontOption updateUIToFontOption();
+    void updateUIToFontOption();
 
     void updateColorOptionToUI();
-    ColorOption updateUIToColorOption();
+    void updateUIToColorOption();
 
     void updateLanguageOptionToUI();
-    LanguageOption updateUIToLanguageOption();
+    void updateUIToLanguageOption();
 
     void updateOperationOptionToUI();
-    OperationOption updateUIToOperationOption();
+    void updateUIToOperationOption();
+
+    void updateColorOptionToUI(ColorOption const& option);
+
+    QIcon createFontIcon(ColorOption const& option, QString const& text);
+    QIcon createBack1Icon(ColorOption const& option, QString const& text);
+    QIcon createBack2Icon(ColorOption const& option, QString const& text);
+    QIcon createMarkIcon(ColorOption const& option, QString const& text);
+    QIcon createCursorIcon(ColorOption const& option, QString const& text);
 private:
     Ui::OptionsDialog *ui;
+    QSize colorSize;
+    ColorOption colorOption;
 };
 
 #endif // OPTIONSDIALOG_H
