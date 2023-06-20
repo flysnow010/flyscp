@@ -116,6 +116,31 @@ QString RemoteDockWidget::root() const
     return QString("/");
 }
 
+void RemoteDockWidget::showHeader(bool isShow)
+{
+    ui->treeView->setHeaderHidden(isShow);
+}
+
+void RemoteDockWidget::showCurrentDir(bool isShow)
+{
+    titleBarWidget->setVisible(isShow);
+}
+
+void RemoteDockWidget::showDeskNavigationButton(bool isShow)
+{
+    titleBarWidget->showLibDirButton(isShow);
+}
+
+void RemoteDockWidget::showFavoriteButton(bool isShow)
+{
+    titleBarWidget->showFavoriteButton(isShow);
+}
+
+void RemoteDockWidget::showHistoryButton(bool isShow)
+{
+    titleBarWidget->showHistoryButton(isShow);
+}
+
 void RemoteDockWidget::libDirContextMenu()
 {
 

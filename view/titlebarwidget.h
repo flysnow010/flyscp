@@ -18,6 +18,10 @@ public:
     void setTitle(QString const& title);
     void setActived(bool isActived);
     bool isActived() const { return actived_; }
+
+    void showLibDirButton(bool isShow);
+    void showFavoriteButton(bool isShow);
+    void showHistoryButton(bool isShow);
 signals:
     void libDirButtonClicked();
     void favoritesDirButtonCLicked();

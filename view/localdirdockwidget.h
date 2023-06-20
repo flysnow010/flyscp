@@ -25,6 +25,12 @@ public:
     void cd(QString const& dir) override;
     QString home() const override;
     QString root() const override;
+    void showHeader(bool isShow) override;
+    void showCurrentDir(bool isShow) override;
+    void showDeskNavigationButton(bool isShow) override;
+    void showFavoriteButton(bool isShow)override;
+    void showHistoryButton(bool isShow) override;
+
     QString currentFileName() const { return selectedFileName(); }
     void resizeSection(int logicalIndex, int size);
     void saveSettings(QString const& name);

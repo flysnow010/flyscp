@@ -26,6 +26,21 @@ TitleBarWidget::~TitleBarWidget()
     delete ui;
 }
 
+void TitleBarWidget::showLibDirButton(bool isShow)
+{
+    ui->btnLibDir->setVisible(isShow);
+}
+
+void TitleBarWidget::showFavoriteButton(bool isShow)
+{
+    ui->btnFavoritesDir->setVisible(isShow);
+}
+
+void TitleBarWidget::showHistoryButton(bool isShow)
+{
+    ui->btnHistoryDir->setVisible(isShow);
+}
+
 void TitleBarWidget::setTitle(QString const& title)
 {
     if(isWindows_)

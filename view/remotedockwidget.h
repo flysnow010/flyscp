@@ -37,6 +37,11 @@ public:
     void cd(QString const& dir) override;
     QString home() const override;
     QString root() const override;
+    void showHeader(bool isShow) override;
+    void showCurrentDir(bool isShow) override;
+    void showDeskNavigationButton(bool isShow) override;
+    void showFavoriteButton(bool isShow)override;
+    void showHistoryButton(bool isShow) override;
 
     void start(SSHSettings const& settings);
     QString const& name() const { return name_; }

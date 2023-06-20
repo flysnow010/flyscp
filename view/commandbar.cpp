@@ -18,7 +18,7 @@ CommandBar::~CommandBar()
 
 void CommandBar::setDir(QString const& dir)
 {
-    ui->labelDir->setText(dir);
+    ui->labelDir->setText(dir.split("/").join("\\"));
 }
 
 bool CommandBar::eventFilter(QObject *obj, QEvent *event)

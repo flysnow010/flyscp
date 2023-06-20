@@ -113,6 +113,31 @@ QString LocalDirDockWidget::root() const
     return QString();
 }
 
+void LocalDirDockWidget::showHeader(bool isShow)
+{
+    ui->treeView->setHeaderHidden(!isShow);
+}
+
+void LocalDirDockWidget::showCurrentDir(bool isShow)
+{
+    titleBarWidget->setVisible(isShow);
+}
+
+void LocalDirDockWidget::showDeskNavigationButton(bool isShow)
+{
+    titleBarWidget->showLibDirButton(isShow);
+}
+
+void LocalDirDockWidget::showFavoriteButton(bool isShow)
+{
+    titleBarWidget->showFavoriteButton(isShow);
+}
+
+void LocalDirDockWidget::showHistoryButton(bool isShow)
+{
+    titleBarWidget->showHistoryButton(isShow);
+}
+
 void LocalDirDockWidget::setActived(bool isActived)
 {
     titleBarWidget->setActived(isActived);

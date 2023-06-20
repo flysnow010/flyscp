@@ -30,6 +30,13 @@ public:
 
     void updateDrivers(bool isAdded);
     int tabCount() const;
+
+    void showDriveButtons(bool isShow);
+    void showHeader(bool isShow);
+    void showCurrentDir(bool isShow);
+    void showDeskNavigationButton(bool isShow);
+    void showFavoriteButton(bool isShow);
+    void showHistoryButton(bool isShow);
 signals:
     void tabCountChanged(int count);
 public slots:

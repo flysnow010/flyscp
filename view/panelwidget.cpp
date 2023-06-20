@@ -362,6 +362,61 @@ int PanelWidget::tabCount() const
     return ui->tabWidget->count();
 }
 
+void PanelWidget::showDriveButtons(bool isShow)
+{
+    ui->driverWidget->setVisible(isShow);
+}
+
+void PanelWidget::showHeader(bool isShow)
+{
+    for(int i = 0; i < ui->tabWidget->count(); i++)
+    {
+        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
+        if(dir)
+            dir->showHeader(isShow);
+    }
+}
+
+void PanelWidget::showCurrentDir(bool isShow)
+{
+    for(int i = 0; i < ui->tabWidget->count(); i++)
+    {
+        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
+        if(dir)
+            dir->showCurrentDir(isShow);
+    }
+}
+
+void PanelWidget::showDeskNavigationButton(bool isShow)
+{
+    for(int i = 0; i < ui->tabWidget->count(); i++)
+    {
+        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
+        if(dir)
+            dir->showDeskNavigationButton(isShow);
+    }
+}
+
+void PanelWidget::showFavoriteButton(bool isShow)
+{
+    for(int i = 0; i < ui->tabWidget->count(); i++)
+    {
+        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
+        if(dir)
+            dir->showFavoriteButton(isShow);
+    }
+}
+
+void PanelWidget::showHistoryButton(bool isShow)
+{
+    for(int i = 0; i < ui->tabWidget->count(); i++)
+    {
+        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
+        if(dir)
+            dir->showHistoryButton(isShow);
+    }
+}
+
 void PanelWidget::buttonClicked(QAbstractButton* button)
 {
     updateDir(button->text().toUpper());
