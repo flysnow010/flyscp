@@ -21,6 +21,7 @@
 #include <QVBoxLayout>
 #include <QDebug>
 #include <QScreen>
+#include <QStyleFactory>
 
 #include <windows.h>
 #include <dbt.h>
@@ -123,7 +124,7 @@ void MainWindow::updateConnectMenu()
     {
         SSHSettings::Ptr settings = sshSettingsMangaer_->settings(i);
         connectMenu->addAction(settings->name, this, [=](){
-                settings->passWord = Utils::getPassword(QString("Input Password for %1").arg(settings->name));
+                settings->passWord = Utils::getPassword(QString("Password for %1").arg(settings->name));
                 if(settings->passWord.isEmpty())
                     return;
                 createRemoteDirWidget(*settings);
@@ -188,6 +189,7 @@ void MainWindow::createMenuConnect()
     connect(ui->actionCompress, SIGNAL(triggered(bool)), this, SLOT(compressFiles()));
     connect(ui->actionUncompress, SIGNAL(triggered(bool)), this, SLOT(uncompressFiles()));
     connect(ui->actionSearch, SIGNAL(triggered(bool)), this, SLOT(searchFiles()));
+     connect(ui->actionOption, SIGNAL(triggered(bool)), this, SLOT(options()));
     connect(ui->actionControlPanel, &QAction::triggered, this, [&](){
         WinShell::Exec("control");
     });
@@ -196,13 +198,6 @@ void MainWindow::createMenuConnect()
     });
     connect(ui->actionSettings, &QAction::triggered, this, [&](){
         NetworkSettingsDialog dialog;
-        if(dialog.exec() == QDialog::Accepted)
-        {
-            ;
-        }
-    });
-    connect(ui->actionOption, &QAction::triggered, this, [&](){
-        OptionsDialog dialog;
         if(dialog.exec() == QDialog::Accepted)
         {
             ;
@@ -550,11 +545,56 @@ void MainWindow::connectSftp()
         SSHSettings::Ptr settings = dialog.sshSettings();
         sshSettingsMangaer_->addSettings(settings);
         updateConnectMenu();
-        settings->passWord = Utils::getPassword(QString("Input Password for %1").arg(settings->name));
+        settings->passWord = Utils::getPassword(QString("Password for %1").arg(settings->name));
         if(settings->passWord.isEmpty())
             return;
         createRemoteDirWidget(*settings);
     }
+}
+
+void MainWindow::options()
+{
+    OptionsDialog dialog;
+    connect(&dialog, &OptionsDialog::layoutOptionChanged, this, [=](LayoutOption const& o){
+        ui->toolBar->setVisible(o.isShowToolBar);
+        ui->buttonsBar->setVisible(o.isShowFunctionKeyButtons);
+        statusBar->setVisible(o.isShowStatusBar);
+        commandBar->setVisible(o.isShowCommandLine);
+        leftPanelWidget->showDriveButtons(o.isShowDriveButtons);
+        leftPanelWidget->showHeader(o.isShowSortHeader);
+        leftPanelWidget->showCurrentDir(o.isShowCurrentDir);
+        leftPanelWidget->showDeskNavigationButton(o.isShowDeskNavigationButton);
+        leftPanelWidget->showFavoriteButton(o.isShowFavoriteButton);
+        leftPanelWidget->showHistoryButton(o.isShowHistoryButton);
+        rightPanelWidget->showDriveButtons(o.isShowDriveButtons);
+        rightPanelWidget->showHeader(o.isShowSortHeader);
+        rightPanelWidget->showCurrentDir(o.isShowCurrentDir);
+        rightPanelWidget->showDeskNavigationButton(o.isShowDeskNavigationButton);
+        rightPanelWidget->showFavoriteButton(o.isShowFavoriteButton);
+        rightPanelWidget->showHistoryButton(o.isShowHistoryButton);
+        QApplication::setStyle(QStyleFactory::create(o.showStyle));
+        theOptionManager.setLayoutOption(o);
+    });
+    connect(&dialog, &OptionsDialog::displayOptionChanged, this, [=](DisplayOption const& option){
+        theOptionManager.setDialayOption(option);
+    });
+    connect(&dialog, &OptionsDialog::iconsOptionChanged, this, [=](IconsOption const& option){
+        theOptionManager.setIconsOption(option);
+    });
+    connect(&dialog, &OptionsDialog::fontOptionChanged, this, [=](FontOption const& option){
+        theOptionManager.setFontOption(option);
+    });
+    connect(&dialog, &OptionsDialog::colorOptionChanged, this, [=](ColorOption const& option){
+        theOptionManager.setColorOption(option);
+    });
+    connect(&dialog, &OptionsDialog::langOptionChanged, this, [=](LanguageOption const& option){
+        theOptionManager.setLanguageOption(option);
+    });
+    connect(&dialog, &OptionsDialog::operationOptionChanged, this, [=](OperationOption const& option){
+        theOptionManager.setOperationOption(option);
+    });
+    if(dialog.exec() == QDialog::Accepted)
+        dialog.updateUIToOption();
 }
 
 void MainWindow::createRemoteDirWidget(SSHSettings const& settings)
