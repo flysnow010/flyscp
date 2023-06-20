@@ -17,8 +17,23 @@ struct LayoutOption
     bool isShowStatusBar = true;
     bool isShowFunctionKeyButtons = true;
 
-    QString showStyle = "WindowsVista";
+    QString showStyle = "windowsvista";//windowsvista Windows Fusion
 
+    bool operator != (LayoutOption const& r) const
+    {
+        return isShowToolBar != r.isShowToolBar
+                || isShowToolBar != r.isShowToolBar
+                || isShowDriveButtons != r.isShowDriveButtons
+                || isShowCurrentDir != r.isShowCurrentDir
+                || isShowDeskNavigationButton != r.isShowDeskNavigationButton
+                || isShowFavoriteButton != r.isShowFavoriteButton
+                || isShowHistoryButton != r.isShowHistoryButton
+                || isShowSortHeader != r.isShowSortHeader
+                || isShowCommandLine != r.isShowCommandLine
+                || isShowStatusBar != r.isShowStatusBar
+                || isShowFunctionKeyButtons != r.isShowFunctionKeyButtons
+                || showStyle != r.showStyle;
+    }
     void save(QSettings & settings);
     void load(QSettings & settings);
 };
@@ -32,6 +47,16 @@ struct DisplayOption
     bool isShowDriveTooltips = true;
     bool isShowFilenameTooltips = true;
 
+    bool operator != (DisplayOption const& r) const
+    {
+        return isShowHideAndSystemFile != r.isShowHideAndSystemFile
+                || isShowParentDirInRootDrive != r.isShowParentDirInRootDrive
+                || isDirSortByName != r.isDirSortByName
+                || isDirSortByName != r.isDirSortByName
+                || isShowToolbarTooltips != r.isShowToolbarTooltips
+                || isShowDriveTooltips != r.isShowDriveTooltips
+                || isShowFilenameTooltips != r.isShowFilenameTooltips;
+    }
     void save(QSettings & settings);
     void load(QSettings & settings);
 };
@@ -50,6 +75,20 @@ struct IconsOption
     int fileIconSize = 24;//16,24,32
     int toolbarIconSize = 20;//16,20,24,32
 
+    bool operator != (IconsOption const& r) const
+    {
+        return isShowAllIconIncludeExeAndLink != r.isShowAllIconIncludeExeAndLink
+                || isShowExeLinkNotOnUDisk != r.isShowExeLinkNotOnUDisk
+                || isShowExeLinkNotOnNet != r.isShowExeLinkNotOnNet
+                || isShowAllIcon != r.isShowAllIcon
+                || isShowStandardIcon != r.isShowStandardIcon
+                || isNoShowIcon != r.isNoShowIcon
+                || isShowIconForFilesystem != r.isShowIconForFilesystem
+                || isShowIconForVirtualFolder != r.isShowIconForVirtualFolder
+                || isShowOverlayIcon != r.isShowOverlayIcon
+                || fileIconSize != r.fileIconSize
+                || toolbarIconSize != r.toolbarIconSize;
+    }
     void save(QSettings & settings);
     void load(QSettings & settings);
 };
@@ -79,6 +118,13 @@ struct FontInfo
     }
     inline QString caption() const { return QString("%1,%2").arg(name).arg(size); }
 
+    bool operator != (FontInfo const& r) const
+    {
+        return name != r.name
+                || size != r.size
+                || isBold != r.isBold
+                || isItalic != r.isItalic;
+    }
     void save(QSettings & settings, QString const& type);
     void load(QSettings & settings, QString const& type);
 };
@@ -90,6 +136,12 @@ struct FontOption
 
     void save(QSettings & settings);
     void load(QSettings & settings);
+    bool operator != (FontOption const& r) const
+    {
+        return fileList != r.fileList
+                || mainWindow != r.mainWindow
+                || dialog != r.dialog;
+    }
 };
 
 struct ColorOption
@@ -97,8 +149,17 @@ struct ColorOption
     QString fontColor = "#454545";
     QString background1Color = "#f9f9f9";
     QString background2Color = "#ffffff";
-    QString markColor;
-    QString cursorColor;
+    QString markColor = "#C7E3FA";
+    QString cursorColor = "#FF8728";
+
+    bool operator != (ColorOption const& r) const
+    {
+        return fontColor != r.fontColor
+                || background1Color != r.background1Color
+                || background2Color != r.background2Color
+                || markColor != r.markColor
+                || cursorColor != r.cursorColor;
+    }
     void save(QSettings & settings);
     void load(QSettings & settings);
 };
@@ -106,7 +167,10 @@ struct ColorOption
 struct LanguageOption
 {
     QString language;
-
+    bool operator != (LanguageOption const& r) const
+    {
+        return language != r.language;
+    }
     void save(QSettings & settings);
     void load(QSettings & settings);
 };
@@ -118,6 +182,13 @@ struct OperationOption
     bool isSelectFileNameWhenRenaming = false;
     bool isLeftButtonSelect = true;
 
+    bool operator != (OperationOption const& r) const
+    {
+        return isOnlyOneMainProgramRun != r.isOnlyOneMainProgramRun
+                || isGoToRootWhenChangeDrive != r.isGoToRootWhenChangeDrive
+                || isSelectFileNameWhenRenaming != r.isSelectFileNameWhenRenaming
+                || isLeftButtonSelect != r.isLeftButtonSelect;
+    }
     void save(QSettings & settings);
     void load(QSettings & settings);
 };
