@@ -57,6 +57,7 @@ SOURCES += \
     ssh/session.cpp \
     ssh/sftp.cpp \
     util/utils.cpp \
+    view/colortoolbutton.cpp \
     view/commandbar.cpp \
     view/localdirdockwidget.cpp \
     view/panelwidget.cpp \
@@ -114,6 +115,7 @@ HEADERS += \
     ssh/sftp.h \
     ssh/sshprivate.h \
     util/utils.h \
+    view/colortoolbutton.h \
     view/commandbar.h \
     view/localdirdockwidget.h \
     view/panelwidget.h \
