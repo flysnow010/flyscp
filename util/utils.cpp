@@ -215,9 +215,9 @@ QString Utils::formatFileSize(qint64 byte)
     else if(byte >= SIZE_MB && byte < SIZE_GB)
         return QString("%1 MB").arg(static_cast<double>(byte) / SIZE_MB, 0, 'f', 2);
     else if(byte >= SIZE_GB && byte < SIZE_TB)
-        return QString("%1 GB").arg(static_cast<double>(byte) / SIZE_GB, 0, 'f', 2);
+        return QString("%1 GB").arg(static_cast<double>(byte) / SIZE_GB, 0, 'f', 1);
     else
-        return QString("%1 TB").arg(static_cast<double>(byte) / SIZE_TB, 0, 'f', 2);
+        return QString("%1 TB").arg(static_cast<double>(byte) / SIZE_TB, 0, 'f', 1);
 }
 
 QString Utils::formatFileSizeB(qint64 byte)
