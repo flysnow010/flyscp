@@ -37,6 +37,7 @@ MainWindow::MainWindow(QWidget *parent)
     , leftDirView(new LocalDirDockWidget(this))
     , rightDirView(new LocalDirDockWidget(this))
     , toolButtons(new ToolButtons(this))
+    , isShowTips_(true)
 {
     ui->setupUi(this);
     QWidget* centerWidget = new QWidget(this);
@@ -71,6 +72,7 @@ MainWindow::MainWindow(QWidget *parent)
     load();
     updateConnectMenu();
     loadStyleSheet();
+    installEventFilter(this);
 }
 
 MainWindow::~MainWindow()
@@ -104,6 +106,8 @@ void MainWindow::createToolButtons()
     connectMenu->setIcon(QIcon(":/image/connect.png"));
     QAction* diffAction = diffMenu->menuAction();
     QAction* connectAction = connectMenu->menuAction();
+    diffAction->setToolTip("Diff folders");
+    connectAction->setToolTip("Connect");
     diffAction->setStatusTip("Diff tow folders");
     connectAction->setStatusTip("Connect a stfp");
 
@@ -166,6 +170,18 @@ bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, long *r
         }
     }
     return false;
+}
+
+bool MainWindow::eventFilter(QObject *obj, QEvent *event)
+{
+
+    if(obj->objectName() == "toolBar")
+    {
+        qDebug() << event->type();
+    }
+    if(event->type() == QEvent::ToolTip || event->type() == QEvent::StatusTip)
+        return !isShowTips_;
+    return QMainWindow::eventFilter(obj, event);
 }
 
 void MainWindow::createConnects()
@@ -555,27 +571,12 @@ void MainWindow::connectSftp()
 void MainWindow::options()
 {
     OptionsDialog dialog;
-    connect(&dialog, &OptionsDialog::layoutOptionChanged, this, [=](LayoutOption const& o){
-        ui->toolBar->setVisible(o.isShowToolBar);
-        ui->buttonsBar->setVisible(o.isShowFunctionKeyButtons);
-        statusBar->setVisible(o.isShowStatusBar);
-        commandBar->setVisible(o.isShowCommandLine);
-        leftPanelWidget->showDriveButtons(o.isShowDriveButtons);
-        leftPanelWidget->showHeader(o.isShowSortHeader);
-        leftPanelWidget->showCurrentDir(o.isShowCurrentDir);
-        leftPanelWidget->showDeskNavigationButton(o.isShowDeskNavigationButton);
-        leftPanelWidget->showFavoriteButton(o.isShowFavoriteButton);
-        leftPanelWidget->showHistoryButton(o.isShowHistoryButton);
-        rightPanelWidget->showDriveButtons(o.isShowDriveButtons);
-        rightPanelWidget->showHeader(o.isShowSortHeader);
-        rightPanelWidget->showCurrentDir(o.isShowCurrentDir);
-        rightPanelWidget->showDeskNavigationButton(o.isShowDeskNavigationButton);
-        rightPanelWidget->showFavoriteButton(o.isShowFavoriteButton);
-        rightPanelWidget->showHistoryButton(o.isShowHistoryButton);
-        QApplication::setStyle(QStyleFactory::create(o.showStyle));
-        theOptionManager.setLayoutOption(o);
+    connect(&dialog, &OptionsDialog::layoutOptionChanged, this, [=](LayoutOption const& option){
+        updateLayout(option);
+        theOptionManager.setLayoutOption(option);
     });
     connect(&dialog, &OptionsDialog::displayOptionChanged, this, [=](DisplayOption const& option){
+        updateDisplay(option);
         theOptionManager.setDialayOption(option);
     });
     connect(&dialog, &OptionsDialog::iconsOptionChanged, this, [=](IconsOption const& option){
@@ -625,3 +626,40 @@ void MainWindow::createRemoteDirWidget(SSHSettings const& settings)
         });
     }
 }
+
+void MainWindow::updateLayout(LayoutOption const& o)
+{
+    ui->toolBar->setVisible(o.isShowToolBar);
+    ui->buttonsBar->setVisible(o.isShowFunctionKeyButtons);
+    statusBar->setVisible(o.isShowStatusBar);
+    commandBar->setVisible(o.isShowCommandLine);
+    leftPanelWidget->showDriveButtons(o.isShowDriveButtons);
+    leftPanelWidget->showHeader(o.isShowSortHeader);
+    leftPanelWidget->showCurrentDir(o.isShowCurrentDir);
+    leftPanelWidget->showDeskNavigationButton(o.isShowDeskNavigationButton);
+    leftPanelWidget->showFavoriteButton(o.isShowFavoriteButton);
+    leftPanelWidget->showHistoryButton(o.isShowHistoryButton);
+    rightPanelWidget->showDriveButtons(o.isShowDriveButtons);
+    rightPanelWidget->showHeader(o.isShowSortHeader);
+    rightPanelWidget->showCurrentDir(o.isShowCurrentDir);
+    rightPanelWidget->showDeskNavigationButton(o.isShowDeskNavigationButton);
+    rightPanelWidget->showFavoriteButton(o.isShowFavoriteButton);
+    rightPanelWidget->showHistoryButton(o.isShowHistoryButton);
+    QApplication::setStyle(QStyleFactory::create(o.showStyle));
+}
+
+void MainWindow::updateDisplay(DisplayOption const& o)
+{
+    leftPanelWidget->showHiddenAndSystem(o.isShowHideAndSystemFile);
+    leftPanelWidget->showParentInRoot(o.isShowParentDirInRootDrive);
+    leftPanelWidget->showDriveToolTips(o.isShowDriveTooltips);
+    leftPanelWidget->showToolTips(o.isShowFilenameTooltips);
+    leftPanelWidget->setDirSoryByTime(!o.isDirSortByName);
+    isShowTips_ = o.isShowToolbarTooltips;
+
+    rightPanelWidget->showHiddenAndSystem(o.isShowHideAndSystemFile);
+    rightPanelWidget->showParentInRoot(o.isShowParentDirInRootDrive);
+    rightPanelWidget->showDriveToolTips(o.isShowDriveTooltips);
+    rightPanelWidget->showToolTips(o.isShowFilenameTooltips);
+    rightPanelWidget->setDirSoryByTime(!o.isDirSortByName);
+};

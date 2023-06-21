@@ -146,6 +146,28 @@ void RemoteDockWidget::libDirContextMenu()
 
 }
 
+void RemoteDockWidget::showHiddenAndSystem(bool isShow)
+{
+    model_->showHidden(isShow);
+    model_->showSystem(isShow);
+    model_->refresh();
+}
+
+void RemoteDockWidget::showToolTips(bool isShow)
+{
+    model_->showToolTips(isShow);
+}
+
+void RemoteDockWidget::setDirSoryByTime(bool isOn)
+{
+    model_->setDirSoryByTime(isOn);
+}
+
+void RemoteDockWidget::showParentInRoot(bool isShow)
+{
+    model_->showParentInRoot(isShow);
+}
+
 void RemoteDockWidget::favoritesDirContextMenu()
 {
     QMenu menu;

@@ -20,8 +20,21 @@ int const TIME_INDEX = 3;
 }
 
 
+static void CancheIcon(LocalDirModel const* model,
+                       QString const& suffix,
+                       QIcon const& icon)
+{
+    LocalDirModel *m = (LocalDirModel *)model;
+    m->cancheIcon(suffix, icon);
+}
+
 LocalDirModel::LocalDirModel(QObject *parent)
     : TreeModel(parent)
+    , isShowHidden_(false)
+    , isShowSystem_(false)
+    , isShowToolTips_(true)
+    , isShowParentInRoot_(false)
+    , dirSortIsByTime_(false)
     , dirIcon(Utils::dirIcon())
     , backIcon(":/image/back.png")
     , sortIndex(NONE_INDEX)
@@ -59,6 +72,12 @@ QVariant LocalDirModel::icon(const QModelIndex &index) const
             if(!icon.isNull())
                 return icon;
         }
+        if(!iconMap.contains(suffix))
+        {
+            QIcon icon = Utils::fileIcon(suffix);
+            CancheIcon(this, suffix, icon);
+            return icon;
+        }
         return iconMap.value(suffix);
     }
     return QVariant();
@@ -69,6 +88,17 @@ QVariant LocalDirModel::userData(const QModelIndex &index) const
     if(index.column() != 3)
         return QVariant();
     return fileInfos_[index.row()].size();
+}
+
+QVariant LocalDirModel::toolTip(const QModelIndex &index) const
+{
+    if(index.column() == 0)
+    {
+        if(isShowToolTips_)
+            return fileInfos_[index.row()].fileName();
+        return QVariant();
+    }
+    return QVariant();
 }
 
 QVariant LocalDirModel::textAlignment(const QModelIndex &index) const
@@ -111,6 +141,30 @@ void LocalDirModel::setDir(QString const& dir)
     }
 }
 
+void LocalDirModel::showHidden(bool isShow)
+{
+    isShowHidden_ = isShow;
+}
+void LocalDirModel::showSystem(bool isShow)
+{
+    isShowSystem_ = isShow;
+}
+
+void LocalDirModel::showToolTips(bool isShow)
+{
+    isShowToolTips_ = isShow;
+}
+
+void LocalDirModel::showParentInRoot(bool isShow)
+{
+    isShowParentInRoot_ = isShow;
+}
+
+void LocalDirModel::setDirSoryByTime(bool isOn)
+{
+    dirSortIsByTime_ = isOn;
+}
+
 void LocalDirModel::refresh()
 {
     if(sortIndex != NONE_INDEX)
@@ -124,7 +178,12 @@ void LocalDirModel::sortItems(int index, bool isDescendingOrder)
     QDir::SortFlags sortFlag = QDir::DirsFirst;
 
     if(index == NAME_INDEX)
-        sortFlag |= QDir::SortFlag::Name;
+    {
+        if(dirSortIsByTime_)
+            sortFlag |=  QDir::SortFlag::Time;
+        else
+            sortFlag |= QDir::SortFlag::Name;
+    }
     else if(index == SIZE_INDEX)
         sortFlag |=  QDir::SortFlag::Size;
     else if(index == TIME_INDEX)
@@ -133,7 +192,7 @@ void LocalDirModel::sortItems(int index, bool isDescendingOrder)
         sortFlag |= QDir::SortFlag::Type;
     if(!isDescendingOrder)
         sortFlag |=  QDir::SortFlag::Reversed;
-    fileInfos_ = dir_.entryInfoList(QDir::AllEntries | QDir::NoDot, sortFlag);
+    fileInfos_ = dir_.entryInfoList(getFilters(), sortFlag);
     sortIndex = index;
     isDescending = isDescendingOrder;
     modifyFileInfos(fileInfos_);
@@ -193,9 +252,16 @@ int LocalDirModel::indexOfFile(QString const& fileName)
 bool LocalDirModel::cd(const QString &dirName)
 {
     if(!dir_.cd(dirName))
-        return false;
+    {
+        if(dirName != ParentPath)
+            return false;
+        dir_= QDir();
+        fileInfos_ = QDir::drives();
+        setupData();
+        return true;
+    }
 
-    fileInfos_ = dir_.entryInfoList(QDir::AllEntries | QDir::NoDot,
+    fileInfos_ = dir_.entryInfoList(getFilters(),
                                     QDir::DirsFirst);
     modifyFileInfos(fileInfos_);
     setupData();
@@ -244,8 +310,6 @@ void LocalDirModel::setupModelData(TreeItem *parent)
                 rowData    << Utils::formatFileSizeB(fileInfos_[i].size());
             rowData << fileInfos_[i].lastModified().toString("yyyy-MM-dd HH:mm:ss");
 
-            if(!iconMap.contains(suffix))
-                iconMap.insert(suffix, Utils::fileIcon(suffix));
             fileCount_++;
             fileSizes_ += size;
         }
@@ -275,24 +339,48 @@ void LocalDirModel::modifyFileInfos(QFileInfoList &fileInfos)
         if(fileInfos[i].isDir())
             dirIndex = i;
     }
+
     for(int i = 0; i <= dirIndex; i++)
     {
         if(fileInfos[i].isDir() && fileInfos[i].isSymLink())
         {
             if(i != dirIndex)
             {
-                QFileInfo filInfo = fileInfos[i];
+                QFileInfo fileInfo = fileInfos[i];
                 fileInfos.removeAt(i);
-                fileInfos.insert(dirIndex, filInfo);
+                fileInfos.insert(dirIndex, fileInfo);
             }
+        }
+    }
+    if(isShowParentInRoot_ && !fileInfos.isEmpty())
+    {
+        if(fileInfos[0].fileName() != ParentPath)
+        {
+            QFileInfo fileInfo(ParentPath);
+            fileInfos.insert(0, fileInfo);
         }
     }
 }
 
 void LocalDirModel::defaultRefresh()
 {
-    fileInfos_ = dir_.entryInfoList(QDir::AllEntries | QDir::NoDot,
+    fileInfos_ = dir_.entryInfoList(getFilters(),
                                     QDir::DirsFirst);
     modifyFileInfos(fileInfos_);
     setupData();
+}
+
+QDir::Filters LocalDirModel::getFilters()
+{
+    QDir::Filters filters = QDir::AllEntries | QDir::NoDot;
+    if(isShowHidden_)
+        filters |= QDir::Hidden;
+    if(isShowSystem_)
+        filters |= QDir::System;
+    return filters;
+}
+
+void LocalDirModel::cancheIcon(QString const& suffix, QIcon const& icon)
+{
+    iconMap.insert(suffix, icon);
 }

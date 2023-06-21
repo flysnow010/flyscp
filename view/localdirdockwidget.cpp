@@ -138,6 +138,30 @@ void LocalDirDockWidget::showHistoryButton(bool isShow)
     titleBarWidget->showHistoryButton(isShow);
 }
 
+void LocalDirDockWidget::showHiddenAndSystem(bool isShow)
+{
+    model_->showHidden(isShow);
+    model_->showSystem(isShow);
+    model_->refresh();
+}
+
+void LocalDirDockWidget::showToolTips(bool isShow)
+{
+    model_->showToolTips(isShow);
+}
+
+void LocalDirDockWidget::showParentInRoot(bool isShow)
+{
+    model_->showParentInRoot(isShow);
+    model_->refresh();
+}
+
+void LocalDirDockWidget::setDirSoryByTime(bool isOn)
+{
+    model_->setDirSoryByTime(isOn);
+}
+
+
 void LocalDirDockWidget::setActived(bool isActived)
 {
     titleBarWidget->setActived(isActived);
@@ -243,7 +267,7 @@ void LocalDirDockWidget::viewClick(QModelIndex const& index)
     else
     {
         if(!fileInfo.isSymLink())
-            cd(fileInfo.fileName());
+            cd(fileInfo.isRoot() ? fileInfo.filePath(): fileInfo.fileName());
         else
         {
             QString dir = QFile::symLinkTarget(fileInfo.filePath());

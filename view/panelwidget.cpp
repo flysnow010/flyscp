@@ -12,13 +12,19 @@
 #include <QButtonGroup>
 #include <QSettings>
 #include <QMenu>
+#include <QLabel>
+#include <QStorageInfo>
+#include <climits>
 
 PanelWidget::PanelWidget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::PanelWidget)
     , buttonGroup(new QButtonGroup(this))
+    , labelDiskInfo(new QLabel(this))
     , dirFavorite(new DirFavorite())
     , dirHistory(new DirHistory())
+    , isShowTips_(true)
+
 {
     ui->setupUi(this);
     ui->tabWidget->setTabBarAutoHide(true);
@@ -273,6 +279,11 @@ void PanelWidget::updateTexts(QWidget* widget)
             if(filePath.startsWith(buttons[i]->text().toUpper()))
             {
                 buttons[i]->setChecked(true);
+                QStorageInfo storeInfo(QString("%1:/").arg(buttons[i]->text()));
+                QString diskInfo = QString(tr("[%1] %2 available, %3 in total")).arg(buttons[i]->toolTip(),
+                             Utils::formatFileSize(storeInfo.bytesFree()),
+                             Utils::formatFileSize(storeInfo.bytesTotal()));
+                labelDiskInfo->setText(diskInfo);
                 break;
             }
         }
@@ -281,7 +292,6 @@ void PanelWidget::updateTexts(QWidget* widget)
 
 void PanelWidget::initDrivers()
 {
-    QFileInfoList drivers = QDir::drives();
     QHBoxLayout* layout = new QHBoxLayout();
     layout->setMargin(3);
     layout->setSpacing(5);
@@ -292,17 +302,24 @@ void PanelWidget::initDrivers()
         button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         button->setText(QString::fromLocal8Bit(&ch, 1));
         button->setIconSize(QSize(10, 10));
+        button->installEventFilter(this);
         layout->addWidget(button);
         buttonGroup->addButton(button, QChar(ch).unicode());
         button->hide();
     }
+
     QFileIconProvider fip;
+    ShellMenuItems drivers = WinShell::computerShellItems();
     for(int i = 0; i < drivers.size(); i++)
     {
-        QChar ch =drivers[i].path().at(0).toLower();
-        QAbstractButton* button = buttonGroup->button(ch.unicode());
-        button->setIcon(fip.icon(drivers[i]));
-        button->show();
+        if(drivers[i].isDrive())
+        {
+            QChar ch = drivers[i].filePath.at(0).toLower();
+            QAbstractButton* button = buttonGroup->button(ch.unicode());
+            button->setIcon(fip.icon(QFileInfo(drivers[i].filePath)));
+            button->setToolTip(drivers[i].showToolTip());
+            button->show();
+        }
     }
 
     QToolButton* homeButton = new QToolButton();
@@ -316,6 +333,10 @@ void PanelWidget::initDrivers()
     QToolButton *topButton = new QToolButton();
     topButton->setText("..");
     layout->addWidget(topButton);
+//    QFont font = labelDiskInfo->font();
+//    font.setBold(true);
+//    labelDiskInfo->setFont(font);
+    layout->addWidget(labelDiskInfo);
     layout->addStretch();
 
     connect(homeButton, SIGNAL(clicked()), this, SLOT(backToHome()));
@@ -326,18 +347,22 @@ void PanelWidget::initDrivers()
 
 void PanelWidget::updateDrivers(bool isAdded)
 {
-    QFileInfoList drivers = QDir::drives();
+    ShellMenuItems drivers = WinShell::computerShellItems();
     if(isAdded)
     {
         QFileIconProvider fip;
         for(int i = 0; i < drivers.size(); i++)
         {
-            QChar ch = drivers[i].path().at(0).toLower();
-            QAbstractButton* button = buttonGroup->button(ch.unicode());
-            if(button && button->isHidden())
+            if(drivers[i].isDrive())
             {
-                button->setIcon(fip.icon(drivers[i]));
-                button->show();
+                QChar ch = drivers[i].filePath.at(0).toLower();
+                QAbstractButton* button = buttonGroup->button(ch.unicode());
+                if(button && button->isHidden())
+                {
+                    button->setIcon(fip.icon(QFileInfo(drivers[i].filePath)));
+                    button->setToolTip(drivers[i].showToolTip());
+                    button->show();
+                }
             }
         }
     }
@@ -345,7 +370,7 @@ void PanelWidget::updateDrivers(bool isAdded)
     {
         QList<int> ids;
         for(int i = 0; i < drivers.size(); i++)
-            ids << drivers[i].path().at(0).toLower().unicode();
+            ids << drivers[i].filePath.at(0).toLower().unicode();
         QList<QAbstractButton*> buttons = buttonGroup->buttons();
         foreach(auto & button, buttons)
         {
@@ -353,7 +378,6 @@ void PanelWidget::updateDrivers(bool isAdded)
             if(!ids.contains(id))
                 button->hide();
         }
-
     }
 }
 
@@ -414,6 +438,51 @@ void PanelWidget::showHistoryButton(bool isShow)
         BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
         if(dir)
             dir->showHistoryButton(isShow);
+    }
+}
+
+void PanelWidget::showHiddenAndSystem(bool isShow)
+{
+    for(int i = 0; i < ui->tabWidget->count(); i++)
+    {
+        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
+        if(dir)
+            dir->showHiddenAndSystem(isShow);
+    }
+}
+
+void PanelWidget::showToolTips(bool isShow)
+{
+    for(int i = 0; i < ui->tabWidget->count(); i++)
+    {
+        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
+        if(dir)
+            dir->showToolTips(isShow);
+    }
+}
+
+void PanelWidget::showDriveToolTips(bool isShow)
+{
+    isShowTips_ = isShow;
+}
+
+void PanelWidget::showParentInRoot(bool isShow)
+{
+    for(int i = 0; i < ui->tabWidget->count(); i++)
+    {
+        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
+        if(dir)
+            dir->showParentInRoot(isShow);
+    }
+}
+
+void PanelWidget::setDirSoryByTime(bool isOn)
+{
+    for(int i = 0; i < ui->tabWidget->count(); i++)
+    {
+        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
+        if(dir)
+            dir->setDirSoryByTime(isOn);
     }
 }
 
@@ -479,4 +548,11 @@ void PanelWidget::tabCloseRequested(int index)
     w->deleteLater();
     ui->tabWidget->removeTab(index);
     emit tabCountChanged(ui->tabWidget->count());
+}
+
+bool PanelWidget::eventFilter(QObject *obj, QEvent *event)
+{
+    if(event->type() == QEvent::ToolTip || event->type() == QEvent::StatusTip)
+        return !isShowTips_;
+    return QWidget::eventFilter(obj, event);
 }

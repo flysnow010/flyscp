@@ -42,6 +42,10 @@ public:
     void showDeskNavigationButton(bool isShow) override;
     void showFavoriteButton(bool isShow)override;
     void showHistoryButton(bool isShow) override;
+    void showHiddenAndSystem(bool isShow) override;
+    void showToolTips(bool isShow) override;
+    void showParentInRoot(bool isShow) override;
+    void setDirSoryByTime(bool isOn) override;
 
     void start(SSHSettings const& settings);
     QString const& name() const { return name_; }

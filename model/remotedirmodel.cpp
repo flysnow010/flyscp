@@ -13,6 +13,11 @@ int const PROPERTY_INDEX = 4;
 
 RemoteDirModel::RemoteDirModel(QObject *parent)
     : TreeModel(parent)
+    , isShowHidden_(false)
+    , isShowSystem_(false)
+    , isShowToolTips_(true)
+    , isShowParentInRoot_(false)
+    , dirSortIsByTime_(false)
     , dirIcon(Utils::dirIcon())
     , backIcon(":/image/back.png")
     , fileCount_(0)
@@ -45,12 +50,42 @@ QString RemoteDirModel::dirName()
     return QString();
 }
 
+void RemoteDirModel::showHidden(bool isShow)
+{
+    isShowHidden_ = isShow;
+}
+
+void RemoteDirModel::showSystem(bool isShow)
+{
+    isShowSystem_ = isShow;
+}
+
+void RemoteDirModel::showToolTips(bool isShow)
+{
+    isShowToolTips_ = isShow;
+}
+
+void RemoteDirModel::showParentInRoot(bool isShow)
+{
+    isShowParentInRoot_ = isShow;
+}
+
+void RemoteDirModel::setDirSoryByTime(bool isOn)
+{
+    dirSortIsByTime_ = isOn;
+}
+
 void RemoteDirModel::sortItems(int index, bool isDescendingOrder)
 {
     uint32_t sortFlag = ssh::Dir::DirsFirst;
 
     if(index == NAME_INDEX)
-        sortFlag |= ssh::Dir::Name;
+    {
+        if(dirSortIsByTime_)
+            sortFlag |=  ssh::Dir::Time;
+        else
+            sortFlag |= ssh::Dir::Name;
+    }
     else if(index == SIZE_INDEX)
         sortFlag |=  ssh::Dir::Size;
     else if(index == TIME_INDEX)
@@ -231,6 +266,17 @@ QVariant RemoteDirModel::userData(const QModelIndex &index) const
 {
     if(index.column() != 3)
         return QVariant();
+    return QVariant();
+}
+
+QVariant RemoteDirModel::toolTip(const QModelIndex &index) const
+{
+    if(index.column() == 0)
+    {
+        if(isShowToolTips_)
+            return fileInfos_[index.row()]->name();
+        return QVariant();
+    }
     return QVariant();
 }
 

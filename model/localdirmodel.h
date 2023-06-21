@@ -13,6 +13,12 @@ public:
 
     void setDir(QString const& dir);
     QString dir() const;
+    void showHidden(bool isShow);
+    void showSystem(bool isShow);
+    void showToolTips(bool isShow);
+    void showParentInRoot(bool isShow);
+    void setDirSoryByTime(bool isOn);
+
     bool mkdirs(QString const& dir);
     bool rename(QString const& original, QString const& newname);
     void refresh();
@@ -29,6 +35,8 @@ public:
     int fileCount () const { return fileCount_; }
     int dirCount() const { return dirCount_; }
     qint64 fileSizes() const { return fileSizes_; }
+
+    void cancheIcon(QString const& suffix, QIcon const& icon);
 protected:
     virtual TreeItem *createRootItem();
     virtual QVariant textAlignment(const QModelIndex &index) const;
@@ -36,15 +44,22 @@ protected:
     virtual QVariant headerTextAlignment(int column) const;
     virtual QVariant icon(const QModelIndex &index) const;
     virtual QVariant userData(const QModelIndex &index) const;
+    virtual QVariant toolTip(const QModelIndex &index) const;
     virtual void setupModelData(TreeItem *parent);
     virtual QVariant foreColor(const QModelIndex &index) const;
 private:
     void modifyFileInfos(QFileInfoList &fileIfos);
     void defaultRefresh();
+    QDir::Filters getFilters();
 private:
     QDir dir_;
     QFileInfoList fileInfos_;
     QMap<QString, QIcon> iconMap;
+    bool isShowHidden_;
+    bool isShowSystem_;
+    bool isShowToolTips_;
+    bool isShowParentInRoot_;
+    bool dirSortIsByTime_;
     QIcon dirIcon;
     QIcon backIcon;
     int sortIndex;

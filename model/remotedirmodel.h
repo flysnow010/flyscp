@@ -13,7 +13,11 @@ public:
 
     void setDir(ssh::DirPtr const& dir);
     QString dirName();
-
+    void showHidden(bool isShow);
+    void showSystem(bool isShow);
+    void showToolTips(bool isShow);
+    void setDirSoryByTime(bool isOn);
+    void showParentInRoot(bool isShow);
     void sortItems(int index, bool isDescendingOrder);
 
     ssh::FileInfoPtr fileInfo(QString const& fileName) const;
@@ -39,12 +43,18 @@ protected:
     virtual QVariant headerTextAlignment(int column) const;
     virtual QVariant icon(const QModelIndex &index) const;
     virtual QVariant userData(const QModelIndex &index) const;
+    virtual QVariant toolTip(const QModelIndex &index) const;
     virtual void setupModelData(TreeItem *parent);
     virtual QVariant foreColor(const QModelIndex &index) const;
 private:
     ssh::DirPtr dir_;
     ssh::FileInfos fileInfos_;
     QMap<QString, QIcon> iconMap;
+    bool isShowHidden_;
+    bool isShowSystem_;
+    bool isShowToolTips_;
+    bool isShowParentInRoot_;
+    bool dirSortIsByTime_;
     QIcon dirIcon;
     QIcon backIcon;
     int fileCount_;

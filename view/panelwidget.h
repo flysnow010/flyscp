@@ -12,6 +12,7 @@ class QAbstractButton;
 class QIcon;
 class DirFavorite;
 class DirHistory;
+class QLabel;
 class PanelWidget : public QWidget
 {
     Q_OBJECT
@@ -37,6 +38,11 @@ public:
     void showDeskNavigationButton(bool isShow);
     void showFavoriteButton(bool isShow);
     void showHistoryButton(bool isShow);
+    void showHiddenAndSystem(bool isShow);
+    void showToolTips(bool isShow);
+    void showDriveToolTips(bool isShow);
+    void showParentInRoot(bool isShow);
+    void setDirSoryByTime(bool isOn);
 signals:
     void tabCountChanged(int count);
 public slots:
@@ -46,7 +52,8 @@ public slots:
     void favoritesDirContextMenu();
     void historyDirContextMenu();
     void closeTab(QWidget *w);
-
+protected:
+    bool eventFilter(QObject *obj, QEvent *event) override;
 private slots:
     void buttonClicked(QAbstractButton* button);
     void backToHome();
@@ -56,13 +63,14 @@ private slots:
     void tabCloseRequested(int index);
 private:
     void initDrivers();
-
     void updateDir(QString const& driver);
 private:
     Ui::PanelWidget *ui;
     QButtonGroup* buttonGroup;
+    QLabel* labelDiskInfo;
     DirFavorite* dirFavorite;
     DirHistory* dirHistory;
+    bool isShowTips_;
 };
 
 #endif // PANELWIDGET_H

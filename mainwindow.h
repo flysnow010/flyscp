@@ -13,6 +13,8 @@ class SSHSettings;
 class SSHSettingsManager;
 class StatusBar;
 class CommandBar;
+class LayoutOption;
+class DisplayOption;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -22,7 +24,8 @@ public:
     ~MainWindow();
 
 protected:
-    bool nativeEvent(const QByteArray &eventType, void *message, long *result);
+    bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
+    bool eventFilter(QObject *obj, QEvent *event) override;
 private slots:
     void newFolder();
     void newFile();
@@ -54,6 +57,8 @@ private:
     void createToolButtons();
     void createRemoteDirWidget(SSHSettings const& settings);
     void updateConnectMenu();
+    void updateLayout(LayoutOption const& option);
+    void updateDisplay(DisplayOption const& option);
 private:
     Ui::MainWindow *ui;
     SSHSettingsManager *sshSettingsMangaer_;
@@ -66,5 +71,6 @@ private:
     StatusBar* statusBar;
     CommandBar* commandBar;
     ToolButtons* toolButtons;
+    bool isShowTips_;
 };
 #endif // MAINWINDOW_H
