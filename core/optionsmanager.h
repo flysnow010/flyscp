@@ -40,7 +40,7 @@ struct LayoutOption
 
 struct DisplayOption
 {
-    bool isShowHideAndSystemFile = true;
+    bool isShowHideAndSystemFile = false;
     bool isShowParentDirInRootDrive = false;
     bool isDirSortByName = false;
     bool isShowToolbarTooltips = true;
