@@ -307,6 +307,30 @@ QList<WinLibDir> WinShell::winLibDirs()
    return dirs;
 }
 
+ShellMenuItems WinShell::computerShellItems()
+{
+    LPITEMIDLIST pidl;
+    HRESULT hr = SHGetSpecialFolderLocation(0, CSIDL_DRIVES, &pidl);
+    ShellMenuItems items;
+    if(SUCCEEDED(hr))
+    {
+        LPSHELLFOLDER  pDesktop = NULL;
+        if(FAILED(SHGetDesktopFolder(&pDesktop)))
+            return items;
+
+        ShellMenuItem menutItem;
+        pDesktop->AddRef();
+        menutItem.pItem = ShellItem::Ptr(new ShellItem());
+        menutItem.pItem->pidlRel = pidl;
+        menutItem.pItem->pidlFQ = ShellItem::clone(pidl);
+        menutItem.pItem->pParentFolder = pDesktop;
+
+        shellSubMenuItems(menutItem, items, true);
+        pDesktop->Release();
+    }
+    return items;
+}
+
 ShellMenuItems WinShell::shellMenuItems()
 {
     LPITEMIDLIST pidl;
@@ -372,7 +396,8 @@ void WinShell::shellSubMenuItems(ShellMenuItem const& item,
             pParentFolder->AddRef();
 
             SHFILEINFO     sfi;
-            if(SHGetFileInfo((LPCTSTR)menutItem.pItem->pidlFQ, 0, &sfi, sizeof(sfi), SHGFI_PIDL | SHGFI_DISPLAYNAME | SHGFI_TYPENAME | SHGFI_ICON | SHGFI_SMALLICON))
+            if(SHGetFileInfo((LPCTSTR)menutItem.pItem->pidlFQ, 0, &sfi, sizeof(sfi),
+                             SHGFI_PIDL | SHGFI_DISPLAYNAME | SHGFI_TYPENAME | SHGFI_ICON | SHGFI_SMALLICON))
             {
                 menutItem.caption = QString::fromStdWString(sfi.szDisplayName);
                 menutItem.icon = QIcon(QtWin::fromHICON(sfi.hIcon));

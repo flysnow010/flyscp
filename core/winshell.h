@@ -22,6 +22,17 @@ public:
     QString filePath;
     QIcon   icon;
     ShellItem::Ptr pItem;
+    bool isDrive() const
+    {
+        return caption.endsWith(":)");//(D:)
+    }
+
+    QString showToolTip() const
+    {
+        if(isDrive())
+            return caption.split(" ").at(0);
+        return caption;
+    }
     QString showPath() const { return QString("\\\\%1\\").arg(caption); }
     bool isDir() const { return filePath.startsWith("::") == false; }
 
@@ -50,6 +61,7 @@ public:
     static bool CreateShortcut(QString const& linkFilePath,
                                QString const& targetFilePath);
     static QList<WinLibDir> winLibDirs();
+    static ShellMenuItems computerShellItems();
     static ShellMenuItems shellMenuItems();
     static void shellSubMenuItems(ShellMenuItem const& item,
                                   ShellMenuItems & menuItems, bool isOnlyDir = true);
