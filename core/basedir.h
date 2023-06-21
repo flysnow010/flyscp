@@ -17,6 +17,10 @@ public:
     virtual void showDeskNavigationButton(bool isShow) = 0;
     virtual void showFavoriteButton(bool isShow) = 0;
     virtual void showHistoryButton(bool isShow) = 0;
+    virtual void showHiddenAndSystem(bool isShow) = 0;
+    virtual void showToolTips(bool isShow) = 0;
+    virtual void showParentInRoot(bool isShow) = 0;
+    virtual void setDirSoryByTime(bool isOn) = 0;
 };
 
 #endif // BASEDIR_H
