@@ -15,6 +15,7 @@ public:
     explicit ToolButtons(QWidget *parent = nullptr);
     ~ToolButtons();
 
+    void setButtonFont(QFont const& font);
 signals:
     void viewClicked();
     void editClicked();
