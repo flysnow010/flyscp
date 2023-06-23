@@ -34,7 +34,7 @@ void LayoutOption::load(QSettings & settings)
     isShowSortHeader = settings.value("isShowSortHeader", true).toBool();
     isShowCommandLine = settings.value("isShowCommandLine", true).toBool();
     isShowFunctionKeyButtons = settings.value("isShowFunctionKeyButtons", true).toBool();
-    showStyle = settings.value("showStyle", "WindowsVista").toString();
+    showStyle = settings.value("showStyle", "windowsvista").toString();
 
     settings.endGroup();
 }
@@ -55,9 +55,9 @@ void DisplayOption::load(QSettings & settings)
 {
     settings.beginGroup("Dialay");
 
-    isShowHideAndSystemFile = settings.value("isShowToolBar", true).toBool();
+    isShowHideAndSystemFile = settings.value("isShowHideAndSystemFile", false).toBool();
     isShowParentDirInRootDrive = settings.value("isShowParentDirInRootDrive", false).toBool();
-    isDirSortByName = settings.value("isDirSortByName", true).toBool();
+    isDirSortByName = settings.value("isDirSortByName", false).toBool();
     isShowToolbarTooltips = settings.value("isShowToolbarTooltips", true).toBool();
     isShowDriveTooltips = settings.value("isShowDriveTooltips", true).toBool();
     isShowFilenameTooltips = settings.value("isShowFilenameTooltips", true).toBool();
@@ -97,7 +97,7 @@ void IconsOption::load(QSettings & settings)
     isShowIconForFilesystem = settings.value("isShowIconForFilesystem", true).toBool();
     isShowIconForVirtualFolder = settings.value("isShowIconForVirtualFolder", true).toBool();
     isShowOverlayIcon = settings.value("isShowOverlayIcon", true).toBool();
-    fileIconSize = settings.value("fileIconSize", 16).toInt();
+    fileIconSize = settings.value("fileIconSize", 20).toInt();
     toolbarIconSize = settings.value("toolbarIconSize", 20).toInt();
 
     settings.endGroup();
@@ -116,7 +116,7 @@ void FontInfo::save(QSettings & settings, QString const& type)
 void FontInfo::load(QSettings & settings, QString const& type)
 {
     settings.beginGroup(type);
-    name = settings.value("name", name).toString();
+    name = settings.value("name", "SimSun").toString();
     size = settings.value("size", 9).toInt();
     isBold = settings.value("isBold", false).toBool();
     isItalic = settings.value("isItalic", false).toBool();
@@ -135,6 +135,9 @@ void FontOption::save(QSettings & settings)
 void FontOption::load(QSettings & settings)
 {
     settings.beginGroup("Font");
+    fileList.load(settings, "fileList");
+    mainWindow.load(settings, "mainWindow");
+    dialog.load(settings, "dialog");
     settings.endGroup();
 }
 
