@@ -43,6 +43,7 @@ SOURCES += \
     dialog/uncompressconfirmdialog.cpp \
     main.cpp \
     mainwindow.cpp \
+    model/dirmodel.cpp \
     model/localdirmodel.cpp \
     model/remotedirmodel.cpp \
     model/stringlistmodel.cpp \
@@ -100,6 +101,7 @@ HEADERS += \
     dialog/serchfiledialog.h \
     dialog/uncompressconfirmdialog.h \
     mainwindow.h \
+    model/dirmodel.h \
     model/localdirmodel.h \
     model/remotedirmodel.h \
     model/stringlistmodel.h \
