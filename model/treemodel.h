@@ -32,6 +32,7 @@ protected:
     virtual TreeItem *createRootItem() = 0;
     virtual QVariant foreColor(const QModelIndex &index) const;
     virtual bool editable(const QModelIndex &index) const;
+    virtual QVariant editText(const QModelIndex &index) const;
     virtual QVariant backColor(const QModelIndex &index) const;
     virtual QVariant textAlignment(const QModelIndex &index) const;
     virtual QVariant headerTextAlignment(int col) const;

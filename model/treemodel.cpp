@@ -50,6 +50,8 @@ QVariant TreeModel::data(const QModelIndex &index, int role) const
         return icon(index);
     if(role == Qt::ToolTipRole)
         return toolTip(index);
+    if(role == Qt::EditRole)
+        return editText(index);
     if (role != Qt::DisplayRole && role != Qt::EditRole)
         return QVariant();
 
@@ -148,12 +150,16 @@ bool TreeModel::editable(const QModelIndex &index) const
     return false;
 }
 
+QVariant TreeModel::editText(const QModelIndex &index) const
+{
+    Q_UNUSED(index)
+    return QVariant();
+}
+
 QVariant TreeModel::backColor(const QModelIndex &index) const
 {
-    if((index.row() % 2) == 0)
-        return QBrush(QColor(QString("#f9f9f9")));
-    else
-        return QBrush(QColor(QString("#ffffff")));
+    Q_UNUSED(index)
+    return QVariant();
 }
 
 QVariant TreeModel::textAlignment(const QModelIndex &index) const
