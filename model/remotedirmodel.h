@@ -1,12 +1,12 @@
 #ifndef REMOTEDIRMODEL_H
 #define REMOTEDIRMODEL_H
 
-#include "treemodel.h"
+#include "dirmodel.h"
 #include "ssh/dir.h"
 #include "ssh/fileinfo.h"
 #include <QIcon>
 
-class RemoteDirModel : public TreeModel
+class RemoteDirModel : public DirModel
 {
 public:
     explicit RemoteDirModel(QObject *parent = nullptr);
@@ -17,6 +17,7 @@ public:
     void showSystem(bool isShow);
     void showToolTips(bool isShow);
     void setDirSoryByTime(bool isOn);
+    void setRenameBasename(bool isOn);
     void showParentInRoot(bool isShow);
     void sortItems(int index, bool isDescendingOrder);
 
@@ -37,15 +38,18 @@ public:
     int fileCount () const { return fileCount_; }
     int dirCount() const { return dirCount_; }
     qint64 fileSizes() const { return fileSizes_; }
+    void cancheIcon(QString const& suffix, QIcon const& icon);
+    bool setData(const QModelIndex &index, const QVariant &value, int role);
 protected:
     virtual TreeItem *createRootItem();
     virtual QVariant textAlignment(const QModelIndex &index) const;
+    virtual bool editable(const QModelIndex &index) const;
+    virtual QVariant editText(const QModelIndex &index) const;
     virtual QVariant headerTextAlignment(int column) const;
     virtual QVariant icon(const QModelIndex &index) const;
     virtual QVariant userData(const QModelIndex &index) const;
     virtual QVariant toolTip(const QModelIndex &index) const;
     virtual void setupModelData(TreeItem *parent);
-    virtual QVariant foreColor(const QModelIndex &index) const;
 private:
     ssh::DirPtr dir_;
     ssh::FileInfos fileInfos_;
@@ -55,6 +59,7 @@ private:
     bool isShowToolTips_;
     bool isShowParentInRoot_;
     bool dirSortIsByTime_;
+    bool isRenameBaseName_;
     QIcon dirIcon;
     QIcon backIcon;
     int fileCount_;

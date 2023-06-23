@@ -3,6 +3,8 @@
 #include "util/utils.h"
 #include <QBrush>
 #include <QDateTime>
+#include <QFileIconProvider>
+
 namespace  {
 int const NAME_INDEX = 0;
 int const SUFFIX_INDEX = 1;
@@ -11,13 +13,23 @@ int const TIME_INDEX = 3;
 int const PROPERTY_INDEX = 4;
 }
 
+static void CancheIcon(RemoteDirModel const* model,
+                       QString const& suffix,
+                       QIcon const& icon)
+{
+    RemoteDirModel *m = (RemoteDirModel *)model;
+    m->cancheIcon(suffix, icon);
+}
+
+
 RemoteDirModel::RemoteDirModel(QObject *parent)
-    : TreeModel(parent)
+    : DirModel(parent)
     , isShowHidden_(false)
     , isShowSystem_(false)
     , isShowToolTips_(true)
     , isShowParentInRoot_(false)
     , dirSortIsByTime_(false)
+    , isRenameBaseName_(false)
     , dirIcon(Utils::dirIcon())
     , backIcon(":/image/back.png")
     , fileCount_(0)
@@ -73,6 +85,11 @@ void RemoteDirModel::showParentInRoot(bool isShow)
 void RemoteDirModel::setDirSoryByTime(bool isOn)
 {
     dirSortIsByTime_ = isOn;
+}
+
+void RemoteDirModel::setRenameBasename(bool isOn)
+{
+    isRenameBaseName_ = isOn;
 }
 
 void RemoteDirModel::sortItems(int index, bool isDescendingOrder)
@@ -245,7 +262,7 @@ TreeItem* RemoteDirModel::createRootItem()
 
 QVariant RemoteDirModel::icon(const QModelIndex &index) const
 {
-    if(index.column() != 0)
+    if(index.column() != 0 || iconShowType() == IconShowType::None)
         return QVariant();
     auto const& fileInfo = fileInfos_[index.row()];
     if(fileInfo->is_dir())
@@ -256,10 +273,43 @@ QVariant RemoteDirModel::icon(const QModelIndex &index) const
     }
     else if(fileInfo->is_file())
     {
+        if(iconShowType() == IconShowType::Standard)
+            return QFileIconProvider().icon(QFileIconProvider::File);
         QString suffix = QString::fromStdString(fileInfo->suffix());
+        if(!iconMap.contains(suffix))
+        {
+            QIcon icon = Utils::fileIcon(suffix);
+            CancheIcon(this, suffix, icon);
+            return icon;
+        }
         return iconMap.value(suffix);
     }
     return QVariant();
+}
+
+bool RemoteDirModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    if(index.column() == 0 && role == Qt::EditRole)
+    {
+        QString newName = value.toString();
+        if(!newName.isEmpty())
+         {
+            ssh::FileInfoPtr fileInfo = fileInfos_.at(index.row());
+            std::string oldFileName = fileInfo->name();
+            std::string const& suffix = fileInfo->suffix();
+            std::string newFileName;
+            if(!isRenameBaseName_ || suffix.empty())
+                newFileName = newName.toStdString();
+            else
+               newFileName = QString("%1.%2").arg(newName, QString::fromStdString(suffix)).toStdString();
+            if(rename(oldFileName, newFileName))
+            {
+                TreeItem *item = static_cast<TreeItem*>(index.internalPointer());
+                return item->setData(index.column(), value);
+            }
+        }
+    }
+    return false;
 }
 
 QVariant RemoteDirModel::userData(const QModelIndex &index) const
@@ -293,17 +343,30 @@ QVariant RemoteDirModel::textAlignment(const QModelIndex &index) const
     return QVariant();
 }
 
+bool RemoteDirModel::editable(const QModelIndex &index) const
+{
+    if(index.column() == 0 && !fileInfos_[index.row()]->is_parent())
+        return true;
+    return false;
+}
+
+QVariant RemoteDirModel::editText(const QModelIndex &index) const
+{
+    if(index.column() == 0)
+    {
+        if(!isRenameBaseName_ || fileInfos_[index.row()]->basename().empty())
+            return QString::fromStdString(fileInfos_[index.row()]->name());
+        else
+            return QString::fromStdString(fileInfos_[index.row()]->basename());
+    }
+    return QVariant();
+}
+
 QVariant RemoteDirModel::headerTextAlignment(int column) const
 {
     if(column == NAME_INDEX)
         return int(Qt::AlignLeft | Qt::AlignVCenter);
     return QVariant();
-}
-
-QVariant RemoteDirModel::foreColor(const QModelIndex &index) const
-{
-    Q_UNUSED(index)
-    return QBrush(QColor(QString("#454545")));
 }
 
 void RemoteDirModel::setupModelData(TreeItem *parent)
@@ -322,9 +385,6 @@ void RemoteDirModel::setupModelData(TreeItem *parent)
                     << Utils::formatFileSizeB(fileInfo->size())
                     << QDateTime::fromSecsSinceEpoch(fileInfo->time()).toString("yyyy-MM-dd HH:mm:ss")
                     << Utils::permissionsText(fileInfo->permissions(), false);
-
-            if(!iconMap.contains(suffix))
-                iconMap.insert(suffix, Utils::fileIcon(suffix));
             fileCount_++;
             fileSizes_ += fileInfo->size();
 
@@ -341,3 +401,7 @@ void RemoteDirModel::setupModelData(TreeItem *parent)
     }
 }
 
+void RemoteDirModel::cancheIcon(QString const& suffix, QIcon const& icon)
+{
+    iconMap.insert(suffix, icon);
+}

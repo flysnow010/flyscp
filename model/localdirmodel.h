@@ -1,12 +1,12 @@
 #ifndef LOCALDIRMODEL_H
 #define LOCALDIRMODEL_H
 
-#include "treemodel.h"
+#include "dirmodel.h"
 #include <QIcon>
 #include <QDir>
 #include <QFileInfoList>
 
-class LocalDirModel : public TreeModel
+class LocalDirModel : public DirModel
 {
 public:
     explicit LocalDirModel(QObject *parent = nullptr);
@@ -18,6 +18,7 @@ public:
     void showToolTips(bool isShow);
     void showParentInRoot(bool isShow);
     void setDirSoryByTime(bool isOn);
+    void setRenameBasename(bool isOn);
 
     bool mkdirs(QString const& dir);
     bool rename(QString const& original, QString const& newname);
@@ -37,16 +38,17 @@ public:
     qint64 fileSizes() const { return fileSizes_; }
 
     void cancheIcon(QString const& suffix, QIcon const& icon);
+    bool setData(const QModelIndex &index, const QVariant &value, int role);
 protected:
     virtual TreeItem *createRootItem();
     virtual QVariant textAlignment(const QModelIndex &index) const;
     virtual bool editable(const QModelIndex &index) const;
+    virtual QVariant editText(const QModelIndex &index) const;
     virtual QVariant headerTextAlignment(int column) const;
     virtual QVariant icon(const QModelIndex &index) const;
     virtual QVariant userData(const QModelIndex &index) const;
     virtual QVariant toolTip(const QModelIndex &index) const;
     virtual void setupModelData(TreeItem *parent);
-    virtual QVariant foreColor(const QModelIndex &index) const;
 private:
     void modifyFileInfos(QFileInfoList &fileIfos);
     void defaultRefresh();
@@ -59,6 +61,7 @@ private:
     bool isShowSystem_;
     bool isShowToolTips_;
     bool isShowParentInRoot_;
+    bool isRenameBaseName_;
     bool dirSortIsByTime_;
     QIcon dirIcon;
     QIcon backIcon;

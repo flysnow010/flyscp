@@ -29,11 +29,12 @@ static void CancheIcon(LocalDirModel const* model,
 }
 
 LocalDirModel::LocalDirModel(QObject *parent)
-    : TreeModel(parent)
+    : DirModel(parent)
     , isShowHidden_(false)
     , isShowSystem_(false)
     , isShowToolTips_(true)
     , isShowParentInRoot_(false)
+    , isRenameBaseName_(false)
     , dirSortIsByTime_(false)
     , dirIcon(Utils::dirIcon())
     , backIcon(":/image/back.png")
@@ -55,18 +56,39 @@ TreeItem* LocalDirModel::createRootItem()
 
 QVariant LocalDirModel::icon(const QModelIndex &index) const
 {
-    if(index.column() != 0)
+    if(index.column() != 0 || iconShowType() == IconShowType::None)
         return QVariant();
-    if(fileInfos_[index.row()].isRoot() || fileInfos_[index.row()].isSymLink())
+
+    if(fileInfos_[index.row()].isRoot())
+    {
+        if(iconShowType() == IconShowType::Standard)if(iconShowType() == IconShowType::Standard)
+            QFileIconProvider().icon(QFileIconProvider::Drive);
         return QFileIconProvider().icon(fileInfos_[index.row()]);
+    }
+    else if(fileInfos_[index.row()].isSymLink())
+    {
+        if(iconShowType() == IconShowType::ALLWithExeAndLink)
+            return QFileIconProvider().icon(fileInfos_[index.row()]);
+        QString suffix = fileInfos_[index.row()].suffix().toLower();
+        if(!iconMap.contains(suffix))
+        {
+            QIcon icon = Utils::fileIcon(suffix);
+            CancheIcon(this, suffix, icon);
+            return icon;
+        }
+        return iconMap.value(suffix);
+    }
     else if(fileInfos_[index.row()].fileName() == ParentPath)
         return backIcon;
     else if(fileInfos_[index.row()].isDir())
         return dirIcon;
     else if(fileInfos_[index.row()].isFile())
     {
+        if(iconShowType() == IconShowType::Standard)
+            return QFileIconProvider().icon(QFileIconProvider::File);
+
         QString suffix = fileInfos_[index.row()].suffix().toLower();
-        if(suffix == ExeSuffix)
+        if(suffix == ExeSuffix && iconShowType() == IconShowType::ALLWithExeAndLink)
         {
             QIcon icon = Utils::GetIcon(fileInfos_[index.row()].filePath());
             if(!icon.isNull())
@@ -81,6 +103,31 @@ QVariant LocalDirModel::icon(const QModelIndex &index) const
         return iconMap.value(suffix);
     }
     return QVariant();
+}
+
+bool LocalDirModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    if(index.column() == 0 && role == Qt::EditRole)
+    {
+        QString newName = value.toString();
+        if(!newName.isEmpty())
+         {
+            QFileInfo fileInfo = fileInfos_.at(index.row());
+            QString oldFileName = fileInfo.fileName();
+            QString suffix = fileInfo.suffix();
+            QString newFileName;
+            if(!isRenameBaseName_ || suffix.isEmpty())
+                newFileName = newName;
+            else
+               newFileName = QString("%1.%2").arg(newName, suffix);
+            if(rename(oldFileName, newFileName))
+            {
+                TreeItem *item = static_cast<TreeItem*>(index.internalPointer());
+                return item->setData(index.column(), value);
+            }
+        }
+    }
+    return false;
 }
 
 QVariant LocalDirModel::userData(const QModelIndex &index) const
@@ -122,8 +169,21 @@ QVariant LocalDirModel::headerTextAlignment(int column) const
 
 bool LocalDirModel::editable(const QModelIndex &index) const
 {
-    Q_UNUSED(index)
+    if(index.column() == 0 && fileInfos_[index.row()].fileName() != ParentPath)
+        return true;
     return false;
+}
+
+QVariant LocalDirModel::editText(const QModelIndex &index) const
+{
+    if(index.column() == 0)
+    {
+        if(!isRenameBaseName_ || fileInfos_[index.row()].completeBaseName().isEmpty())
+            return fileInfos_[index.row()].fileName();
+        else
+            return fileInfos_[index.row()].completeBaseName();
+    }
+    return QVariant();
 }
 
 void LocalDirModel::setDir(QString const& dir)
@@ -163,6 +223,11 @@ void LocalDirModel::showParentInRoot(bool isShow)
 void LocalDirModel::setDirSoryByTime(bool isOn)
 {
     dirSortIsByTime_ = isOn;
+}
+
+void LocalDirModel::setRenameBasename(bool isOn)
+{
+    isRenameBaseName_ = isOn;
 }
 
 void LocalDirModel::refresh()
@@ -266,12 +331,6 @@ bool LocalDirModel::cd(const QString &dirName)
     modifyFileInfos(fileInfos_);
     setupData();
     return true;
-}
-
-QVariant LocalDirModel::foreColor(const QModelIndex &index) const
-{
-    Q_UNUSED(index)
-    return QBrush(QColor(QString("#454545")));
 }
 
 void LocalDirModel::setupModelData(TreeItem *parent)
