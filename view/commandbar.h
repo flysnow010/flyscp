@@ -16,7 +16,7 @@ public:
     ~CommandBar();
 
     void setDir(QString const& dir);
-
+    void setDirFont(QFont const& font);
 signals:
     void commanded(QString const& commnad);
 protected:

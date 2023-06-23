@@ -21,6 +21,12 @@ void CommandBar::setDir(QString const& dir)
     ui->labelDir->setText(dir.split("/").join("\\"));
 }
 
+void CommandBar::setDirFont(QFont const& font)
+{
+    ui->labelDir->setFont(font);
+    ui->cbbCommand->setFont(font);
+}
+
 bool CommandBar::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::KeyPress)
