@@ -40,7 +40,7 @@
      <item>
       <widget class="QStackedWidget" name="stackedWidget">
        <property name="currentIndex">
-        <number>0</number>
+        <number>4</number>
        </property>
        <widget class="QWidget" name="layoutPage">
         <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -1077,9 +1077,15 @@ abcdefghijklmnopqrstuvwxyz</string>
                 <number>0</number>
                </property>
                <item>
-                <widget class="QTreeView" name="treeView">
-                 <property name="frameShape">
-                  <enum>QFrame::NoFrame</enum>
+                <widget class="QLabel" name="labelExample">
+                 <property name="minimumSize">
+                  <size>
+                   <width>200</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string/>
                  </property>
                 </widget>
                </item>
@@ -1118,7 +1124,7 @@ abcdefghijklmnopqrstuvwxyz</string>
             <item row="1" column="0" colspan="2">
              <widget class="QLabel" name="label_9">
               <property name="text">
-               <string>Font color:</string>
+               <string>Text color:</string>
               </property>
              </widget>
             </item>

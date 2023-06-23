@@ -7,6 +7,7 @@
 #include <QFontDialog>
 #include <QPainter>
 #include <QMenu>
+#include <QSettings>
 
 int const LayoutPage    = 0;
 int const DisplayPage   = 1;
@@ -69,10 +70,12 @@ OptionsDialog::OptionsDialog(QWidget *parent)
 
     updateOptionToUI();
     createConnects();
+    loadSettings();
 }
 
 OptionsDialog::~OptionsDialog()
 {
+    saveSettings();
     delete ui;
 }
 
@@ -284,7 +287,7 @@ void OptionsDialog::updateIconsOptionToUI()
     ui->cbShowIconForVirtualFolder->setChecked(option.isShowIconForVirtualFolder);
     ui->cbShowOverlayIcon->setChecked(option.isShowOverlayIcon);
 
-    QList<int> fileIconSize({16, 24, 32}) ;
+    QList<int> fileIconSize({16, 20, 24, 32}) ;
     int fileIconSizeIndex = fileIconSize.indexOf(option.fileIconSize);
     foreach(auto size, fileIconSize)
          ui->cbbFileIconSize->addItem(QString("%1x%1").arg(size), size);
@@ -345,7 +348,7 @@ void OptionsDialog::updateUIToFontOption()
 
 void OptionsDialog::updateColorOptionToUI()
 {
-    colorOption = theOptionManager.colorOption();
+    ColorOption colorOption;
     ui->tbFontColor->setDefaultColor(QColor(colorOption.fontColor));
     ui->tbBackgroud1->setDefaultColor(QColor(colorOption.background1Color));
     ui->tbBackgroud2->setDefaultColor(QColor(colorOption.background2Color));
@@ -361,6 +364,7 @@ void OptionsDialog::updateColorOptionToUI(ColorOption const& option)
     ui->tbBackgroud2->setIcon(createBack2Icon(option, ui->tbBackgroud2->text()));
     ui->tbMarkColor->setIcon(createMarkIcon(option, ui->tbMarkColor->text()));
     ui->tbCursorColor->setIcon(createCursorIcon(option, ui->tbCursorColor->text()));
+    ui->labelExample->setPixmap(createExample(option));
 }
 
 void OptionsDialog::updateUIToColorOption()
@@ -416,8 +420,7 @@ QIcon OptionsDialog::createFontIcon(ColorOption const& option, QString const& te
     QPixmap pixmap(colorSize);
     QPainter painter(&pixmap);
     painter.setPen(Qt::NoPen);
-    painter.fillRect(0, 0, colorSize.width(), colorSize.height() / 2, QColor(option.background1Color));
-    painter.fillRect(0, colorSize.height() / 2, colorSize.width(), colorSize.height() /2, QColor(option.background2Color));
+    painter.fillRect(0, 0, colorSize.width(), colorSize.height(), QColor(QString("#FFFFFF")));
     painter.setPen(QColor(option.fontColor));
     painter.drawText(QRect(QPoint(0, 0), colorSize), Qt::AlignHCenter | Qt::AlignVCenter, text);
 
@@ -472,4 +475,90 @@ QIcon OptionsDialog::createCursorIcon(ColorOption const& option, QString const& 
     painter.drawText(QRect(QPoint(0, 0), colorSize), Qt::AlignHCenter | Qt::AlignVCenter, text);
 
     return QIcon(pixmap);
+}
+
+QPixmap OptionsDialog::createExample(ColorOption const& option)
+{
+    QSize size(200, 161);
+    QPixmap pixmap(size);
+    QPainter painter(&pixmap);
+    painter.setPen(Qt::NoPen);
+    painter.fillRect(QRect(QPoint(0, 0), size), QColor(option.background1Color));
+
+    int x = 0;
+    int y = 0;
+    int w = size.width();
+    int h = colorSize.height() + 4;
+
+    painter.setPen(QColor(option.fontColor));
+    painter.fillRect(QRect(x, y, size.width(), h), QColor(option.background1Color));
+    painter.setPen(QColor(option.fontColor));
+    painter.drawText(QRect(x, y, w, h), Qt::AlignHCenter | Qt::AlignVCenter, "Text");
+    y += h;
+    painter.fillRect(QRect(x, y, w, h), QColor(option.background2Color));
+    painter.setPen(QColor(option.fontColor));
+    painter.drawText(QRect(x, y, w, h), Qt::AlignHCenter | Qt::AlignVCenter, "Text");
+    y += h;
+    painter.fillRect(QRect(x, y, w, h), QColor(option.markColor));
+    painter.setPen(QColor(option.cursorColor));
+    painter.drawRect(QRect(x, y, w - 1, h - 1));
+    painter.setPen(QColor(option.fontColor));
+    painter.drawText(QRect(x, y, w, h), Qt::AlignHCenter | Qt::AlignVCenter, "Mark+Text");
+    y += h;
+    painter.fillRect(QRect(x, y, w, h), QColor(option.background2Color));
+    painter.setPen(QColor(option.fontColor));
+    painter.drawText(QRect(x, y, w, h), Qt::AlignHCenter | Qt::AlignVCenter, "Text");
+    y += h;
+    painter.fillRect(QRect(x, y, w, h), QColor(option.background1Color));
+    painter.setPen(QColor(option.fontColor));
+    painter.drawText(QRect(x, y, w, h), Qt::AlignHCenter | Qt::AlignVCenter, "Text");
+    y += h;
+    painter.fillRect(QRect(x, y, w, h), QColor(option.markColor));
+    painter.setPen(QColor(option.cursorColor));
+    painter.drawRect(QRect(x, y, w - 1, h - 1));
+    painter.setPen(QColor(option.fontColor));
+    painter.drawText(QRect(x, y, w, h), Qt::AlignHCenter | Qt::AlignVCenter, "Mark+Text");
+
+    return pixmap;
+}
+
+void OptionsDialog::setCurrntTreeItem(int index)
+{
+    for(int i = 0; i < ui->treeWidget->topLevelItemCount(); i++)
+    {
+        QTreeWidgetItem* item = ui->treeWidget->topLevelItem(i);
+        if(item->data(0, Qt::UserRole).toInt() == index)
+        {
+            ui->treeWidget->setCurrentItem(item);
+            break;
+        }
+        for(int j = 0; j < item->childCount(); j++)
+        {
+            if(item->child(j)->data(0, Qt::UserRole).toInt() == index)
+            {
+                ui->treeWidget->setCurrentItem(item->child(j));
+                break;
+            }
+        }
+    }
+}
+
+void OptionsDialog::saveSettings()
+{
+    QSettings settings(QCoreApplication::applicationName(),
+                       QCoreApplication::applicationVersion());
+    settings.beginGroup("OptionsDialog");
+    settings.setValue("currentIndex", ui->stackedWidget->currentIndex());
+    settings.endGroup();
+}
+
+void OptionsDialog::loadSettings()
+{
+    QSettings settings(QCoreApplication::applicationName(),
+                       QCoreApplication::applicationVersion());
+    settings.beginGroup("OptionsDialog");
+    int index = settings.value("currentIndex", 0).toInt();
+    ui->stackedWidget->setCurrentIndex(index);
+    setCurrntTreeItem(index);
+    settings.endGroup();
 }

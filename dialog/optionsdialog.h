@@ -62,6 +62,11 @@ private:
     QIcon createBack2Icon(ColorOption const& option, QString const& text);
     QIcon createMarkIcon(ColorOption const& option, QString const& text);
     QIcon createCursorIcon(ColorOption const& option, QString const& text);
+    QPixmap createExample(ColorOption const& option);
+
+    void setCurrntTreeItem(int index);
+    void saveSettings();
+    void loadSettings();
 private:
     Ui::OptionsDialog *ui;
     QSize colorSize;
