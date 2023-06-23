@@ -24,6 +24,7 @@ PanelWidget::PanelWidget(QWidget *parent)
     , dirFavorite(new DirFavorite())
     , dirHistory(new DirHistory())
     , isShowTips_(true)
+    , isGotRoot_(false)
 
 {
     ui->setupUi(this);
@@ -486,6 +487,149 @@ void PanelWidget::setDirSoryByTime(bool isOn)
     }
 }
 
+void PanelWidget::setRenameFileName(bool isOn)
+{
+    for(int i = 0; i < ui->tabWidget->count(); i++)
+    {
+        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
+        if(dir)
+            dir->setRenameFileName(isOn);
+    }
+}
+
+void PanelWidget::showAllIconWithExeAndLink(bool isShow)
+{
+    for(int i = 0; i < ui->tabWidget->count(); i++)
+    {
+        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
+        if(dir)
+            dir->showAllIconWithExeAndLink(isShow);
+    }
+}
+
+void PanelWidget::showAllIcon(bool isShow)
+{
+    for(int i = 0; i < ui->tabWidget->count(); i++)
+    {
+        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
+        if(dir)
+            dir->showAllIcon(isShow);
+    }
+}
+
+void PanelWidget::showStandardIcon(bool isShow)
+{
+    for(int i = 0; i < ui->tabWidget->count(); i++)
+    {
+        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
+        if(dir)
+            dir->showStandardIcon(isShow);
+    }
+}
+
+void PanelWidget::showNoneIcon(bool isShow)
+{
+    for(int i = 0; i < ui->tabWidget->count(); i++)
+    {
+        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
+        if(dir)
+            dir->showNoneIcon(isShow);
+    }
+}
+
+void PanelWidget::showIconForFyleSystem(bool isShow)
+{
+    for(int i = 0; i < ui->tabWidget->count(); i++)
+    {
+        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
+        if(dir)
+            dir->showIconForFyleSystem(isShow);
+    }
+}
+
+void PanelWidget::showIconForVirtualFolder(bool isShow)
+{
+    for(int i = 0; i < ui->tabWidget->count(); i++)
+    {
+        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
+        if(dir)
+            dir->showIconForVirtualFolder(isShow);
+    }
+}
+
+void PanelWidget::showOverlayIcon(bool isShow)
+{
+    for(int i = 0; i < ui->tabWidget->count(); i++)
+    {
+        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
+        if(dir)
+            dir->showOverlayIcon(isShow);
+    }
+}
+
+void PanelWidget::fileIconSize(int size)
+{
+    for(int i = 0; i < ui->tabWidget->count(); i++)
+    {
+        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
+        if(dir)
+            dir->fileIconSize(size);
+    }
+}
+
+void PanelWidget::fileFont(QFont const& font)
+{
+    for(int i = 0; i < ui->tabWidget->count(); i++)
+    {
+        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
+        if(dir)
+            dir->fileFont(font);
+    }
+}
+
+void PanelWidget::setDriveFont(QFont const& font)
+{
+    QList<QWidget *> children = ui->driverWidget->findChildren<QWidget *>();
+    foreach(auto child, children)
+    {
+        child->setFont(font);
+    }
+}
+
+void PanelWidget::setItemColor(QString const& fore,
+                  QString const& back,
+                  QString const&alternate)
+{
+    for(int i = 0; i < ui->tabWidget->count(); i++)
+    {
+        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
+        if(dir)
+            dir->setItemColor(fore, back, alternate);
+    }
+}
+
+void PanelWidget::setItemSelectedColor(QString const& back,
+                  QString const& mark,
+                  QString const&cursor)
+{
+    for(int i = 0; i < ui->tabWidget->count(); i++)
+    {
+        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
+        if(dir)
+            dir->setItemSelectedColor(back, mark, cursor);
+    }
+}
+
+void PanelWidget::refresh()
+{
+    for(int i = 0; i < ui->tabWidget->count(); i++)
+    {
+        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
+        if(dir)
+            dir->refresh();
+    }
+}
+
 void PanelWidget::buttonClicked(QAbstractButton* button)
 {
     updateDir(button->text().toUpper());
@@ -516,7 +660,12 @@ void PanelWidget::updateDir(QString const& driver)
 {
     BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
     if(dir)
-        dir->setDir(dirHistory->find(driver));
+    {
+        if(isGotRoot_)
+            dir->setDir(QString("%1:/").arg(driver));
+        else
+            dir->setDir(dirHistory->find(driver));
+    }
 }
 
 void PanelWidget::currentChanged(int index)

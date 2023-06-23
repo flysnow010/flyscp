@@ -238,18 +238,29 @@ void MainWindow::createMenuConnect()
             rightPanelWidget->nextDir();
     });
 
-
     connect(ui->actionToolBar,  &QAction::triggered, this, [&](bool on){
+        LayoutOption option = theOptionManager.layoutOption();
+        option.isShowToolBar = on;
         ui->toolBar->setVisible(on);
+        theOptionManager.setLayoutOption(option);
     });
     connect(ui->actionStatusBar,  &QAction::triggered, this, [&](bool on){
+        LayoutOption option = theOptionManager.layoutOption();
+        option.isShowStatusBar = on;
         statusBar->setVisible(on);
+        theOptionManager.setLayoutOption(option);
     });
     connect(ui->actionCommandBar,  &QAction::triggered, this, [&](bool on){
+        LayoutOption option = theOptionManager.layoutOption();
+        option.isShowCommandLine = on;
         commandBar->setVisible(on);
+        theOptionManager.setLayoutOption(option);
     });
     connect(ui->actionButtonsBar,  &QAction::triggered, this, [&](bool on){
+        LayoutOption option = theOptionManager.layoutOption();
+        option.isShowFunctionKeyButtons = on;
         ui->buttonsBar->setVisible(on);
+        theOptionManager.setLayoutOption(option);
     });
 
     connect(ui->actionAbout,  &QAction::triggered, this, [](bool){ AboutDialog().exec(); });
@@ -344,6 +355,7 @@ void MainWindow::save()
     leftPanelWidget->saveSettings("LeftPanel");
     rightPanelWidget->saveSettings("RightPane");
     sshSettingsMangaer_->save(QString("%1/settings.json").arg(Utils::sshSettingsPath()));
+    theOptionManager.save("Options");
 }
 
 void MainWindow::load()
@@ -366,6 +378,17 @@ void MainWindow::load()
         emit rightDirView->actived();
         rightDirView->setActived(true);
     }
+    theOptionManager.load("Options");
+    updateLayout(theOptionManager.layoutOption());
+    updateDisplay(theOptionManager.displayOption());
+    updateIcons(theOptionManager.iconOption());
+    updateFonts(theOptionManager.fontOption());
+    updateColors(theOptionManager.colorOption());
+    updateLang(theOptionManager.languageOption());
+    updateOperation(theOptionManager.operationOption());
+
+    leftPanelWidget->refresh();
+    rightPanelWidget->refresh();
 }
 
 void MainWindow::saveSettings()
@@ -374,10 +397,6 @@ void MainWindow::saveSettings()
                        QCoreApplication::applicationVersion());
     settings.setValue("geometry", saveGeometry());
     settings.setValue("windowState", saveState());
-    settings.setValue("toolBarIsVisible", ui->actionToolBar->isChecked());
-    settings.setValue("statusBarIsVisible", ui->actionStatusBar->isChecked());
-    settings.setValue("commandBarIsVisible", ui->actionCommandBar->isChecked());
-    settings.setValue("ButtonsBarIsVisible", ui->actionButtonsBar->isChecked());
     settings.setValue("LeftDirViewIsActived", leftDirView->isActived());
 }
 
@@ -397,18 +416,6 @@ bool MainWindow::loadSettings()
     }
     if(!windowState.isEmpty())
         restoreState(windowState);
-    bool toolBarIsVisible = settings.value("toolBarIsVisible", true).toBool();
-    bool statusBarIsVisible = settings.value("statusBarIsVisible", true).toBool();
-    bool commandBarIsVisible = settings.value("commandBarIsVisible", true).toBool();
-    bool buttonsBarIsVisible = settings.value("ButtonsBarIsVisible", true).toBool();
-    ui->actionToolBar->setChecked(toolBarIsVisible);
-    ui->actionStatusBar->setChecked(statusBarIsVisible);
-    ui->actionCommandBar->setChecked(commandBarIsVisible);
-    ui->actionButtonsBar->setChecked(buttonsBarIsVisible);
-    ui->toolBar->setVisible(toolBarIsVisible);
-    statusBar->setVisible(statusBarIsVisible);
-    commandBar->setVisible(commandBarIsVisible);
-    ui->buttonsBar->setVisible(buttonsBarIsVisible);
 
     return settings.value("LeftDirViewIsActived", true).toBool();
 }
@@ -580,18 +587,23 @@ void MainWindow::options()
         theOptionManager.setDialayOption(option);
     });
     connect(&dialog, &OptionsDialog::iconsOptionChanged, this, [=](IconsOption const& option){
+        updateIcons(option);
         theOptionManager.setIconsOption(option);
     });
     connect(&dialog, &OptionsDialog::fontOptionChanged, this, [=](FontOption const& option){
+        updateFonts(option);
         theOptionManager.setFontOption(option);
     });
     connect(&dialog, &OptionsDialog::colorOptionChanged, this, [=](ColorOption const& option){
+        updateColors(option);
         theOptionManager.setColorOption(option);
     });
     connect(&dialog, &OptionsDialog::langOptionChanged, this, [=](LanguageOption const& option){
+        updateLang(option);
         theOptionManager.setLanguageOption(option);
     });
     connect(&dialog, &OptionsDialog::operationOptionChanged, this, [=](OperationOption const& option){
+        updateOperation(option);
         theOptionManager.setOperationOption(option);
     });
     if(dialog.exec() == QDialog::Accepted)
@@ -633,6 +645,12 @@ void MainWindow::updateLayout(LayoutOption const& o)
     ui->buttonsBar->setVisible(o.isShowFunctionKeyButtons);
     statusBar->setVisible(o.isShowStatusBar);
     commandBar->setVisible(o.isShowCommandLine);
+
+    ui->actionToolBar->setChecked(o.isShowToolBar);
+    ui->actionButtonsBar->setChecked(o.isShowFunctionKeyButtons);
+    ui->actionStatusBar->setChecked(o.isShowStatusBar);
+    ui->actionCommandBar->setChecked(o.isShowCommandLine);
+
     leftPanelWidget->showDriveButtons(o.isShowDriveButtons);
     leftPanelWidget->showHeader(o.isShowSortHeader);
     leftPanelWidget->showCurrentDir(o.isShowCurrentDir);
@@ -646,9 +664,10 @@ void MainWindow::updateLayout(LayoutOption const& o)
     rightPanelWidget->showFavoriteButton(o.isShowFavoriteButton);
     rightPanelWidget->showHistoryButton(o.isShowHistoryButton);
     QApplication::setStyle(QStyleFactory::create(o.showStyle));
+
 }
 
-void MainWindow::updateDisplay(DisplayOption const& o)
+void MainWindow::updateDisplay(DisplayOption const& o, bool isRefresh)
 {
     leftPanelWidget->showHiddenAndSystem(o.isShowHideAndSystemFile);
     leftPanelWidget->showParentInRoot(o.isShowParentDirInRootDrive);
@@ -662,4 +681,77 @@ void MainWindow::updateDisplay(DisplayOption const& o)
     rightPanelWidget->showDriveToolTips(o.isShowDriveTooltips);
     rightPanelWidget->showToolTips(o.isShowFilenameTooltips);
     rightPanelWidget->setDirSoryByTime(!o.isDirSortByName);
-};
+
+    if(isRefresh)
+    {
+        leftPanelWidget->refresh();
+        rightPanelWidget->refresh();
+    }
+}
+
+void MainWindow::updateIcons(IconsOption const& option, bool isRefresh)
+{
+    leftPanelWidget->showAllIconWithExeAndLink(option.isShowAllIconIncludeExeAndLink);
+    leftPanelWidget->showAllIcon(option.isShowAllIcon);
+    leftPanelWidget->showStandardIcon(option.isShowStandardIcon);
+    leftPanelWidget->showNoneIcon(option.isNoShowIcon);
+    leftPanelWidget->showIconForFyleSystem(option.isShowIconForFilesystem);
+    leftPanelWidget->showIconForVirtualFolder(option.isShowOverlayIcon);
+    leftPanelWidget->fileIconSize(option.fileIconSize);
+    ui->toolBar->setIconSize(QSize(option.toolbarIconSize, option.toolbarIconSize));
+    rightPanelWidget->showAllIconWithExeAndLink(option.isShowAllIconIncludeExeAndLink);
+    rightPanelWidget->showAllIcon(option.isShowAllIcon);
+    rightPanelWidget->showStandardIcon(option.isShowStandardIcon);
+    rightPanelWidget->showNoneIcon(option.isNoShowIcon);
+    rightPanelWidget->showIconForFyleSystem(option.isShowIconForFilesystem);
+    rightPanelWidget->showIconForVirtualFolder(option.isShowOverlayIcon);
+    rightPanelWidget->fileIconSize(option.fileIconSize);
+
+    if(isRefresh)
+    {
+        leftPanelWidget->refresh();
+        rightPanelWidget->refresh();
+    }
+}
+
+void MainWindow::updateFonts(FontOption const& option)
+{
+    QFont font = option.mainWindow.font();
+    toolButtons->setButtonFont(font);
+    commandBar->setDirFont(font);
+    leftPanelWidget->setDriveFont(font);
+    rightPanelWidget->setDriveFont(font);
+    leftPanelWidget->fileFont(option.fileList.font());
+    rightPanelWidget->fileFont(option.fileList.font());
+}
+
+void MainWindow::updateColors(ColorOption const& option, bool isRefresh)
+{
+    leftPanelWidget->setItemColor(option.fontColor,
+                                  option.background1Color, option.background2Color);
+    leftPanelWidget->setItemSelectedColor(option.background1Color,
+                                  option.markColor, option.cursorColor);
+
+    rightPanelWidget->setItemColor(option.fontColor,
+                                  option.background1Color, option.background2Color);
+    rightPanelWidget->setItemSelectedColor(option.background1Color,
+                                   option.markColor, option.cursorColor);
+    if(isRefresh)
+    {
+        leftPanelWidget->refresh();
+        rightPanelWidget->refresh();
+    }
+}
+
+void MainWindow::updateLang(LanguageOption const& option)
+{
+}
+
+void MainWindow::updateOperation(OperationOption const& option)
+{
+    leftPanelWidget->setGoToRoot(option.isGoToRootWhenChangeDrive);
+    leftPanelWidget->setRenameFileName(option.isSelectFileNameWhenRenaming);
+
+    rightPanelWidget->setGoToRoot(option.isGoToRootWhenChangeDrive);
+    rightPanelWidget->setRenameFileName(option.isSelectFileNameWhenRenaming);
+}

@@ -43,6 +43,25 @@ public:
     void showDriveToolTips(bool isShow);
     void showParentInRoot(bool isShow);
     void setDirSoryByTime(bool isOn);
+    void setRenameFileName(bool isOn);
+    void showAllIconWithExeAndLink(bool isShow);
+    void showAllIcon(bool isShow);
+    void showStandardIcon(bool isShow);
+    void showNoneIcon(bool isShow);
+    void showIconForFyleSystem(bool isShow);
+    void showIconForVirtualFolder(bool isShow);
+    void showOverlayIcon(bool isShow);
+    void fileIconSize(int size);
+    void fileFont(QFont const& font);
+    void setDriveFont(QFont const& font);
+    void setItemColor(QString const& fore,
+                      QString const& back,
+                      QString const&alternate);
+    void setItemSelectedColor(QString const& back,
+                      QString const& mark,
+                      QString const&cursor);
+    void setGoToRoot(bool isOn) { isGotRoot_ = isOn; }
+    void refresh();
 signals:
     void tabCountChanged(int count);
 public slots:
@@ -71,6 +90,7 @@ private:
     DirFavorite* dirFavorite;
     DirHistory* dirHistory;
     bool isShowTips_;
+    bool isGotRoot_;
 };
 
 #endif // PANELWIDGET_H

@@ -142,7 +142,6 @@ void LocalDirDockWidget::showHiddenAndSystem(bool isShow)
 {
     model_->showHidden(isShow);
     model_->showSystem(isShow);
-    model_->refresh();
 }
 
 void LocalDirDockWidget::showToolTips(bool isShow)
@@ -153,7 +152,6 @@ void LocalDirDockWidget::showToolTips(bool isShow)
 void LocalDirDockWidget::showParentInRoot(bool isShow)
 {
     model_->showParentInRoot(isShow);
-    model_->refresh();
 }
 
 void LocalDirDockWidget::setDirSoryByTime(bool isOn)
@@ -161,6 +159,95 @@ void LocalDirDockWidget::setDirSoryByTime(bool isOn)
     model_->setDirSoryByTime(isOn);
 }
 
+void LocalDirDockWidget::setRenameFileName(bool isOn)
+{
+    model_->setRenameBasename(isOn);
+}
+
+void LocalDirDockWidget::showAllIconWithExeAndLink(bool isShow)
+{
+    if(isShow)
+        model_->setIconShowType(DirModel::ALLWithExeAndLink);
+}
+
+void LocalDirDockWidget::showAllIcon(bool isShow)
+{
+    if(isShow)
+        model_->setIconShowType(DirModel::All);
+}
+
+void LocalDirDockWidget::showStandardIcon(bool isShow)
+{
+    if(isShow)
+        model_->setIconShowType(DirModel::Standard);
+}
+
+void LocalDirDockWidget::showNoneIcon(bool isShow)
+{
+    if(isShow)
+        model_->setIconShowType(DirModel::None);
+}
+
+void LocalDirDockWidget::showIconForFyleSystem(bool isShow)
+{
+    model_->setShowIconForFyleSystem(isShow);
+}
+
+void LocalDirDockWidget::showIconForVirtualFolder(bool isShow)
+{
+    model_->setShowIconForVirtualFolder(isShow);
+}
+
+void LocalDirDockWidget::showOverlayIcon(bool isShow)
+{
+    model_->setShowOverlayIcon(isShow);
+}
+
+void LocalDirDockWidget::fileIconSize(int size)
+{
+    ui->treeView->setIconSize(QSize(size, size));
+}
+
+void LocalDirDockWidget::fileFont(QFont const& font)
+{
+    ui->treeView->setFont(font);
+    if(ui->treeView->header())
+        ui->treeView->header()->setFont(font);
+}
+
+void LocalDirDockWidget::setItemColor(QString const& fore,
+                  QString const& back,
+                  QString const&alternate)
+{
+    model_->setTextColor(fore);
+    model_->setBackground(back);
+    model_->setAltColor(alternate);
+}
+
+void LocalDirDockWidget::setItemSelectedColor(QString const& back,
+                  QString const& mark,
+                  QString const&cursor)
+{
+    ui->treeView->setStyleSheet(QString("QTreeView{ background: %1;}"
+                                        "QTreeView::item:selected:active:first{ "
+                                        "border: 1px solid  %2;"
+                                        "border-right-width: 0px;"
+                                        "color: %4;"
+                                        "background: %3;}"
+                                        "QTreeView::item:selected:active{ "
+                                        "border: 1px solid  %2;"
+                                        "border-left-width: 0px;"
+                                        "border-right-width: 0px;"
+                                        "color: %4;"
+                                        "background: %3;}"
+                                        "QTreeView::item:selected:active:last{ "
+                                        "border: 1px solid  %2;"
+                                        "border-left-width: 0px;"
+                                        "color: %4;"
+                                        "background: %3;}"
+                                        )
+                                .arg(back, cursor, mark, model_->textColor()));
+}
 
 void LocalDirDockWidget::setActived(bool isActived)
 {
@@ -562,12 +649,7 @@ void LocalDirDockWidget::rename()
     QString fileName = selectedFileName(true);
     if(fileName.isEmpty())
         return;
-    QString newileName = Utils::getText(tr("New filename"), fileName);
-    if(newileName.isEmpty() ||  newileName == fileName)
-        return;
-
-    if(model_->rename(fileName, newileName))
-        model_->refresh();
+    ui->treeView->edit(ui->treeView->currentIndex());
 }
 
 void LocalDirDockWidget::createShortcut()

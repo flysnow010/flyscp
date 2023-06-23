@@ -25,6 +25,7 @@ public:
     void cd(QString const& dir) override;
     QString home() const override;
     QString root() const override;
+    void refresh() override;
     void showHeader(bool isShow) override;
     void showCurrentDir(bool isShow) override;
     void showDeskNavigationButton(bool isShow) override;
@@ -34,6 +35,22 @@ public:
     void showToolTips(bool isShow) override;
     void showParentInRoot(bool isShow) override;
     void setDirSoryByTime(bool isOn) override;
+    void setRenameFileName(bool isOn) override;
+    void showAllIconWithExeAndLink(bool isShow) override;
+    void showAllIcon(bool isShow) override;
+    void showStandardIcon(bool isShow) override;
+    void showNoneIcon(bool isShow) override;
+    void showIconForFyleSystem(bool isShow) override;
+    void showIconForVirtualFolder(bool isShow) override;
+    void showOverlayIcon(bool isShow) override;
+    void fileIconSize(int size) override;
+    void fileFont(QFont const& font) override;
+    void setItemColor(QString const& fore,
+                      QString const& back,
+                      QString const&alternate) override;
+    void setItemSelectedColor(QString const& back,
+                      QString const& mark,
+                      QString const&cursor) override;
 
     QString currentFileName() const { return selectedFileName(); }
     void resizeSection(int logicalIndex, int size);
@@ -46,7 +63,7 @@ public:
     void editFile();
     void copyFiles(QString const& dstFilePath);
     void moveFiles(QString const& dstFilePath);
-    void refresh();
+
     void delFilesWithConfirm();
     void selectAll();
     void compressFiles(QString const& dstFilePath);

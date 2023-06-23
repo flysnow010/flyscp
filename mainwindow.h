@@ -15,6 +15,11 @@ class StatusBar;
 class CommandBar;
 class LayoutOption;
 class DisplayOption;
+class IconsOption;
+class FontOption;
+class ColorOption;
+class LanguageOption;
+class OperationOption;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -58,7 +63,12 @@ private:
     void createRemoteDirWidget(SSHSettings const& settings);
     void updateConnectMenu();
     void updateLayout(LayoutOption const& option);
-    void updateDisplay(DisplayOption const& option);
+    void updateDisplay(DisplayOption const& option, bool isRefresh = true);
+    void updateIcons(IconsOption const& option, bool isRefresh = true);
+    void updateFonts(FontOption const& option);
+    void updateColors(ColorOption const& option, bool isRefresh = true);
+    void updateLang(LanguageOption const& option);
+    void updateOperation(OperationOption const& option);
 private:
     Ui::MainWindow *ui;
     SSHSettingsManager *sshSettingsMangaer_;

@@ -116,6 +116,11 @@ QString RemoteDockWidget::root() const
     return QString("/");
 }
 
+void RemoteDockWidget::refresh()
+{
+    model_->refresh();
+}
+
 void RemoteDockWidget::showHeader(bool isShow)
 {
     ui->treeView->setHeaderHidden(isShow);
@@ -150,7 +155,6 @@ void RemoteDockWidget::showHiddenAndSystem(bool isShow)
 {
     model_->showHidden(isShow);
     model_->showSystem(isShow);
-    model_->refresh();
 }
 
 void RemoteDockWidget::showToolTips(bool isShow)
@@ -162,6 +166,97 @@ void RemoteDockWidget::setDirSoryByTime(bool isOn)
 {
     model_->setDirSoryByTime(isOn);
 }
+
+void RemoteDockWidget::setRenameFileName(bool isOn)
+{
+    model_->setRenameBasename(isOn);
+}
+
+void RemoteDockWidget::showAllIconWithExeAndLink(bool isShow)
+{
+    if(isShow)
+        model_->setIconShowType(DirModel::ALLWithExeAndLink);
+}
+
+void RemoteDockWidget::showAllIcon(bool isShow)
+{
+    if(isShow)
+        model_->setIconShowType(DirModel::All);
+}
+
+void RemoteDockWidget::showStandardIcon(bool isShow)
+{
+    if(isShow)
+        model_->setIconShowType(DirModel::Standard);
+}
+
+void RemoteDockWidget::showNoneIcon(bool isShow)
+{
+    if(isShow)
+        model_->setIconShowType(DirModel::None);
+}
+
+void RemoteDockWidget::showIconForFyleSystem(bool isShow)
+{
+    model_->setShowIconForFyleSystem(isShow);
+}
+
+void RemoteDockWidget::showIconForVirtualFolder(bool isShow)
+{
+    model_->setShowIconForVirtualFolder(isShow);
+}
+
+void RemoteDockWidget::showOverlayIcon(bool isShow)
+{
+    model_->setShowOverlayIcon(isShow);
+}
+
+void RemoteDockWidget::setItemColor(QString const& fore,
+                  QString const& back,
+                  QString const&alternate)
+{
+    model_->setTextColor(fore);
+    model_->setBackground(back);
+    model_->setAltColor(alternate);
+}
+
+void RemoteDockWidget::setItemSelectedColor(QString const& back,
+                  QString const& mark,
+                  QString const&cursor)
+{
+    ui->treeView->setStyleSheet(QString("QTreeView{ background: %1;}"
+                                        "QTreeView::item:selected:active:first{ "
+                                        "border: 1px solid  %2;"
+                                        "border-right-width: 0px;"
+                                        "color: %4;"
+                                        "background: %3;}"
+                                        "QTreeView::item:selected:active{ "
+                                        "border: 1px solid  %2;"
+                                        "border-left-width: 0px;"
+                                        "border-right-width: 0px;"
+                                        "color: %4;"
+                                        "background: %3;}"
+                                        "QTreeView::item:selected:active:last{ "
+                                        "border: 1px solid  %2;"
+                                        "border-left-width: 0px;"
+                                        "color: %4;"
+                                        "background: %3;}"
+                                        )
+                                .arg(back, cursor, mark, model_->textColor()));
+}
+
+void RemoteDockWidget::fileIconSize(int size)
+{
+    ui->treeView->setIconSize(QSize(size, size));
+}
+
+void RemoteDockWidget::fileFont(QFont const& font)
+{
+    ui->treeView->setFont(font);
+    if(ui->treeView->header())
+        ui->treeView->header()->setFont(font);
+}
+
 
 void RemoteDockWidget::showParentInRoot(bool isShow)
 {
@@ -296,7 +391,7 @@ void RemoteDockWidget::customContextMenuRequested(const QPoint &pos)
         menu.addAction(tr("New directory"), this, SLOT(makeDirectory()));
         menu.addAction(tr("New file"), this, SLOT(newFile()));
         menu.addSeparator();
-        menu.addAction(tr("Refresh current folder"), this, SLOT(refreshFolder()));
+        menu.addAction(tr("Refresh current folder"), this, [=](){ refresh(); });
         menu.addAction(tr("Upload to current folder"), this, SLOT(upload()));
     }
     else
@@ -444,11 +539,6 @@ void RemoteDockWidget::newFile()
         model_->refresh();
 }
 
-void RemoteDockWidget::refreshFolder()
-{
-    model_->refresh();
-}
-
 void RemoteDockWidget::upload()
 {
     QString fileName = QFileDialog::getOpenFileName(this, QApplication::applicationName());
@@ -526,13 +616,13 @@ void RemoteDockWidget::rename()
     ssh::FileInfoPtr fileInfo = model_->fileInfo(index.row());
     if(!fileInfo)
         return;
+    ui->treeView->edit(ui->treeView->currentIndex());
+//    QString fileName = Utils::getText(tr("New filename"), QString::fromStdString(fileInfo->name()));
+//    if(fileName.isEmpty())
+//        return;
 
-    QString fileName = Utils::getText(tr("New filename"), QString::fromStdString(fileInfo->name()));
-    if(fileName.isEmpty())
-        return;
-
-    model_->rename(fileInfo->name(), fileName.toStdString());
-    model_->refresh();
+//    model_->rename(fileInfo->name(), fileName.toStdString());
+//    model_->refresh();
 }
 
 void RemoteDockWidget::copyFilepath()

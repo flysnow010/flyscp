@@ -44,6 +44,9 @@
       <property name="frameShape">
        <enum>QFrame::NoFrame</enum>
       </property>
+      <property name="editTriggers">
+       <set>QAbstractItemView::EditKeyPressed</set>
+      </property>
       <property name="dragEnabled">
        <bool>true</bool>
       </property>
