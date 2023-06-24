@@ -45,6 +45,7 @@ SOURCES += \
     mainwindow.cpp \
     model/dirmodel.cpp \
     model/localdirmodel.cpp \
+    model/netsettingsmodel.cpp \
     model/remotedirmodel.cpp \
     model/stringlistmodel.cpp \
     model/treeitem.cpp \
@@ -103,6 +104,7 @@ HEADERS += \
     mainwindow.h \
     model/dirmodel.h \
     model/localdirmodel.h \
+    model/netsettingsmodel.h \
     model/remotedirmodel.h \
     model/stringlistmodel.h \
     model/treeitem.h \
