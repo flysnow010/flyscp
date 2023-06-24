@@ -20,7 +20,7 @@ public:
     ConnectType type() const;
     void setType(ConnectType t);
 
-    SSHSettings::Ptr sshSettings() const;
+    SSHSettings::Ptr sshSettings();
     void setSshSettings(SSHSettings::Ptr const& settings);
 
 private slots:
@@ -29,6 +29,7 @@ private:
 
 private:
     Ui::ConnectDialog *ui;
+    SSHSettings::Ptr settings_;
 };
 
 #endif // CONNECTDIALOG_H

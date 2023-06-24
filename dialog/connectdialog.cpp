@@ -31,20 +31,22 @@ void ConnectDialog::setType(ConnectType t)
         ui->tabWidget->setCurrentIndex(0);
 }
 
-SSHSettings::Ptr ConnectDialog::sshSettings() const
+SSHSettings::Ptr ConnectDialog::sshSettings()
 {
-    SSHSettings::Ptr settings(new SSHSettings);
-    settings->hostName = ui->sshHostname->text();
-    settings->userName = ui->sshUsername->text();
-    settings->port = ui->sshPort->value();
+    if(!settings_)
+        settings_ = SSHSettings::Ptr(new SSHSettings);
+    settings_->hostName = ui->sshHostname->text();
+    settings_->userName = ui->sshUsername->text();
+    settings_->port = ui->sshPort->value();
     if(ui->usePrivateKey)
     {
-        settings->privateKeyFileName = ui->privateKeyFileName->text();
-        if(!settings->privateKeyFileName.isEmpty())
-            settings->usePrivateKey = true;
+        settings_->privateKeyFileName = ui->privateKeyFileName->text();
+        if(!settings_->privateKeyFileName.isEmpty())
+            settings_->usePrivateKey = true;
     }
-    settings->name = QString("%1@%2").arg(settings->userName, settings->hostName);
-    return settings;
+    if(settings_->name.isEmpty())
+        settings_->name = QString("%1@%2").arg(settings_->userName, settings_->hostName);
+    return settings_;
 }
 
 void ConnectDialog::setSshSettings(SSHSettings::Ptr const& settings)
@@ -54,6 +56,9 @@ void ConnectDialog::setSshSettings(SSHSettings::Ptr const& settings)
     ui->sshPort->setValue(settings->port);
     ui->usePrivateKey->setChecked(settings->usePrivateKey);
     ui->privateKeyFileName->setText(settings->privateKeyFileName);
+    settings_ = settings;
+    if(!settings_->name.isEmpty())
+        setWindowTitle(QString("Connect - %1").arg(settings_->name));
 }
 
 void ConnectDialog::selectPrivateKeyFileName()

@@ -21,6 +21,7 @@ class SSHSettingsManager
 {
 public:
     SSHSettingsManager();
+    using Ptr = std::shared_ptr<SSHSettingsManager>;
 
     int size() const { return settingsList_.size(); }
     SSHSettings::Ptr settings(int index) const;
