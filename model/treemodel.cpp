@@ -152,8 +152,8 @@ bool TreeModel::editable(const QModelIndex &index) const
 
 QVariant TreeModel::editText(const QModelIndex &index) const
 {
-    Q_UNUSED(index)
-    return QVariant();
+    TreeItem *item = static_cast<TreeItem*>(index.internalPointer());
+    return item->data(index.column());
 }
 
 QVariant TreeModel::backColor(const QModelIndex &index) const
