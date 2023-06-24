@@ -47,6 +47,7 @@ private slots:
     void diffFiles();
     void connectSftp();
     void options();
+    void netsettings();
 private:
     void save();
     void load();

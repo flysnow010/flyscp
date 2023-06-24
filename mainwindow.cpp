@@ -136,10 +136,7 @@ void MainWindow::updateConnectMenu()
     }
     if(sshSettingsMangaer_->size() > 0)
         connectMenu->addSeparator();
-    connectMenu->addAction("Settings", this, [=](){
-        NetworkSettingsDialog dialog(this);
-        dialog.exec();
-    });
+    connectMenu->addAction("Settings", this, SLOT(netsettings()));
 }
 
 bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, long *result)
@@ -205,19 +202,13 @@ void MainWindow::createMenuConnect()
     connect(ui->actionCompress, SIGNAL(triggered(bool)), this, SLOT(compressFiles()));
     connect(ui->actionUncompress, SIGNAL(triggered(bool)), this, SLOT(uncompressFiles()));
     connect(ui->actionSearch, SIGNAL(triggered(bool)), this, SLOT(searchFiles()));
-     connect(ui->actionOption, SIGNAL(triggered(bool)), this, SLOT(options()));
+    connect(ui->actionOption, SIGNAL(triggered(bool)), this, SLOT(options()));
+    connect(ui->actionSettings, SIGNAL(triggered(bool)), this, SLOT(netsettings()));
     connect(ui->actionControlPanel, &QAction::triggered, this, [&](){
         WinShell::Exec("control");
     });
     connect(ui->actionCalc, &QAction::triggered, this, [&](){
         WinShell::Exec("calc");
-    });
-    connect(ui->actionSettings, &QAction::triggered, this, [&](){
-        NetworkSettingsDialog dialog;
-        if(dialog.exec() == QDialog::Accepted)
-        {
-            ;
-        }
     });
     connect(ui->actionRefresh, &QAction::triggered, this, [&](){
         if(leftDirView->isActived())
@@ -608,6 +599,20 @@ void MainWindow::options()
     });
     if(dialog.exec() == QDialog::Accepted)
         dialog.updateUIToOption();
+}
+
+void MainWindow::netsettings()
+{
+    NetworkSettingsDialog dialog;
+    dialog.setManager(sshSettingsMangaer_);
+    if(dialog.exec() == QDialog::Accepted)
+    {
+        int index = dialog.connectIndex();
+        SSHSettings::Ptr settings = sshSettingsMangaer_->settings(index);
+        if(settings)
+            createRemoteDirWidget(*settings);
+    }
+    updateConnectMenu();
 }
 
 void MainWindow::createRemoteDirWidget(SSHSettings const& settings)
