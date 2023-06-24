@@ -649,7 +649,9 @@ void LocalDirDockWidget::rename()
     QString fileName = selectedFileName(true);
     if(fileName.isEmpty())
         return;
-    ui->treeView->edit(ui->treeView->currentIndex());
+    QModelIndex index = ui->treeView->currentIndex();
+    QModelIndex nameIndex = model_->index(index.row(), 0);
+    ui->treeView->edit(nameIndex);
 }
 
 void LocalDirDockWidget::createShortcut()
