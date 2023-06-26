@@ -22,6 +22,7 @@ public:
     static QString formatVideoTime(int time_ms);
 
     static QIcon dirIcon();
+    static QIcon fileIcon();
     static QIcon computerIcon();
     static QIcon driverIcon();
     static QIcon networkIcon();

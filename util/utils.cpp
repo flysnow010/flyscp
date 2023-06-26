@@ -132,26 +132,27 @@ QString Utils::formatVideoTime(int time_ms)
 
 QIcon Utils::dirIcon()
 {
-    QFileIconProvider fip;
-    return fip.icon(QFileIconProvider::Folder);
+    return QFileIconProvider().icon(QFileIconProvider::Folder);
+}
+
+QIcon Utils::fileIcon()
+{
+    return QFileIconProvider().icon(QFileIconProvider::File);
 }
 
 QIcon Utils::computerIcon()
 {
-    QFileIconProvider fip;
-    return fip.icon(QFileIconProvider::Computer);
+    return QFileIconProvider().icon(QFileIconProvider::Computer);
 }
 
 QIcon Utils::driverIcon()
 {
-    QFileIconProvider fip;
-    return fip.icon(QFileIconProvider::Drive);
+    return QFileIconProvider().icon(QFileIconProvider::Drive);
 }
 
 QIcon Utils::networkIcon()
 {
-    QFileIconProvider fip;
-    return fip.icon(QFileIconProvider::Network);
+    return QFileIconProvider().icon(QFileIconProvider::Network);
 }
 
 QIcon Utils::fileIcon(QString const& suffix)
