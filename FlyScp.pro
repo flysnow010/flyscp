@@ -13,6 +13,7 @@ LIBS += -L$$(PWD)\lib -lssh.dll -lshlwapi
 SOURCES += \
     core/basedir.cpp \
     core/clipboard.cpp \
+    core/compressfileinfo.cpp \
     core/contextmenu.cpp \
     core/dirfavorite.cpp \
     core/dirhistory.cpp \
@@ -43,6 +44,7 @@ SOURCES += \
     dialog/uncompressconfirmdialog.cpp \
     main.cpp \
     mainwindow.cpp \
+    model/compressdirmodel.cpp \
     model/dirmodel.cpp \
     model/localdirmodel.cpp \
     model/netsettingsmodel.cpp \
@@ -72,6 +74,7 @@ SOURCES += \
 HEADERS += \
     core/basedir.h \
     core/clipboard.h \
+    core/compressfileinfo.h \
     core/connecttype.h \
     core/contextmenu.h \
     core/dirfavorite.h \
@@ -102,6 +105,7 @@ HEADERS += \
     dialog/serchfiledialog.h \
     dialog/uncompressconfirmdialog.h \
     mainwindow.h \
+    model/compressdirmodel.h \
     model/dirmodel.h \
     model/localdirmodel.h \
     model/netsettingsmodel.h \
