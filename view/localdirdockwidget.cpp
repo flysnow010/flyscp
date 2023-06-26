@@ -2,6 +2,7 @@
 #include "ui_localdirdockwidget.h"
 #include "titlebarwidget.h"
 #include "model/localdirmodel.h"
+#include "model/compressdirmodel.h"
 #include "core/filemanager.h"
 #include "core/filetransfer.h"
 #include "core/winshell.h"
@@ -9,6 +10,7 @@
 #include "core/contextmenu.h"
 #include "core/filecompresser.h"
 #include "core/fileuncompresser.h"
+#include "core/compressfileinfo.h"
 #include "util/utils.h"
 #include "dialog/fileprogressdialog.h"
 #include "dialog/fileoperateconfirmdialog.h"
@@ -26,32 +28,37 @@ LocalDirDockWidget::LocalDirDockWidget(QWidget *parent)
     : QDockWidget(parent)
     , ui(new Ui::LocalDirDockWidget)
     , model_(new LocalDirModel(this))
+    , compressModel_(new CompressDirModel(this))
     , titleBarWidget(new TitleBarWidget())
     , fileSystemWatcher(new QFileSystemWatcher(this))
 {
     ui->setupUi(this);
-    ui->treeView->setModel(model_);
-    ui->treeView->installEventFilter(this);
+    ui->tvNormal->setModel(model_);
+    ui->tvCompress->setModel(compressModel_);
+    ui->tvCompress->hide();
+    ui->tvNormal->installEventFilter(this);
     titleBarWidget->installEventFilter(this);
     setTitleBarWidget(titleBarWidget);
 
-    connect(ui->treeView, SIGNAL(doubleClicked(QModelIndex)),
-                    this, SLOT(viewClick(QModelIndex)));
-    connect(ui->treeView, SIGNAL(customContextMenuRequested(QPoint)),
+    connect(ui->tvNormal, SIGNAL(doubleClicked(QModelIndex)),
+                    this, SLOT(normalDoubleClick(QModelIndex)));
+    connect(ui->tvCompress, SIGNAL(doubleClicked(QModelIndex)),
+                    this, SLOT(compressDoubleClick(QModelIndex)));
+    connect(ui->tvNormal, SIGNAL(customContextMenuRequested(QPoint)),
                     this, SLOT(customContextMenuRequested(QPoint)));
-    connect(ui->treeView, SIGNAL(prepareDrag(QPoint)),
+    connect(ui->tvNormal, SIGNAL(prepareDrag(QPoint)),
                     this, SLOT(beginDragFile(QPoint)));
-    connect(ui->treeView, SIGNAL(dragEnter(QDragEnterEvent*)),
+    connect(ui->tvNormal, SIGNAL(dragEnter(QDragEnterEvent*)),
                     this, SLOT(dragEnter(QDragEnterEvent*)));
-    connect(ui->treeView, SIGNAL(dragMove(QDragMoveEvent*)),
+    connect(ui->tvNormal, SIGNAL(dragMove(QDragMoveEvent*)),
                     this, SLOT(dragMove(QDragMoveEvent*)));
-    connect(ui->treeView, SIGNAL(drop(QDropEvent*)),
+    connect(ui->tvNormal, SIGNAL(drop(QDropEvent*)),
                     this, SLOT(drop(QDropEvent*)));
-    connect(ui->treeView->header(), SIGNAL(sortIndicatorChanged(int,Qt::SortOrder)),
+    connect(ui->tvNormal->header(), SIGNAL(sortIndicatorChanged(int,Qt::SortOrder)),
             this, SLOT(sortIndicatorChanged(int,Qt::SortOrder)));
-    connect(ui->treeView->header(), SIGNAL(sectionResized(int,int,int)),
+    connect(ui->tvNormal->header(), SIGNAL(sectionResized(int,int,int)),
             this, SIGNAL(sectionResized(int,int,int)));
-    connect(ui->treeView->selectionModel(), &QItemSelectionModel::selectionChanged, this, [=](){
+    connect(ui->tvNormal->selectionModel(), &QItemSelectionModel::selectionChanged, this, [=](){
             emit statusTextChanged(getStatusText());
     });
 
@@ -115,7 +122,7 @@ QString LocalDirDockWidget::root() const
 
 void LocalDirDockWidget::showHeader(bool isShow)
 {
-    ui->treeView->setHeaderHidden(!isShow);
+    ui->tvNormal->setHeaderHidden(!isShow);
 }
 
 void LocalDirDockWidget::showCurrentDir(bool isShow)
@@ -205,14 +212,14 @@ void LocalDirDockWidget::showOverlayIcon(bool isShow)
 
 void LocalDirDockWidget::fileIconSize(int size)
 {
-    ui->treeView->setIconSize(QSize(size, size));
+    ui->tvNormal->setIconSize(QSize(size, size));
 }
 
 void LocalDirDockWidget::fileFont(QFont const& font)
 {
-    ui->treeView->setFont(font);
-    if(ui->treeView->header())
-        ui->treeView->header()->setFont(font);
+    ui->tvNormal->setFont(font);
+    if(ui->tvNormal->header())
+        ui->tvNormal->header()->setFont(font);
 }
 
 void LocalDirDockWidget::setItemColor(QString const& fore,
@@ -228,7 +235,7 @@ void LocalDirDockWidget::setItemSelectedColor(QString const& back,
                   QString const& mark,
                   QString const&cursor)
 {
-    ui->treeView->setStyleSheet(QString("QTreeView{ background: %1;}"
+    ui->tvNormal->setStyleSheet(QString("QTreeView{ background: %1;}"
                                         "QTreeView::item:selected:active:first{ "
                                         "border: 1px solid  %2;"
                                         "border-right-width: 0px;"
@@ -273,8 +280,8 @@ void LocalDirDockWidget::cd(QString const& dir)
 
 void LocalDirDockWidget::resizeSection(int logicalIndex, int size)
 {
-    if(ui->treeView->header()->sectionSize(logicalIndex) != size)
-        ui->treeView->header()->resizeSection(logicalIndex, size);
+    if(ui->tvNormal->header()->sectionSize(logicalIndex) != size)
+        ui->tvNormal->header()->resizeSection(logicalIndex, size);
 }
 
 void LocalDirDockWidget::saveSettings(QString const& name)
@@ -282,7 +289,7 @@ void LocalDirDockWidget::saveSettings(QString const& name)
     QSettings settings(QCoreApplication::applicationName(),
                        QCoreApplication::applicationVersion());
     settings.beginGroup(name);
-    QHeaderView *headerView = ui->treeView->header();
+    QHeaderView *headerView = ui->tvNormal->header();
     settings.setValue("DirName", model_->dir());
     settings.beginWriteArray("sectionSizes", headerView->count());
     for(int i = 0; i < headerView->count(); i++)
@@ -300,12 +307,14 @@ void LocalDirDockWidget::loadSettings(QString const& name)
                        QCoreApplication::applicationVersion());
     settings.beginGroup(name);
     cd(settings.value("DirName").toString());
-    QHeaderView *headerView = ui->treeView->header();
+    QHeaderView *headerView = ui->tvNormal->header();
+    QHeaderView *compresSheaderView = ui->tvCompress->header();
     int size = settings.beginReadArray("sectionSizes");
     for(int i = 0; i < size && i < headerView->count(); i++)
     {
         settings.setArrayIndex(i);
         headerView->resizeSection(i, settings.value("sectionSize").toInt());
+        compresSheaderView->resizeSection(i, settings.value("sectionSize").toInt());
     }
     settings.endArray();
     settings.endGroup();
@@ -345,12 +354,21 @@ bool LocalDirDockWidget::eventFilter(QObject *obj, QEvent *event)
     return QDockWidget::eventFilter(obj, event);
 }
 
-void LocalDirDockWidget::viewClick(QModelIndex const& index)
+void LocalDirDockWidget::normalDoubleClick(QModelIndex const& index)
 {
     QFileInfo fileInfo = model_->fileInfo(index.row());
 
     if(!fileInfo.isDir())
-         WinShell::Open(model_->filePath(index.row()));
+    {
+        if(!isCompressFiles(fileInfo.suffix()))
+            WinShell::Open(model_->filePath(index.row()));
+        else
+        {
+            compressModel_->setCompressFile(fileInfo);
+            ui->tvCompress->show();
+            ui->tvNormal->hide();
+        }
+    }
     else
     {
         if(!fileInfo.isSymLink())
@@ -361,6 +379,23 @@ void LocalDirDockWidget::viewClick(QModelIndex const& index)
             model_->setDir(dir);
             updateCurrentDir(model_->dir());
         }
+    }
+}
+
+void LocalDirDockWidget::compressDoubleClick(QModelIndex const& index)
+{
+    CompressFileInfo::Ptr fileInfo = compressModel_->fileInfo(index.row());
+    if(fileInfo->isDir())
+    {
+        if(!compressModel_->cd(fileInfo->path()))
+        {
+            ui->tvCompress->hide();
+            ui->tvNormal->show();
+        }
+    }
+    else
+    {
+
     }
 }
 
@@ -380,7 +415,7 @@ void LocalDirDockWidget::sortIndicatorChanged(int logicalIndex, Qt::SortOrder or
 
 void LocalDirDockWidget::customContextMenuRequested(const QPoint & pos)
 {
-    QModelIndex index = ui->treeView->indexAt(pos);
+    QModelIndex index = ui->tvNormal->indexAt(pos);
     QMenu menu;
     ContextMenuItems items;
     QString fileName;
@@ -506,10 +541,10 @@ void LocalDirDockWidget::customContextMenuRequested(const QPoint & pos)
 
 void LocalDirDockWidget::beginDragFile(QPoint const& point)
 {
-    QModelIndex index = ui->treeView->indexAt(point);
+    QModelIndex index = ui->tvNormal->indexAt(point);
     if(!index.isValid())
         return;
-    QDrag *drag = new QDrag(ui->treeView);
+    QDrag *drag = new QDrag(ui->tvNormal);
     QStringList fileNames = ClipBoard::fileNames(selectedFileNames());
     QMimeData* mimeData = WinShell::dropMimeData(fileNames);
     drag->setMimeData(mimeData);
@@ -526,8 +561,8 @@ void LocalDirDockWidget::dragEnter(QDragEnterEvent * event)
 
 void LocalDirDockWidget::dragMove(QDragMoveEvent * event)
 {
-    QModelIndex index = ui->treeView->indexAt(event->pos());
-    bool isSelf = (event->source() == ui->treeView);
+    QModelIndex index = ui->tvNormal->indexAt(event->pos());
+    bool isSelf = (event->source() == ui->tvNormal);
     if(index.isValid())
     {
         if(isSelf && model_->fileInfo(index.row()).isFile())
@@ -546,7 +581,7 @@ void LocalDirDockWidget::dragMove(QDragMoveEvent * event)
 
 void LocalDirDockWidget::drop(QDropEvent * event)
 {
-    QModelIndex index = ui->treeView->indexAt(event->pos());
+    QModelIndex index = ui->tvNormal->indexAt(event->pos());
     QString filePath;
     if(!index.isValid())
         filePath = model_->dir();
@@ -649,9 +684,9 @@ void LocalDirDockWidget::rename()
     QString fileName = selectedFileName(true);
     if(fileName.isEmpty())
         return;
-    QModelIndex index = ui->treeView->currentIndex();
+    QModelIndex index = ui->tvNormal->currentIndex();
     QModelIndex nameIndex = model_->index(index.row(), 0);
-    ui->treeView->edit(nameIndex);
+    ui->tvNormal->edit(nameIndex);
 }
 
 void LocalDirDockWidget::createShortcut()
@@ -758,13 +793,13 @@ void LocalDirDockWidget::refresh()
 
 void LocalDirDockWidget::selectAll()
 {
-    ui->treeView->selectAll();
+    ui->tvNormal->selectAll();
     if(model_->isParent(0))
     {
-        QModelIndexList indexList = ui->treeView->selectionModel()->selectedColumns(0);
+        QModelIndexList indexList = ui->tvNormal->selectionModel()->selectedColumns(0);
         foreach(auto const& index, indexList)
         {
-            ui->treeView->selectionModel()->select(index, QItemSelectionModel::Deselect);
+            ui->tvNormal->selectionModel()->select(index, QItemSelectionModel::Deselect);
         }
     }
 }
@@ -924,24 +959,19 @@ void LocalDirDockWidget::newTxtFile()
 
 bool LocalDirDockWidget::isMultiSelected()
 {
-    return ui->treeView->selectionModel()->selectedRows(0).size() > 1;
+    return ui->tvNormal->selectionModel()->selectedRows(0).size() > 1;
 }
 
-bool LocalDirDockWidget::isCompressFiles(QStringList const& fileNames)
+bool LocalDirDockWidget::isCompressFiles(QString const& suffix)
 {
     QStringList suffixs = QStringList() << "zip" << "7z" << "wim" << "tar"
                                         << "gz" << "xz" << "bz2" << "iso";
-    foreach(auto const& fileName, fileNames)
-    {
-        if(!suffixs.contains(QFileInfo(fileName).suffix().toLower()))
-            return false;
-    }
-    return true;
+    return suffixs.contains(suffix.toLower());
 }
 
 QStringList LocalDirDockWidget::selectedFileNames(bool isOnlyFilename, bool isParent)
 {
-    QModelIndexList indexs = ui->treeView->selectionModel()->selectedRows(0);
+    QModelIndexList indexs = ui->tvNormal->selectionModel()->selectedRows(0);
     QStringList names;
     for(int i = 0; i < indexs.size(); i++)
     {
@@ -960,7 +990,7 @@ QStringList LocalDirDockWidget::selectedFileNames(bool isOnlyFilename, bool isPa
 
 QString LocalDirDockWidget::selectedFileName(bool isOnlyFilename) const
 {
-    QModelIndex index = ui->treeView->currentIndex();
+    QModelIndex index = ui->tvNormal->currentIndex();
     if(!index.isValid())
         return QString();
     if(isOnlyFilename)
@@ -1025,7 +1055,8 @@ void LocalDirDockWidget::goToFile(QString const& fileName)
         for(int col = 0; col < model_->columnCount(); col++)
         {
             QModelIndex modeIndex = model_->index(index, col);
-            ui->treeView->selectionModel()->select(modeIndex, QItemSelectionModel::Select);
+            ui->tvNormal->selectionModel()->select(modeIndex,
+                                                   QItemSelectionModel::Select);
         }
     }
     emit statusTextChanged(getStatusText());
@@ -1033,7 +1064,7 @@ void LocalDirDockWidget::goToFile(QString const& fileName)
 
 QString LocalDirDockWidget::getStatusText()
 {
-    QModelIndexList indexs = ui->treeView->selectionModel()->selectedRows(0);
+    QModelIndexList indexs = ui->tvNormal->selectionModel()->selectedRows(0);
     QStringList names;
     int files = 0;
     int dirs = 0;
@@ -1053,12 +1084,15 @@ QString LocalDirDockWidget::getStatusText()
         }
     }
     return  QString("%1/%2,%3/%4 files,%5/%6 dirs(s)")
-            .arg(Utils::formatFileSizeKB(fileSize), Utils::formatFileSizeKB(model_->fileSizes()))
+            .arg(Utils::formatFileSizeKB(fileSize),
+                 Utils::formatFileSizeKB(model_->fileSizes()))
             .arg(files).arg(model_->fileCount())
             .arg(dirs).arg(model_->dirCount());
 }
 
-void LocalDirDockWidget::updateCurrentDir(QString const& dir, QString const& caption, bool isNavigation)
+void LocalDirDockWidget::updateCurrentDir(QString const& dir,
+                                          QString const& caption,
+                                          bool isNavigation)
 {
     if(caption.isEmpty())
         titleBarWidget->setTitle(dir);

@@ -8,6 +8,7 @@ namespace Ui {
 class LocalDirDockWidget;
 }
 class LocalDirModel;
+class CompressDirModel;
 class QMimeData;
 class TitleBarWidget;
 class QFileSystemWatcher;
@@ -89,7 +90,8 @@ signals:
 protected:
      bool eventFilter(QObject *obj, QEvent *event) override;
 private slots:
-    void viewClick(QModelIndex const& index);
+    void normalDoubleClick(QModelIndex const& index);
+    void compressDoubleClick(QModelIndex const& index);
     void directoryChanged(const QString &path);
     void sortIndicatorChanged(int logicalIndex, Qt::SortOrder order);
     void customContextMenuRequested(const QPoint &pos);
@@ -107,7 +109,7 @@ private slots:
     void createShortcut();
 private:
     bool isMultiSelected();
-    bool isCompressFiles(QStringList const& fileNames);
+    bool isCompressFiles(QString const& suffix);
     QStringList selectedFileNames(bool isOnlyFilename = false, bool isParent = false);
     QString selectedFileName(bool isOnlyFilename = false) const;
 
@@ -122,6 +124,7 @@ private:
 private:
     Ui::LocalDirDockWidget *ui;
     LocalDirModel* model_;
+    CompressDirModel* compressModel_;
     TitleBarWidget* titleBarWidget;
     QFileSystemWatcher* fileSystemWatcher;
 };
