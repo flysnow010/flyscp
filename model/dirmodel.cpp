@@ -15,9 +15,9 @@ DirModel::DirModel(QObject *parent)
 QVariant DirModel::backColor(const QModelIndex &index) const
 {
     if((index.row() % 2) == 0)
-        return QBrush(QColor(backColor_));
-    else
         return QBrush(QColor(altColor_));
+    else
+        return QBrush(QColor(backColor_));
 }
 
 QVariant DirModel::foreColor(const QModelIndex &index) const
