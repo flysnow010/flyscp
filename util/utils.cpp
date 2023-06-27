@@ -278,9 +278,9 @@ QString Utils::getPassword(QString const& label)
     return QString();
 }
 
-QString Utils::getPath(QString const& caption)
+QString Utils::getPath(QString const& caption, QString const& defaultPath)
 {
-    return QFileDialog::getExistingDirectory(0, caption);
+    return QFileDialog::getExistingDirectory(0, caption, defaultPath);
 }
 
 QString Utils::getSaveFile(QString const& caption)
