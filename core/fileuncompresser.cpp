@@ -26,6 +26,7 @@ FileUncompresser::FileUncompresser(QObject *parent)
     , mode(Uncompress)
     , isEncrypted_(false)
     , isListStart_(false)
+    , isOK_(true)
 {
     connect(process, &QProcess::readyReadStandardOutput, this, [=](){
         while(process->canReadLine())
@@ -53,6 +54,11 @@ FileUncompresser::FileUncompresser(QObject *parent)
                        isListStart_ = !isListStart_;
                     else if(isListStart_)
                         fileInfos << text;
+                }
+                else if(mode == Delete || mode == Extract || mode == Rename)
+                {
+                    if(text.startsWith("No files to process"))
+                        isOK_ = false;
                 }
             }
         }
@@ -120,6 +126,7 @@ bool FileUncompresser::isEncrypted(QString const& fileName)
     argsList.clear();
     argsList << args;
     mode = CheckEncrypt;
+    isEncrypted_ = false;
     currentIndex = 0;
     process->setProgram(Utils::compressApp());
     process->setArguments(nextArgs());
@@ -142,6 +149,65 @@ QStringList FileUncompresser::listFileInfo(QString const& fileName)
     process->start();
     process->waitForFinished();
     return fileInfos;
+}
+
+bool FileUncompresser::remove(QString const& archiveFileName, QString const& fileName)
+{
+    QStringList args;
+    args << "d"  << archiveFileName << fileName << "-r";
+    argsList.clear();
+    argsList << args;
+    mode = Delete;
+    currentIndex = 0;
+    isOK_ = true;
+    process->setProgram(Utils::compressApp());
+    process->setArguments(nextArgs());
+    process->start();
+    process->waitForFinished();
+    return isOK_;
+}
+
+bool FileUncompresser::rename(QString const& archiveFileName, QString const& oldName, QString const& newName)
+{
+    QStringList args;
+    args << "rn"  << archiveFileName << oldName << newName;
+    argsList.clear();
+    argsList << args;
+    qDebug() << args.join(" ");
+    mode = Rename;
+    currentIndex = 0;
+    isOK_ = true;
+    process->setProgram(Utils::compressApp());
+    process->setArguments(nextArgs());
+    process->start();
+    process->waitForFinished();
+    return isOK_;
+}
+
+bool FileUncompresser::extract(QString const& archiveFileName,
+                               QString const& targetPath,
+                               QString const& fileName,
+                               bool isWithPath)
+{
+    QStringList args;
+    if(isWithPath)
+        args << "x";
+    else
+        args << "e";
+    args << archiveFileName
+         << QString("-o%1").arg(targetPath)
+         << fileName << "-y";
+    argsList.clear();
+    argsList << args;
+    qDebug()<< args.join(" ");
+    mode = Extract;
+    currentIndex = 0;
+    isOK_ = true;
+    process->setProgram(Utils::compressApp());
+    process->setArguments(nextArgs());
+    process->start();
+    process->waitForFinished();
+    return isOK_;
 }
 
 void FileUncompresser::cancel()

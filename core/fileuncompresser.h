@@ -26,7 +26,7 @@ class FileUncompresser: public QObject
 public:
     explicit FileUncompresser(QObject *parent = nullptr);
 
-    enum Mode { Uncompress, CheckEncrypt, List };
+    enum Mode { Uncompress, CheckEncrypt, List, Delete, Extract, Rename };
 
     static bool isCompressFiles(QStringList const& fileNames, QString &unCompressfileName);
     bool uncompress(QStringList const& fileNames,
@@ -35,6 +35,11 @@ public:
 
     bool isEncrypted(QString const& fileName);
     QStringList listFileInfo(QString const& fileName);
+    bool remove(QString const& archiveFileName, QString const& fileName);
+    bool rename(QString const& archiveFileName, QString const& oldName, QString const& newName);
+    bool extract(QString const& archiveFileName,
+                 QString const& targetPath,
+                 QString const& fileName, bool isWithPath);
 
     void cancel();
 signals:
@@ -53,6 +58,7 @@ private:
     Mode mode;
     bool isEncrypted_;
     bool isListStart_;
+    bool isOK_;
 };
 
 #endif // FILEUNCOMPRESSER_H
