@@ -1,5 +1,6 @@
 #include "commandbar.h"
 #include "ui_commandbar.h"
+#include "util/utils.h"
 
 #include <QKeyEvent>
 
@@ -18,7 +19,7 @@ CommandBar::~CommandBar()
 
 void CommandBar::setDir(QString const& dir)
 {
-    ui->labelDir->setText(dir.split("/").join("\\"));
+    ui->labelDir->setText(Utils::toWindowsPath(dir));
 }
 
 void CommandBar::setDirFont(QFont const& font)

@@ -1,6 +1,6 @@
 #include "titlebarwidget.h"
 #include "ui_titlebarwidget.h"
-#include <QDebug>
+#include "util/utils.h"
 #include <QScreen>
 #include <QMouseEvent>
 #include <QFontMetrics>
@@ -16,7 +16,6 @@ TitleBarWidget::TitleBarWidget(bool isWindows, QWidget *parent)
     connect(ui->btnLibDir, SIGNAL(clicked()), this, SIGNAL(libDirButtonClicked()));
     connect(ui->btnFavoritesDir, SIGNAL(clicked()), this, SIGNAL(favoritesDirButtonCLicked()));
     connect(ui->btnHistoryDir, SIGNAL(clicked()), this, SIGNAL(historyDirButtonClicked()));
-    connect(ui->labelTitle, SIGNAL(linkHovered(QString)), this, SLOT(linkHovered(QString)));
     setActived(false);
     ui->labelTitle->installEventFilter(this);
 }
@@ -44,7 +43,7 @@ void TitleBarWidget::showHistoryButton(bool isShow)
 void TitleBarWidget::setTitle(QString const& title)
 {
     if(isWindows_)
-        ui->labelTitle->setText(title.split("/").join("\\"));
+        ui->labelTitle->setText(Utils::toWindowsPath(title));
     else
         ui->labelTitle->setText(title);
 }
@@ -76,11 +75,6 @@ void TitleBarWidget::setActived(bool isActived)
                       "padding: 0px;"
                       "border-width: 0px;"
                       "border-radius: 0px;}");
-}
-
-void TitleBarWidget::linkHovered(const QString &link)
-{
-    qDebug() << link;
 }
 
 bool TitleBarWidget::eventFilter(QObject *obj, QEvent *event)

@@ -1,4 +1,6 @@
 #include "winshell.h"
+#include "util/utils.h"
+
 #include <windows.h>
 #include <oleidl.h>
 
@@ -50,7 +52,7 @@ struct ShellHelper
         size = fileNames.size();
         for(int i = 0; i < fileNames.size(); i++)
         {
-            QString fileName = fileNames[i].split("/").join("\\");
+            QString fileName = Utils::toWindowsPath(fileNames[i]);
             hr = pDesktop->ParseDisplayName(0, 0, (LPWSTR)(fileName.toStdWString().c_str()),
                                          0, (LPITEMIDLIST*)&pidlDrives[i], 0);
             if(FAILED(hr))
@@ -219,7 +221,7 @@ void WinShell::OpenWith(QString const& fileName)
 
 void WinShell::OpenByExplorer(QString const& fileName)
 {
-    QString filePath = fileName.split("/").join("\\");
+    QString filePath = Utils::toWindowsPath(fileName);
     ShellExecute(0, L"open", L"explorer",
                  filePath.toStdWString().c_str(), 0, SW_SHOWNORMAL);
 }

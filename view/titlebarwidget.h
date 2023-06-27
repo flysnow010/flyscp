@@ -30,8 +30,6 @@ signals:
     void actived();
 protected:
      bool eventFilter(QObject *obj, QEvent *event) override;
-private slots:
-    void linkHovered(const QString &link);
 private:
     void selectDir(int x);
 private:

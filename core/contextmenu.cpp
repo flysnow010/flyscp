@@ -34,7 +34,7 @@ struct ContextMenuHelper
         size = fileNames.size();
         for(int i = 0; i < fileNames.size(); i++)
         {
-            QString fileName = fileNames[i].split("/").join("\\");
+            QString fileName = Utils::toWindowsPath(fileNames[i]);
             hr = pDesktop->ParseDisplayName(0, 0, (LPWSTR)(fileName.toStdWString().c_str()),
                                          0, (LPITEMIDLIST*)&pidlDrives[i], 0);
             if(FAILED(hr))
