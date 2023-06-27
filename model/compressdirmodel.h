@@ -13,14 +13,19 @@ public:
 
     void setCompressFile(QFileInfo const& fileInfo);
     bool setDir(QString const& dir);
-    bool cd(QString const& dir);
     QString dir() const;
+
+    bool cd(QString const& dir);
+    void sortItems(int index, bool isDescendingOrder);
+
+
     CompressFileInfo::Ptr fileInfo(int index);
 
     bool rmFile(QString const& filePath);
     bool rename(QString const& oldFileName, QString const& newFileName);
     bool extract(QString const& targetPath, QString const& filePath, bool isWithPath);
     void refresh();
+
     bool setData(const QModelIndex &index, const QVariant &value, int role);
 protected:
     virtual TreeItem *createRootItem();
@@ -35,6 +40,8 @@ private:
     QIcon dirIcon;
     QIcon fileIcon;
     QIcon backIcon;
+    int sortIndex;
+    bool isDescending;
 };
 
 #endif // COMPRESSDIRMODEL_H

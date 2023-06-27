@@ -58,6 +58,8 @@ LocalDirDockWidget::LocalDirDockWidget(QWidget *parent)
                     this, SLOT(drop(QDropEvent*)));
     connect(ui->tvNormal->header(), SIGNAL(sortIndicatorChanged(int,Qt::SortOrder)),
             this, SLOT(sortIndicatorChanged(int,Qt::SortOrder)));
+    connect(ui->tvCompress->header(), SIGNAL(sortIndicatorChanged(int,Qt::SortOrder)),
+            this, SLOT(sortIndicatorChanged(int,Qt::SortOrder)));
     connect(ui->tvNormal->header(), SIGNAL(sectionResized(int,int,int)),
             this, SIGNAL(sectionResized(int,int,int)));
     connect(ui->tvNormal->selectionModel(), &QItemSelectionModel::selectionChanged, this, [=](){
@@ -441,7 +443,7 @@ void LocalDirDockWidget::compressDoubleClick(QModelIndex const& index)
     }
     else
     {
-
+        ;
     }
 }
 
@@ -453,10 +455,20 @@ void LocalDirDockWidget::directoryChanged(const QString &path)
 
 void LocalDirDockWidget::sortIndicatorChanged(int logicalIndex, Qt::SortOrder order)
 {
-    if(order == Qt::SortOrder::AscendingOrder)
-        model_->sortItems(logicalIndex, false);
-    else
-        model_->sortItems(logicalIndex, true);
+    if(sender() == ui->tvNormal->header())
+    {
+        if(order == Qt::SortOrder::AscendingOrder)
+            model_->sortItems(logicalIndex, false);
+        else
+            model_->sortItems(logicalIndex, true);
+    }
+    else if(sender() == ui->tvCompress->header())
+    {
+        if(order == Qt::SortOrder::AscendingOrder)
+            compressModel_->sortItems(logicalIndex, false);
+        else
+            compressModel_->sortItems(logicalIndex, true);
+    }
 }
 
 void LocalDirDockWidget::customNormalContextMenu(const QPoint & pos)

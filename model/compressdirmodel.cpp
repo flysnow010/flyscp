@@ -2,8 +2,11 @@
 #include "util/utils.h"
 #include <QFileInfo>
 namespace  {
+int const NONE_INDEX = -1;
 int const NAME_INDEX = 0;
+int const SUFFIX_INDEX = 1;
 int const SIZE_INDEX = 2;
+int const TIME_INDEX = 3;
 }
 
 CompressDirModel::CompressDirModel(QObject *parent)
@@ -11,6 +14,8 @@ CompressDirModel::CompressDirModel(QObject *parent)
     , dirIcon(Utils::dirIcon())
     , fileIcon(Utils::fileIcon())
     , backIcon(":/image/back.png")
+    , sortIndex(NONE_INDEX)
+    , isDescending(false)
 {
     setupData();
 }
@@ -63,6 +68,31 @@ bool CompressDirModel::cd(QString const& dir)
     return true;
 }
 
+void CompressDirModel::sortItems(int index, bool isDescendingOrder)
+{
+     uint32_t sortFlag = CompressFile::DirsFirst;
+
+    if(index == NAME_INDEX)
+    {
+        if(dirSortIsByTime())
+            sortFlag |=  CompressFile::Time;
+        else
+            sortFlag |= CompressFile::Name;
+    }
+    else if(index == SIZE_INDEX)
+        sortFlag |=  CompressFile::Size;
+    else if(index == TIME_INDEX)
+        sortFlag |=  CompressFile::Time;
+    else if(index == SUFFIX_INDEX)
+        sortFlag |= CompressFile::Type;
+    if(!isDescendingOrder)
+        sortFlag |=  CompressFile::Reversed;
+    fileInfos_ = compressFile.fileInfoList( static_cast<CompressFile::SortFlag>(sortFlag));
+    sortIndex = index;
+    isDescending = isDescendingOrder;
+    setupData();
+}
+
 QVariant CompressDirModel::icon(const QModelIndex &index) const
 {
     if(index.column() != 0)
@@ -99,8 +129,13 @@ bool CompressDirModel::setDir(QString const& dir)
 void CompressDirModel::refresh()
 {
     compressFile.refresh();
-    fileInfos_ = compressFile.fileInfoList(CompressFile::DirsFirst);
-    setupData();
+    if(sortIndex != NONE_INDEX)
+        sortItems(sortIndex, isDescending);
+    else
+    {
+        fileInfos_ = compressFile.fileInfoList(CompressFile::DirsFirst);
+        setupData();
+    }
 }
 
 bool CompressDirModel::rmFile(QString const& filePath)
@@ -160,7 +195,7 @@ void CompressDirModel::setupModelData(TreeItem *parent)
         if(fileInfos_[i]->isDir())
             rowData << fileInfos_[i]->path() << QString() << QString("<DIR>");
         else
-            rowData << fileInfos_[i]->fileName() << fileInfos_[i]->suffix()
+            rowData << fileInfos_[i]->baseName() << fileInfos_[i]->suffix()
                     << Utils::formatFileSizeB(fileInfos_[i]->size());
         rowData << fileInfos_[i]->timeText();
         TreeItem* item = new TreeItem(rowData, parent);
