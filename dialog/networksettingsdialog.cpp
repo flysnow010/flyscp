@@ -85,6 +85,7 @@ void NetworkSettingsDialog::saveSettings()
     QSettings settings(QCoreApplication::applicationName(),
                        QCoreApplication::applicationVersion());
     settings.beginGroup("NetworkSettingsDialog");
+    settings.setValue("geometry", saveGeometry());
     QHeaderView *headerView = ui->treeView->header();
     settings.beginWriteArray("sectionSizes", headerView->count());
     for(int i = 0; i < headerView->count(); i++)
@@ -101,6 +102,9 @@ void NetworkSettingsDialog::loadSettings()
     QSettings settings(QCoreApplication::applicationName(),
                        QCoreApplication::applicationVersion());
     settings.beginGroup("NetworkSettingsDialog");
+    const QByteArray geometry = settings.value("geometry", QByteArray()).toByteArray();
+    if(!geometry.isEmpty())
+        restoreGeometry(geometry);
     QHeaderView *headerView = ui->treeView->header();
     int size = settings.beginReadArray("sectionSizes");
     for(int i = 0; i < size && i < headerView->count(); i++)
