@@ -646,10 +646,10 @@ void LocalDirDockWidget::customCompressContextMenu(const QPoint &pos)
     }
     menu.addSeparator();
     menu.addAction("Copy to...", this, [=]() {
-
+        emit copyRequested();
     });
     menu.addAction("Move to...", this, [=](){
-
+        emit moveRequested();
     });
     menu.addAction("Rename", this, [=](){
         QModelIndex nameIndex = compressModel_->index(index.row(), 0);
@@ -860,7 +860,12 @@ void LocalDirDockWidget::editFile()
 
 void LocalDirDockWidget::copyFiles(QString const& dstFilePath)
 {
-    QStringList fileNames = selectedFileNames(true);
+    QStringList fileNames;
+    if(ui->tvCompress->isVisible())
+        fileNames = selectedCompressedFileNames();
+    else
+        fileNames = selectedFileNames(true);
+
     if(fileNames.isEmpty())
     {
         Utils::warring("No files or folders selected!");
@@ -882,12 +887,22 @@ void LocalDirDockWidget::copyFiles(QString const& dstFilePath)
     }
     dialog.setPath(dstFilePath);
     if(dialog.exec() == QDialog::Accepted)
-        copyFilels(selectedFileNames(), dstFilePath);
+    {
+        if(ui->tvNormal->isVisible())
+            copyFilels(selectedFileNames(), dialog.path());
+        else
+        {}
+    }
 }
 
 void LocalDirDockWidget::moveFiles(QString const& dstFilePath)
 {
-    QStringList fileNames = selectedFileNames(true);
+    QStringList fileNames;
+    if(ui->tvCompress->isVisible())
+        fileNames = selectedCompressedFileNames();
+    else
+        fileNames = selectedFileNames(true);
+
     if(fileNames.isEmpty())
     {
         Utils::warring("No files or folders selected!");
@@ -909,8 +924,15 @@ void LocalDirDockWidget::moveFiles(QString const& dstFilePath)
     dialog.setPath(dstFilePath);
     if(dialog.exec() == QDialog::Accepted)
     {
-        cutFiles(selectedFileNames(), dstFilePath);
-        model_->refresh();
+        if(ui->tvNormal->isVisible())
+        {
+            cutFiles(selectedFileNames(), dialog.path());
+            model_->refresh();
+        }
+        else
+        {
+            ;
+        }
     }
 }
 
@@ -1096,7 +1118,8 @@ bool LocalDirDockWidget::isMultiSelected()
 bool LocalDirDockWidget::isCompressFiles(QString const& suffix)
 {
     QStringList suffixs = QStringList() << "zip" << "7z" << "wim" << "tar"
-                                        << "gz" << "xz" << "bz2" << "iso";
+                                        << "gz" << "xz" << "bz2" << "iso"
+                                        << "rar";
     return suffixs.contains(suffix.toLower());
 }
 
@@ -1116,6 +1139,19 @@ QStringList LocalDirDockWidget::selectedFileNames(bool isOnlyFilename, bool isPa
     }
     if(isParent && names.isEmpty())
         names << model_->dir();
+    return names;
+}
+
+QStringList LocalDirDockWidget::selectedCompressedFileNames()
+{
+    QModelIndexList indexs = ui->tvCompress->selectionModel()->selectedRows(0);
+    QStringList names;
+    for(int i = 0; i < indexs.size(); i++)
+    {
+        if(compressModel_->isParent(indexs[i].row()))
+            continue;
+         names << compressModel_->filePath(indexs[i].row());
+    }
     return names;
 }
 

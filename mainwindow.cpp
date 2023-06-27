@@ -287,6 +287,12 @@ void MainWindow::createViewConnect()
     connect(leftDirView, &LocalDirDockWidget::historyDirContextMenuRequested, this, [&](){
         leftPanelWidget->historyDirContextMenu();
     });
+    connect(leftDirView, &LocalDirDockWidget::copyRequested, this, [&](){
+        leftDirView->copyFiles(rightDirView->dir());
+    });
+    connect(leftDirView, &LocalDirDockWidget::moveRequested, this, [&](){
+        leftDirView->moveFiles(rightDirView->dir());
+    });
 
     connect(rightDirView, &LocalDirDockWidget::libDirContextMenuRequested, this, [&](){
         rightPanelWidget->libDirContextMenu();
@@ -297,6 +303,13 @@ void MainWindow::createViewConnect()
     connect(rightDirView, &LocalDirDockWidget::historyDirContextMenuRequested, this, [&](){
         rightPanelWidget->historyDirContextMenu();
     });
+    connect(rightDirView, &LocalDirDockWidget::copyRequested, this, [&](){
+        rightDirView->copyFiles(leftDirView->dir());
+    });
+    connect(rightDirView, &LocalDirDockWidget::moveRequested, this, [&](){
+        rightDirView->moveFiles(leftDirView->dir());
+    });
+
 
     connect(rightDirView, &LocalDirDockWidget::actived, this, [&](){
         leftDirView->setActived(false);

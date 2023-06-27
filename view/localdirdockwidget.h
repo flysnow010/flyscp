@@ -82,6 +82,8 @@ signals:
     void libDirContextMenuRequested();
     void favoritesDirContextMenuRequested();
     void historyDirContextMenuRequested();
+    void copyRequested();
+    void moveRequested();
     void remoteDownload(QString const& remoteSrc,
                         QStringList const& fileNames,
                         QString const& targetFilePath);
@@ -112,6 +114,7 @@ private:
     bool isMultiSelected();
     bool isCompressFiles(QString const& suffix);
     QStringList selectedFileNames(bool isOnlyFilename = false, bool isParent = false);
+    QStringList selectedCompressedFileNames();
     QString selectedFileName(bool isOnlyFilename = false) const;
 
     void copyFilels(QStringList const& fileNames, QString const& dstFilePath);
