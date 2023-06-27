@@ -94,7 +94,8 @@ private slots:
     void compressDoubleClick(QModelIndex const& index);
     void directoryChanged(const QString &path);
     void sortIndicatorChanged(int logicalIndex, Qt::SortOrder order);
-    void customContextMenuRequested(const QPoint &pos);
+    void customNormalContextMenu(const QPoint &pos);
+    void customCompressContextMenu(const QPoint &pos);
     void beginDragFile(QPoint const& point);
     void dragEnter(QDragEnterEvent * event);
     void dragMove(QDragMoveEvent * event);

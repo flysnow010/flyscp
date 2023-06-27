@@ -45,7 +45,9 @@ LocalDirDockWidget::LocalDirDockWidget(QWidget *parent)
     connect(ui->tvCompress, SIGNAL(doubleClicked(QModelIndex)),
                     this, SLOT(compressDoubleClick(QModelIndex)));
     connect(ui->tvNormal, SIGNAL(customContextMenuRequested(QPoint)),
-                    this, SLOT(customContextMenuRequested(QPoint)));
+                    this, SLOT(customNormalContextMenu(QPoint)));
+    connect(ui->tvCompress, SIGNAL(customContextMenuRequested(QPoint)),
+                    this, SLOT(customCompressContextMenu(QPoint)));
     connect(ui->tvNormal, SIGNAL(prepareDrag(QPoint)),
                     this, SLOT(beginDragFile(QPoint)));
     connect(ui->tvNormal, SIGNAL(dragEnter(QDragEnterEvent*)),
@@ -87,10 +89,38 @@ LocalDirDockWidget::~LocalDirDockWidget()
 
 void LocalDirDockWidget::setDir(QString const& dir, QString const& caption, bool isNavigation)
 {
-    fileSystemWatcher->removePath(model_->dir());
-    model_->setDir(dir);
-    fileSystemWatcher->addPath(dir);
-    updateCurrentDir(dir, caption, isNavigation);
+    QDir dirInfo(dir);
+    if(ui->tvNormal->isVisible())
+    {
+        if(!dirInfo.exists())
+        {
+            ui->tvNormal->hide();
+            ui->tvCompress->show();
+            compressModel_->setDir(dir);
+        }
+        else
+        {
+            fileSystemWatcher->removePath(model_->dir());
+            model_->setDir(dir);
+            fileSystemWatcher->addPath(dir);
+        }
+        updateCurrentDir(dir, caption, isNavigation);
+
+    }
+    else if(ui->tvCompress->isVisible())
+    {
+        if(!dirInfo.exists())
+            compressModel_->setDir(dir);
+        else
+        {
+            ui->tvCompress->hide();
+            ui->tvNormal->show();
+            fileSystemWatcher->removePath(model_->dir());
+            model_->setDir(dir);
+            fileSystemWatcher->addPath(dir);
+        }
+        updateCurrentDir(dir, caption, isNavigation);
+    }
     if(!isActived())
     {
         setActived(true);
@@ -154,21 +184,26 @@ void LocalDirDockWidget::showHiddenAndSystem(bool isShow)
 void LocalDirDockWidget::showToolTips(bool isShow)
 {
     model_->showToolTips(isShow);
+    compressModel_->showToolTips(isShow);
+
 }
 
 void LocalDirDockWidget::showParentInRoot(bool isShow)
 {
     model_->showParentInRoot(isShow);
+    compressModel_->showParentInRoot(isShow);
 }
 
 void LocalDirDockWidget::setDirSoryByTime(bool isOn)
 {
-    model_->setDirSoryByTime(isOn);
+    model_->setDirSortByTime(isOn);
+    compressModel_->setDirSortByTime(isOn);
 }
 
 void LocalDirDockWidget::setRenameFileName(bool isOn)
 {
-    model_->setRenameBasename(isOn);
+    model_->setRenameBaseName(isOn);
+    compressModel_->setRenameBaseName(isOn);
 }
 
 void LocalDirDockWidget::showAllIconWithExeAndLink(bool isShow)
@@ -197,17 +232,17 @@ void LocalDirDockWidget::showNoneIcon(bool isShow)
 
 void LocalDirDockWidget::showIconForFyleSystem(bool isShow)
 {
-    model_->setShowIconForFyleSystem(isShow);
+    model_->showIconForFyleSystem(isShow);
 }
 
 void LocalDirDockWidget::showIconForVirtualFolder(bool isShow)
 {
-    model_->setShowIconForVirtualFolder(isShow);
+    model_->showIconForVirtualFolder(isShow);
 }
 
 void LocalDirDockWidget::showOverlayIcon(bool isShow)
 {
-    model_->setShowOverlayIcon(isShow);
+    model_->showOverlayIcon(isShow);
 }
 
 void LocalDirDockWidget::fileIconSize(int size)
@@ -229,31 +264,38 @@ void LocalDirDockWidget::setItemColor(QString const& fore,
     model_->setTextColor(fore);
     model_->setBackground(back);
     model_->setAltColor(alternate);
+
+    compressModel_->setTextColor(fore);
+    compressModel_->setBackground(back);
+    compressModel_->setAltColor(alternate);
+
 }
 
 void LocalDirDockWidget::setItemSelectedColor(QString const& back,
                   QString const& mark,
                   QString const&cursor)
 {
-    ui->tvNormal->setStyleSheet(QString("QTreeView{ background: %1;}"
-                                        "QTreeView::item:selected:active:first{ "
-                                        "border: 1px solid  %2;"
-                                        "border-right-width: 0px;"
-                                        "color: %4;"
-                                        "background: %3;}"
-                                        "QTreeView::item:selected:active{ "
-                                        "border: 1px solid  %2;"
-                                        "border-left-width: 0px;"
-                                        "border-right-width: 0px;"
-                                        "color: %4;"
-                                        "background: %3;}"
-                                        "QTreeView::item:selected:active:last{ "
-                                        "border: 1px solid  %2;"
-                                        "border-left-width: 0px;"
-                                        "color: %4;"
-                                        "background: %3;}"
-                                        )
-                                .arg(back, cursor, mark, model_->textColor()));
+    QString styleSheet = QString("QTreeView{ background: %1;}"
+                                 "QTreeView::item:selected:active:first{ "
+                                 "border: 1px ridge  %2;"
+                                 "border-right-width: 0px;"
+                                 "color: %4;"
+                                 "background: %3;}"
+                                 "QTreeView::item:selected:active{ "
+                                 "border: 1px ridge  %2;"
+                                 "border-left-width: 0px;"
+                                 "border-right-width: 0px;"
+                                 "color: %4;"
+                                 "background: %3;}"
+                                 "QTreeView::item:selected:active:last{ "
+                                 "border: 1px ridge  %2;"
+                                 "border-left-width: 0px;"
+                                 "color: %4;"
+                                 "background: %3;}"
+                                 )
+                         .arg(back, cursor, mark, model_->textColor());
+    ui->tvNormal->setStyleSheet(styleSheet);
+    ui->tvCompress->setStyleSheet(styleSheet);
 }
 
 void LocalDirDockWidget::setActived(bool isActived)
@@ -367,6 +409,7 @@ void LocalDirDockWidget::normalDoubleClick(QModelIndex const& index)
             compressModel_->setCompressFile(fileInfo);
             ui->tvCompress->show();
             ui->tvNormal->hide();
+            updateCurrentDir(compressModel_->dir());
         }
     }
     else
@@ -387,10 +430,13 @@ void LocalDirDockWidget::compressDoubleClick(QModelIndex const& index)
     CompressFileInfo::Ptr fileInfo = compressModel_->fileInfo(index.row());
     if(fileInfo->isDir())
     {
-        if(!compressModel_->cd(fileInfo->path()))
+        if(compressModel_->cd(fileInfo->path()))
+            updateCurrentDir(compressModel_->dir());
+        else
         {
             ui->tvCompress->hide();
             ui->tvNormal->show();
+            updateCurrentDir(model_->dir());
         }
     }
     else
@@ -413,7 +459,7 @@ void LocalDirDockWidget::sortIndicatorChanged(int logicalIndex, Qt::SortOrder or
         model_->sortItems(logicalIndex, true);
 }
 
-void LocalDirDockWidget::customContextMenuRequested(const QPoint & pos)
+void LocalDirDockWidget::customNormalContextMenu(const QPoint & pos)
 {
     QModelIndex index = ui->tvNormal->indexAt(pos);
     QMenu menu;
@@ -535,6 +581,75 @@ void LocalDirDockWidget::customContextMenuRequested(const QPoint & pos)
         else
             WinShell::Property(fileName);
     });
+
+    menu.exec(QCursor::pos());
+}
+#include <QDebug>
+void LocalDirDockWidget::customCompressContextMenu(const QPoint &pos)
+{
+    QModelIndex index = ui->tvCompress->indexAt(pos);
+
+    if(!index.isValid())
+        return;
+
+    CompressFileInfo::Ptr fileInfo = compressModel_->fileInfo(index.row());
+    if(fileInfo->isParent())
+        return;
+
+    QMenu menu;
+
+    if(fileInfo->isDir())
+        menu.addAction("Open", this, [=](){
+            if(compressModel_->cd(fileInfo->path()))
+                updateCurrentDir(compressModel_->dir());
+            else
+            {
+                ui->tvCompress->hide();
+                ui->tvNormal->show();
+                updateCurrentDir(model_->dir());
+            }
+        });
+    else
+    {
+        menu.addAction("View", this, [=](){
+            QDir targetDir = Utils::tempDir();
+            if(compressModel_->extract(targetDir.path(), fileInfo->filePath(), false))
+            {
+                QString fileName = targetDir.filePath(fileInfo->fileName());
+                qDebug() << fileName;
+                FileNames::MakeFileNameAsParams(fileName);
+                WinShell::Exec(Utils::viewApp(), fileName);
+
+            }
+        });
+        menu.addAction("Edit", this, [=](){
+            QDir targetDir = Utils::tempDir();
+            if(compressModel_->extract(targetDir.path(), fileInfo->filePath(), false))
+            {
+                QString fileName = targetDir.filePath(fileInfo->fileName());
+                FileNames::MakeFileNameAsParams(fileName);
+                WinShell::Exec(Utils::editApp(), fileName);
+            }
+        });
+    }
+    menu.addSeparator();
+    menu.addAction("Copy to...", this, [=]() {
+
+    });
+    menu.addAction("Move to...", this, [=](){
+
+    });
+    menu.addAction("Rename", this, [=](){
+        QModelIndex nameIndex = compressModel_->index(index.row(), 0);
+        ui->tvCompress->edit(nameIndex);
+    });
+    menu.addAction("Delete", this, [=](){
+        compressModel_->rmFile(fileInfo->filePath());
+        compressModel_->refresh();
+    });
+    menu.addSeparator();
+    menu.addAction("New Folder", this, [=](){});
+    menu.addAction("Properties", this, [=](){});
 
     menu.exec(QCursor::pos());
 }
@@ -684,6 +799,7 @@ void LocalDirDockWidget::rename()
     QString fileName = selectedFileName(true);
     if(fileName.isEmpty())
         return;
+
     QModelIndex index = ui->tvNormal->currentIndex();
     QModelIndex nameIndex = model_->index(index.row(), 0);
     ui->tvNormal->edit(nameIndex);
@@ -788,7 +904,10 @@ void LocalDirDockWidget::moveFiles(QString const& dstFilePath)
 
 void LocalDirDockWidget::refresh()
 {
-    model_->refresh();
+    if(ui->tvNormal->isVisible())
+        model_->refresh();
+    else if(ui->tvCompress->isVisible())
+        compressModel_->refresh();
 }
 
 void LocalDirDockWidget::selectAll()
