@@ -17,6 +17,7 @@ public:
 
     void setLabel(QString const& label);
     void setPath(QString const& path);
+    QString path() const;
     QString fileType() const;
 
     bool isToQueue()  const { return isToQueue_; }
