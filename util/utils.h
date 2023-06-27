@@ -40,7 +40,7 @@ public:
     static QString permissionsText(quint32 permissions, bool isDir);
     static QString getText(QString const& label, QString const& value = QString());
     static QString getPassword(QString const& label);
-    static QString getPath(QString const& caption);
+    static QString getPath(QString const& caption, QString const& defaultPath = QString());
     static QString getSaveFile(QString const& caption);
     static QString toWindowsPath(QString const& linuxPath);
     static QString toLinuxPath(QString const& windowsPath);
