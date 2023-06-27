@@ -72,8 +72,8 @@ struct IconsOption
     bool isShowIconForFilesystem = true;
     bool isShowIconForVirtualFolder = true;
     bool isShowOverlayIcon = true;
-    int fileIconSize = 20;//16,20,24,32
-    int toolbarIconSize = 20;//16,20,24,32
+    int fileIconSize = 16;//16,20,24,32
+    int toolbarIconSize = 16;//16,20,24,32
 
     bool operator != (IconsOption const& r) const
     {
