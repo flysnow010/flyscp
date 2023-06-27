@@ -30,12 +30,6 @@ static void CancheIcon(LocalDirModel const* model,
 
 LocalDirModel::LocalDirModel(QObject *parent)
     : DirModel(parent)
-    , isShowHidden_(false)
-    , isShowSystem_(false)
-    , isShowToolTips_(true)
-    , isShowParentInRoot_(false)
-    , isRenameBaseName_(false)
-    , dirSortIsByTime_(false)
     , dirIcon(Utils::dirIcon())
     , backIcon(":/image/back.png")
     , sortIndex(NONE_INDEX)
@@ -116,7 +110,7 @@ bool LocalDirModel::setData(const QModelIndex &index, const QVariant &value, int
             QString oldFileName = fileInfo.fileName();
             QString suffix = fileInfo.suffix();
             QString newFileName;
-            if(!isRenameBaseName_ || suffix.isEmpty())
+            if(!isRenameBaseName() || suffix.isEmpty())
                 newFileName = newName;
             else
                newFileName = QString("%1.%2").arg(newName, suffix);
@@ -141,7 +135,7 @@ QVariant LocalDirModel::toolTip(const QModelIndex &index) const
 {
     if(index.column() == 0)
     {
-        if(isShowToolTips_)
+        if(isShowToolTips())
             return fileInfos_[index.row()].fileName();
         return QVariant();
     }
@@ -178,7 +172,7 @@ QVariant LocalDirModel::editText(const QModelIndex &index) const
 {
     if(index.column() == 0)
     {
-        if(!isRenameBaseName_ || fileInfos_[index.row()].completeBaseName().isEmpty())
+        if(!isRenameBaseName() || fileInfos_[index.row()].completeBaseName().isEmpty())
             return fileInfos_[index.row()].fileName();
         else
             return fileInfos_[index.row()].completeBaseName();
@@ -201,35 +195,6 @@ void LocalDirModel::setDir(QString const& dir)
     }
 }
 
-void LocalDirModel::showHidden(bool isShow)
-{
-    isShowHidden_ = isShow;
-}
-void LocalDirModel::showSystem(bool isShow)
-{
-    isShowSystem_ = isShow;
-}
-
-void LocalDirModel::showToolTips(bool isShow)
-{
-    isShowToolTips_ = isShow;
-}
-
-void LocalDirModel::showParentInRoot(bool isShow)
-{
-    isShowParentInRoot_ = isShow;
-}
-
-void LocalDirModel::setDirSoryByTime(bool isOn)
-{
-    dirSortIsByTime_ = isOn;
-}
-
-void LocalDirModel::setRenameBasename(bool isOn)
-{
-    isRenameBaseName_ = isOn;
-}
-
 void LocalDirModel::refresh()
 {
     if(sortIndex != NONE_INDEX)
@@ -244,7 +209,7 @@ void LocalDirModel::sortItems(int index, bool isDescendingOrder)
 
     if(index == NAME_INDEX)
     {
-        if(dirSortIsByTime_)
+        if(dirSortIsByTime())
             sortFlag |=  QDir::SortFlag::Time;
         else
             sortFlag |= QDir::SortFlag::Name;
@@ -411,7 +376,7 @@ void LocalDirModel::modifyFileInfos(QFileInfoList &fileInfos)
             }
         }
     }
-    if(isShowParentInRoot_ && !fileInfos.isEmpty())
+    if(isShowParentInRoot() && !fileInfos.isEmpty())
     {
         if(fileInfos[0].fileName() != ParentPath)
         {
@@ -432,9 +397,9 @@ void LocalDirModel::defaultRefresh()
 QDir::Filters LocalDirModel::getFilters()
 {
     QDir::Filters filters = QDir::AllEntries | QDir::NoDot;
-    if(isShowHidden_)
+    if(isShowHidden())
         filters |= QDir::Hidden;
-    if(isShowSystem_)
+    if(isShowSystem())
         filters |= QDir::System;
     return filters;
 }

@@ -13,12 +13,6 @@ public:
 
     void setDir(QString const& dir);
     QString dir() const;
-    void showHidden(bool isShow);
-    void showSystem(bool isShow);
-    void showToolTips(bool isShow);
-    void showParentInRoot(bool isShow);
-    void setDirSoryByTime(bool isOn);
-    void setRenameBasename(bool isOn);
 
     bool mkdirs(QString const& dir);
     bool rename(QString const& original, QString const& newname);
@@ -57,12 +51,6 @@ private:
     QDir dir_;
     QFileInfoList fileInfos_;
     QMap<QString, QIcon> iconMap;
-    bool isShowHidden_;
-    bool isShowSystem_;
-    bool isShowToolTips_;
-    bool isShowParentInRoot_;
-    bool isRenameBaseName_;
-    bool dirSortIsByTime_;
     QIcon dirIcon;
     QIcon backIcon;
     int sortIndex;

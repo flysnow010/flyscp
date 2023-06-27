@@ -13,12 +13,6 @@ public:
 
     void setDir(ssh::DirPtr const& dir);
     QString dirName();
-    void showHidden(bool isShow);
-    void showSystem(bool isShow);
-    void showToolTips(bool isShow);
-    void setDirSoryByTime(bool isOn);
-    void setRenameBasename(bool isOn);
-    void showParentInRoot(bool isShow);
     void sortItems(int index, bool isDescendingOrder);
 
     ssh::FileInfoPtr fileInfo(QString const& fileName) const;
@@ -54,12 +48,6 @@ private:
     ssh::DirPtr dir_;
     ssh::FileInfos fileInfos_;
     QMap<QString, QIcon> iconMap;
-    bool isShowHidden_;
-    bool isShowSystem_;
-    bool isShowToolTips_;
-    bool isShowParentInRoot_;
-    bool dirSortIsByTime_;
-    bool isRenameBaseName_;
     QIcon dirIcon;
     QIcon backIcon;
     int fileCount_;

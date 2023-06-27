@@ -24,12 +24,6 @@ static void CancheIcon(RemoteDirModel const* model,
 
 RemoteDirModel::RemoteDirModel(QObject *parent)
     : DirModel(parent)
-    , isShowHidden_(false)
-    , isShowSystem_(false)
-    , isShowToolTips_(true)
-    , isShowParentInRoot_(false)
-    , dirSortIsByTime_(false)
-    , isRenameBaseName_(false)
     , dirIcon(Utils::dirIcon())
     , backIcon(":/image/back.png")
     , fileCount_(0)
@@ -62,43 +56,13 @@ QString RemoteDirModel::dirName()
     return QString();
 }
 
-void RemoteDirModel::showHidden(bool isShow)
-{
-    isShowHidden_ = isShow;
-}
-
-void RemoteDirModel::showSystem(bool isShow)
-{
-    isShowSystem_ = isShow;
-}
-
-void RemoteDirModel::showToolTips(bool isShow)
-{
-    isShowToolTips_ = isShow;
-}
-
-void RemoteDirModel::showParentInRoot(bool isShow)
-{
-    isShowParentInRoot_ = isShow;
-}
-
-void RemoteDirModel::setDirSoryByTime(bool isOn)
-{
-    dirSortIsByTime_ = isOn;
-}
-
-void RemoteDirModel::setRenameBasename(bool isOn)
-{
-    isRenameBaseName_ = isOn;
-}
-
 void RemoteDirModel::sortItems(int index, bool isDescendingOrder)
 {
     uint32_t sortFlag = ssh::Dir::DirsFirst;
 
     if(index == NAME_INDEX)
     {
-        if(dirSortIsByTime_)
+        if(dirSortIsByTime())
             sortFlag |=  ssh::Dir::Time;
         else
             sortFlag |= ssh::Dir::Name;
@@ -298,7 +262,7 @@ bool RemoteDirModel::setData(const QModelIndex &index, const QVariant &value, in
             std::string oldFileName = fileInfo->name();
             std::string const& suffix = fileInfo->suffix();
             std::string newFileName;
-            if(!isRenameBaseName_ || suffix.empty())
+            if(!isRenameBaseName() || suffix.empty())
                 newFileName = newName.toStdString();
             else
                newFileName = QString("%1.%2").arg(newName, QString::fromStdString(suffix)).toStdString();
@@ -323,7 +287,7 @@ QVariant RemoteDirModel::toolTip(const QModelIndex &index) const
 {
     if(index.column() == 0)
     {
-        if(isShowToolTips_)
+        if(isShowToolTips())
             return fileInfos_[index.row()]->name();
         return QVariant();
     }
@@ -354,7 +318,7 @@ QVariant RemoteDirModel::editText(const QModelIndex &index) const
 {
     if(index.column() == 0)
     {
-        if(!isRenameBaseName_ || fileInfos_[index.row()]->basename().empty())
+        if(!isRenameBaseName() || fileInfos_[index.row()]->basename().empty())
             return QString::fromStdString(fileInfos_[index.row()]->name());
         else
             return QString::fromStdString(fileInfos_[index.row()]->basename());

@@ -13,12 +13,30 @@ public:
     void setIconShowType(IconShowType const& showType) { iconShowType_ = showType; }
 
     bool isShowIconForFyleSystem() const { return isShowIconForFyleSystem_; }
-    void setShowIconForFyleSystem(bool isShow) { isShowIconForFyleSystem_ = isShow; }
+    void showIconForFyleSystem(bool isShow) { isShowIconForFyleSystem_ = isShow; }
     bool isShowIconForVirtualFolder() const { return isShowIconForVirtualFolder_; }
-    void setShowIconForVirtualFolder(bool isShow) { isShowIconForVirtualFolder_ = isShow; }
+    void showIconForVirtualFolder(bool isShow) { isShowIconForVirtualFolder_ = isShow; }
 
     bool isShowOverlayIcon() const { return isShowOverlayIcon_; }
-    void setShowOverlayIcon(bool isShow) { isShowOverlayIcon_ = isShow; }
+    void showOverlayIcon(bool isShow) { isShowOverlayIcon_ = isShow; }
+
+    bool isShowHidden() const { return isShowHidden_; }
+    void showHidden(bool isShow) { isShowHidden_ = isShow; }
+
+    bool isShowSystem() const { return isShowSystem_; }
+    void showSystem(bool isShow) { isShowSystem_ = isShow; }
+
+    bool isShowToolTips() const { return isShowToolTips_; }
+    void showToolTips(bool isShow) { isShowToolTips_ = isShow; }
+
+    bool isShowParentInRoot() const { return isShowParentInRoot_; }
+    void showParentInRoot(bool isShow) { isShowParentInRoot_ = isShow; }
+
+    bool isRenameBaseName() const { return isRenameBaseName_; }
+    void setRenameBaseName(bool isShow) { isRenameBaseName_ = isShow; }
+
+    bool dirSortIsByTime() const { return dirSortIsByTime_; }
+    void setDirSortByTime(bool isShow) { dirSortIsByTime_ = isShow; }
 
     void setTextColor(QString const& color) { textColor_ = color; }
     QString textColor() const { return textColor_; }
@@ -33,9 +51,15 @@ protected:
     QVariant foreColor(const QModelIndex &index) const override;
 private:
     IconShowType iconShowType_;
-    bool isShowIconForFyleSystem_;
-    bool isShowIconForVirtualFolder_;
-    bool isShowOverlayIcon_;
+    bool isShowIconForFyleSystem_ = true;
+    bool isShowIconForVirtualFolder_ = true;
+    bool isShowOverlayIcon_ = true;
+    bool isShowHidden_ = false;
+    bool isShowSystem_ = false;
+    bool isShowToolTips_ = true;
+    bool isShowParentInRoot_ = false;
+    bool isRenameBaseName_ = false;
+    bool dirSortIsByTime_ = false;
     QString textColor_;
     QString backColor_;
     QString altColor_;
