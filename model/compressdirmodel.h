@@ -20,6 +20,8 @@ public:
 
 
     CompressFileInfo::Ptr fileInfo(int index);
+    bool isParent(int index) const;
+    QString filePath(int index) const;
 
     bool rmFile(QString const& filePath);
     bool rename(QString const& oldFileName, QString const& newFileName);

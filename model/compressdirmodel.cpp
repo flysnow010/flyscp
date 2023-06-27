@@ -98,8 +98,12 @@ QVariant CompressDirModel::icon(const QModelIndex &index) const
     if(index.column() != 0)
         return QVariant();
 
+    if(fileInfos_[index.row()]->isParent())
+        return backIcon;
+
     if(fileInfos_[index.row()]->isDir())
         return dirIcon;
+
     return fileIcon;
 }
 
@@ -158,6 +162,16 @@ bool CompressDirModel::extract(QString const& targetPath,
 CompressFileInfo::Ptr CompressDirModel::fileInfo(int index)
 {
     return fileInfos_.at(index);
+}
+
+bool CompressDirModel::isParent(int index) const
+{
+    return fileInfos_.at(index)->isParent();
+}
+
+QString CompressDirModel::filePath(int index) const
+{
+    return fileInfos_.at(index)->filePath();
 }
 
 bool CompressDirModel::setData(const QModelIndex &index, const QVariant &value, int role)
