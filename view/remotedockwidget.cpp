@@ -164,12 +164,12 @@ void RemoteDockWidget::showToolTips(bool isShow)
 
 void RemoteDockWidget::setDirSoryByTime(bool isOn)
 {
-    model_->setDirSoryByTime(isOn);
+    model_->setDirSortByTime(isOn);
 }
 
 void RemoteDockWidget::setRenameFileName(bool isOn)
 {
-    model_->setRenameBasename(isOn);
+    model_->setRenameBaseName(isOn);
 }
 
 void RemoteDockWidget::showAllIconWithExeAndLink(bool isShow)
@@ -198,17 +198,17 @@ void RemoteDockWidget::showNoneIcon(bool isShow)
 
 void RemoteDockWidget::showIconForFyleSystem(bool isShow)
 {
-    model_->setShowIconForFyleSystem(isShow);
+    model_->showIconForFyleSystem(isShow);
 }
 
 void RemoteDockWidget::showIconForVirtualFolder(bool isShow)
 {
-    model_->setShowIconForVirtualFolder(isShow);
+    model_->showIconForVirtualFolder(isShow);
 }
 
 void RemoteDockWidget::showOverlayIcon(bool isShow)
 {
-    model_->setShowOverlayIcon(isShow);
+    model_->showOverlayIcon(isShow);
 }
 
 void RemoteDockWidget::setItemColor(QString const& fore,
@@ -556,7 +556,7 @@ void RemoteDockWidget::open()
         openDir(fileInfo);
     else
     {
-        QString fileName = download(fileInfo, Utils::tempPath());
+        QString fileName = download(fileInfo, Utils::tempDir());
         if(!fileName.isEmpty())
             WinShell::Open(fileName);
     }
@@ -569,7 +569,7 @@ void RemoteDockWidget::openWith()
     if(!fileInfo)
         return;
 
-    QString fileName = download(fileInfo, Utils::tempPath());
+    QString fileName = download(fileInfo, Utils::tempDir());
     if(!fileName.isEmpty())
         WinShell::OpenWith(fileName);
 }
