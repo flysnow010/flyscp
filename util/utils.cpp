@@ -12,7 +12,6 @@
 #include <QDir>
 #include <QFile>
 #include <QtWin>
-#include <QDebug>
 
 #include <cstring>
 #include <windows.h>
@@ -23,6 +22,11 @@ QString Utils::currentPath()
     if(filePath.startsWith("C:") ||filePath.startsWith("c:"))
         return QString("%1/FlyScp").arg(QDir::homePath());
     return filePath;
+}
+
+QString Utils::tempPath()
+{
+    return QDir::tempPath();
 }
 
 QString Utils::sshSettingsPath()
@@ -54,7 +58,7 @@ QString Utils::diffApp()
     return QString("%1/MobaRTE.exe").arg(QApplication::applicationDirPath());
 }
 
-QDir Utils::tempPath()
+QDir Utils::tempDir()
 {
     QDir dir = QDir::temp();
     QString appName = QApplication::applicationName();
@@ -182,7 +186,6 @@ QIcon Utils::GetIcon(QString const& fileName, int index)
     {
         if(hicon)
             return QIcon(QtWin::fromHICON(hicon));
-        qDebug() << fileName <<  "," << index;
     }
     return QIcon();
 }
@@ -190,13 +193,9 @@ QIcon Utils::GetIcon(QString const& fileName, int index)
 QString Utils::GetText(QString const& fileName, quint32 index)
 {
     HMODULE h = LoadLibrary(fileName.toStdWString().c_str());
-    //GetModuleHandleEx(0x02, fileName.toStdWString().c_str(), &h);
     wchar_t text[256];
     if(!h)
-    {
-         qDebug() << fileName <<  "," << index;
          return QString();
-    }
     int len = LoadString(h, index, text, 256);
     FreeLibrary(h);
     return QString::fromStdWString(std::wstring(text, len));
@@ -294,6 +293,20 @@ bool Utils::question(QString const& text)
     if(QMessageBox::question(0, QApplication::applicationName(), text) == QMessageBox::Yes)
         return true;
     return false;
+}
+
+QString Utils::toWindowsPath(QString const& linuxPath)
+{
+   QString windowsPath = linuxPath;
+   windowsPath.replace("/", "\\");
+   return windowsPath;
+}
+
+QString Utils::toLinuxPath(QString const& windowsPath)
+{
+    QString linuxPath = windowsPath;
+    linuxPath.replace("\\", "/");
+    return linuxPath;
 }
 
 void Utils::warring(QString const& text)

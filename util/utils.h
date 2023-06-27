@@ -8,12 +8,14 @@ class Utils
 {
 public:
     static QString currentPath();
+    static QString tempPath();
+    static QDir tempDir();
     static QString sshSettingsPath();
     static QString compressApp();
     static QString viewApp();
     static QString editApp();
     static QString diffApp();
-    static QDir tempPath();
+
     static QByteArray readFile(QString const& filename);
 
     static QString formatTime(int time_ms);
@@ -40,6 +42,8 @@ public:
     static QString getPassword(QString const& label);
     static QString getPath(QString const& caption);
     static QString getSaveFile(QString const& caption);
+    static QString toWindowsPath(QString const& linuxPath);
+    static QString toLinuxPath(QString const& windowsPath);
     static bool question(QString const& text);
     static void warring(QString const& text);
     static bool saveFile(QString const& fileName, QString const& text);
