@@ -310,7 +310,6 @@ void MainWindow::createViewConnect()
         rightDirView->moveFiles(leftDirView->dir());
     });
 
-
     connect(rightDirView, &LocalDirDockWidget::actived, this, [&](){
         leftDirView->setActived(false);
         commandBar->setDir(rightDirView->dir());
@@ -637,6 +636,9 @@ void MainWindow::createRemoteDirWidget(SSHSettings const& settings)
     {
         rightPanelWidget->addDirTab(remoteDockWidget, Utils::networkIcon(), remoteDockWidget->name());
         connect(remoteDockWidget, &RemoteDockWidget::closeRequest, rightPanelWidget, &PanelWidget::closeTab);
+        connect(remoteDockWidget, &RemoteDockWidget::statusTextChanged, this, [&](QString const& text){
+            statusBar->setRightStatusText(text);
+        });
         connect(leftDirView, &LocalDirDockWidget::remoteDownload, this, [=](
                 QString const& remoteSrc, QStringList const& fileNames,
                 QString const& targetFilePath) {
@@ -648,6 +650,9 @@ void MainWindow::createRemoteDirWidget(SSHSettings const& settings)
     {
         leftPanelWidget->addDirTab(remoteDockWidget, Utils::networkIcon(), remoteDockWidget->name());
         connect(remoteDockWidget, &RemoteDockWidget::closeRequest, leftPanelWidget, &PanelWidget::closeTab);
+        connect(remoteDockWidget, &RemoteDockWidget::statusTextChanged, this, [&](QString const& text){
+            statusBar->setLeftStatusText(text);
+        });
         connect(rightDirView, &LocalDirDockWidget::remoteDownload, this, [=](
                 QString const& remoteSrc, QStringList const& fileNames,
                 QString const& targetFilePath) {
@@ -763,6 +768,7 @@ void MainWindow::updateColors(ColorOption const& option, bool isRefresh)
 
 void MainWindow::updateLang(LanguageOption const& option)
 {
+    Q_UNUSED(option)
 }
 
 void MainWindow::updateOperation(OperationOption const& option)
