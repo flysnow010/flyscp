@@ -66,6 +66,9 @@ LocalDirDockWidget::LocalDirDockWidget(QWidget *parent)
     connect(ui->tvNormal->selectionModel(), &QItemSelectionModel::selectionChanged, this, [=](){
             emit statusTextChanged(getStatusText());
     });
+    connect(ui->tvCompress->selectionModel(), &QItemSelectionModel::selectionChanged, this, [=](){
+            emit statusTextChanged(getStatusText());
+    });
 
     connect(titleBarWidget, SIGNAL(libDirButtonClicked()),
                     this, SIGNAL(libDirContextMenuRequested()));
@@ -1268,30 +1271,36 @@ void LocalDirDockWidget::goToFile(QString const& fileName)
 
 QString LocalDirDockWidget::getStatusText()
 {
-    QModelIndexList indexs = ui->tvNormal->selectionModel()->selectedRows(0);
+    if(ui->tvNormal->isVisible())
+        return getStatusText(ui->tvNormal->selectionModel(), model_);
+    else
+        return getStatusText(ui->tvCompress->selectionModel(), compressModel_);
+}
+
+QString LocalDirDockWidget::getStatusText(QItemSelectionModel* selectMode, DirModel* model)
+{
+    QModelIndexList indexs = selectMode->selectedRows(0);
     QStringList names;
     int files = 0;
     int dirs = 0;
     qint64 fileSize = 0;
     for(int i = 0; i < indexs.size(); i++)
     {
-        if(model_->isParent(indexs[i].row()))
+        if(model->isParent(indexs[i].row()))
             continue;
-
-        QFileInfo const& fileInfo = model_->fileInfo(indexs[i].row());
-        if(fileInfo.isDir())
+        if(model->isDir(indexs[i].row()))
             dirs++;
         else
         {
             files++;
-            fileSize += fileInfo.size();
+            fileSize += model->fileSize(indexs[i].row());
         }
     }
     return  QString("%1/%2,%3/%4 files,%5/%6 dirs(s)")
             .arg(Utils::formatFileSizeKB(fileSize),
-                 Utils::formatFileSizeKB(model_->fileSizes()))
-            .arg(files).arg(model_->fileCount())
-            .arg(dirs).arg(model_->dirCount());
+                 Utils::formatFileSizeKB(model->fileSizes()))
+            .arg(files).arg(model->fileCount())
+            .arg(dirs).arg(model->dirCount());
 }
 
 void LocalDirDockWidget::updateCurrentDir(QString const& dir,

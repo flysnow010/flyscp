@@ -11,6 +11,8 @@ class LocalDirModel;
 class CompressDirModel;
 class QMimeData;
 class TitleBarWidget;
+class QItemSelectionModel;
+class DirModel;
 class QFileSystemWatcher;
 class LocalDirDockWidget : public QDockWidget, public BaseDir
 {
@@ -126,6 +128,7 @@ private:
     void goToFile(QString const& fileName);
 
     QString getStatusText();
+    QString getStatusText(QItemSelectionModel* selectMode, DirModel* model);
     void updateCurrentDir(QString const& dir,
                           QString const& caption = QString(),
                           bool isNavigation = false);
