@@ -59,13 +59,15 @@ FileUncompresser::FileUncompresser(QObject *parent)
                 {
                     if(text.startsWith("No files to process"))
                         isOK_ = false;
+                    if(mode == Extract)
+                        emit progress(text);
                 }
             }
         }
     });
     connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this,
         [=](int exitCode, QProcess::ExitStatus exitStatus) {
-        if(mode != Uncompress)
+        if(mode != Uncompress && mode != Extract)
             return;
         if(exitStatus != QProcess::ExitStatus::NormalExit)
             onError("Program is crash exit");
@@ -151,12 +153,15 @@ QStringList FileUncompresser::listFileInfo(QString const& fileName)
     return fileInfos;
 }
 
-bool FileUncompresser::remove(QString const& archiveFileName, QString const& fileName)
+bool FileUncompresser::remove(QString const& archiveFileName, QStringList const& fileNames)
 {
     QStringList args;
-    args << "d"  << archiveFileName << fileName << "-r";
+    args << "d"  << archiveFileName;
+    foreach(auto fileName, fileNames)
+        args << fileName;
     argsList.clear();
     argsList << args;
+    qDebug()<< args.join(" ");
     mode = Delete;
     currentIndex = 0;
     isOK_ = true;
@@ -186,7 +191,7 @@ bool FileUncompresser::rename(QString const& archiveFileName, QString const& old
 
 bool FileUncompresser::extract(QString const& archiveFileName,
                                QString const& targetPath,
-                               QString const& fileName,
+                               QStringList const& fileNames,
                                bool isWithPath)
 {
     QStringList args;
@@ -195,11 +200,12 @@ bool FileUncompresser::extract(QString const& archiveFileName,
     else
         args << "e";
     args << archiveFileName
-         << QString("-o%1").arg(targetPath)
-         << fileName << "-y";
+         << QString("-o%1").arg(targetPath);
+    foreach(auto fileName, fileNames)
+        args << fileName;
+    args << "-y";
     argsList.clear();
     argsList << args;
-    qDebug()<< args.join(" ");
     mode = Extract;
     currentIndex = 0;
     isOK_ = true;
