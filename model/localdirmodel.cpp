@@ -34,9 +34,6 @@ LocalDirModel::LocalDirModel(QObject *parent)
     , backIcon(":/image/back.png")
     , sortIndex(NONE_INDEX)
     , isDescending(false)
-    , fileCount_(0)
-    , dirCount_(0)
-    , fileSizes_(0)
 {
     setupData();
 }
@@ -268,6 +265,21 @@ QString LocalDirModel::filePath(QString const& fileName)
 bool LocalDirModel::isParent(int index) const
 {
     return fileInfos_[index].fileName() == ParentPath;
+}
+
+bool LocalDirModel::isDir(int index) const
+{
+    return fileInfos_[index].isDir();
+}
+
+bool LocalDirModel::isFile(int index) const
+{
+    return fileInfos_[index].isFile();
+}
+
+qint64 LocalDirModel::fileSize(int index) const
+{
+    return fileInfos_[index].size();
 }
 
 int LocalDirModel::indexOfFile(QString const& fileName)

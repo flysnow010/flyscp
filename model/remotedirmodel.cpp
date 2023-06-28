@@ -21,14 +21,10 @@ static void CancheIcon(RemoteDirModel const* model,
     m->cancheIcon(suffix, icon);
 }
 
-
 RemoteDirModel::RemoteDirModel(QObject *parent)
     : DirModel(parent)
     , dirIcon(Utils::dirIcon())
     , backIcon(":/image/back.png")
-    , fileCount_(0)
-    , dirCount_(0)
-    , fileSizes_(0)
 {
     setupData();
 }
@@ -276,6 +272,26 @@ bool RemoteDirModel::setData(const QModelIndex &index, const QVariant &value, in
     return false;
 }
 
+bool RemoteDirModel::isParent(int index) const
+{
+    return fileInfos_.at(static_cast<size_t>(index))->is_parent();
+}
+
+bool RemoteDirModel::isDir(int index) const
+{
+    return fileInfos_.at(static_cast<size_t>(index))->is_dir();
+}
+
+bool RemoteDirModel::isFile(int index) const
+{
+    return fileInfos_.at(static_cast<size_t>(index))->is_file();
+}
+
+qint64 RemoteDirModel::fileSize(int index) const
+{
+    return fileInfos_.at(static_cast<size_t>(index))->size();
+}
+
 QVariant RemoteDirModel::userData(const QModelIndex &index) const
 {
     if(index.column() != 3)
@@ -358,7 +374,8 @@ void RemoteDirModel::setupModelData(TreeItem *parent)
             rowData << QString() << QString("<DIR>")
                     << QDateTime::fromSecsSinceEpoch(fileInfo->time()).toString("yyyy-MM-dd HH:mm:ss")
                     << Utils::permissionsText(fileInfo->permissions(), true);
-            dirCount_++;
+            if(!fileInfo->is_parent())
+                dirCount_++;
         }
         TreeItem* item = new TreeItem(rowData, parent);
         parent->appendChild(item);

@@ -179,6 +179,21 @@ bool CompressDirModel::isParent(int index) const
     return fileInfos_.at(index)->isParent();
 }
 
+bool CompressDirModel::isDir(int index) const
+{
+    return fileInfos_.at(index)->isDir();
+}
+
+bool CompressDirModel::isFile(int index) const
+{
+    return fileInfos_.at(index)->isFile();
+}
+
+qint64 CompressDirModel::fileSize(int index) const
+{
+    return fileInfos_.at(index)->size();
+}
+
 QString CompressDirModel::filePath(int index) const
 {
     return fileInfos_.at(index)->filePath();
@@ -213,14 +228,25 @@ bool CompressDirModel::setData(const QModelIndex &index, const QVariant &value, 
 
 void CompressDirModel::setupModelData(TreeItem *parent)
 {
+    fileCount_ = 0;
+    dirCount_ = 0;
+    fileSizes_ = 0;
     for(int i = 0; i < fileInfos_.size();i++)
     {
         QList<QVariant> rowData;
         if(fileInfos_[i]->isDir())
+        {
             rowData << fileInfos_[i]->path() << QString() << QString("<DIR>");
+            if(!fileInfos_[i]->isParent())
+                dirCount_++;
+        }
         else
+        {
             rowData << fileInfos_[i]->baseName() << fileInfos_[i]->suffix()
                     << Utils::formatFileSizeB(fileInfos_[i]->size());
+            fileCount_++;
+            fileSizes_ += fileInfos_[i]->size();
+        }
         rowData << fileInfos_[i]->timeText();
         TreeItem* item = new TreeItem(rowData, parent);
         parent->appendChild(item);

@@ -38,6 +38,10 @@ public:
     bool dirSortIsByTime() const { return dirSortIsByTime_; }
     void setDirSortByTime(bool isShow) { dirSortIsByTime_ = isShow; }
 
+    int fileCount () const { return fileCount_; }
+    int dirCount() const { return dirCount_; }
+    qint64 fileSizes() const { return fileSizes_; }
+
     void setTextColor(QString const& color) { textColor_ = color; }
     QString textColor() const { return textColor_; }
 
@@ -46,11 +50,20 @@ public:
 
     void setAltColor(QString const& color) { altColor_ = color; }
     QString altColo() const { return altColor_; }
+
+    virtual bool isParent(int index) const = 0;
+    virtual bool isDir(int index) const = 0;
+    virtual bool isFile(int index) const = 0;
+    virtual qint64 fileSize(int index) const = 0;
 protected:
     QVariant backColor(const QModelIndex &index) const override;
     QVariant foreColor(const QModelIndex &index) const override;
+protected:
+    int fileCount_ = 0;
+    int dirCount_ = 0;
+    qint64 fileSizes_ = 0;
 private:
-    IconShowType iconShowType_;
+    IconShowType iconShowType_ = All;
     bool isShowIconForFyleSystem_ = true;
     bool isShowIconForVirtualFolder_ = true;
     bool isShowOverlayIcon_ = true;
@@ -60,9 +73,9 @@ private:
     bool isShowParentInRoot_ = false;
     bool isRenameBaseName_ = false;
     bool dirSortIsByTime_ = false;
-    QString textColor_;
-    QString backColor_;
-    QString altColor_;
+    QString textColor_ = "#454545";
+    QString backColor_ = "#ffffff";
+    QString altColor_ = "#f9f9f9";
 };
 
 #endif // DIRMODEL_H

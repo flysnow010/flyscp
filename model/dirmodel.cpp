@@ -4,12 +4,7 @@
 
 DirModel::DirModel(QObject *parent)
     : TreeModel(parent)
-    , iconShowType_(All)
-    , textColor_("#454545")
-    , backColor_("#ffffff")
-    , altColor_("#f9f9f9")
 {
-
 }
 
 QVariant DirModel::backColor(const QModelIndex &index) const

@@ -29,30 +29,29 @@ public:
     bool rename(std::string const& original, std::string const& newname);
     bool chmod(const char* file, uint16_t mode);
     void refresh();
-    int fileCount () const { return fileCount_; }
-    int dirCount() const { return dirCount_; }
-    qint64 fileSizes() const { return fileSizes_; }
     void cancheIcon(QString const& suffix, QIcon const& icon);
-    bool setData(const QModelIndex &index, const QVariant &value, int role);
+
+    bool setData(const QModelIndex &index, const QVariant &value, int role) override;
+    bool isParent(int index) const override;
+    bool isDir(int index) const override;
+    bool isFile(int index) const override;
+    qint64 fileSize(int index) const override;
 protected:
-    virtual TreeItem *createRootItem();
-    virtual QVariant textAlignment(const QModelIndex &index) const;
-    virtual bool editable(const QModelIndex &index) const;
-    virtual QVariant editText(const QModelIndex &index) const;
-    virtual QVariant headerTextAlignment(int column) const;
-    virtual QVariant icon(const QModelIndex &index) const;
-    virtual QVariant userData(const QModelIndex &index) const;
-    virtual QVariant toolTip(const QModelIndex &index) const;
-    virtual void setupModelData(TreeItem *parent);
+    TreeItem *createRootItem() override;
+    QVariant textAlignment(const QModelIndex &index) const override;
+    bool editable(const QModelIndex &index) const override;
+    QVariant editText(const QModelIndex &index) const override;
+    QVariant headerTextAlignment(int column) const override;
+    QVariant icon(const QModelIndex &index) const override;
+    QVariant userData(const QModelIndex &index) const override;
+    QVariant toolTip(const QModelIndex &index) const override;
+    void setupModelData(TreeItem *parent) override;
 private:
     ssh::DirPtr dir_;
     ssh::FileInfos fileInfos_;
     QMap<QString, QIcon> iconMap;
     QIcon dirIcon;
     QIcon backIcon;
-    int fileCount_;
-    int dirCount_;
-    qint64 fileSizes_;
 };
 
 #endif // REMOTEDIRMODEL_H
