@@ -30,6 +30,7 @@ public:
     bool add(QStringList const& fileNames);
     bool add(QString const& fileName, bool isRemoveSrc);
     bool rename(QString const& oldFileName, QString const& newFileName);
+    bool rename(QStringList const& fileNames, QString const& subPath);
     bool extract(QString const& targetPath, QStringList const& fileNames, bool isWithPath);
     void refresh();
 

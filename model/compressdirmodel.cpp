@@ -180,6 +180,11 @@ bool CompressDirModel::rename(QString const& oldFileName, QString const& newFile
     return compressFile.rename(oldFileName, newFileName);
 }
 
+bool CompressDirModel::rename(QStringList const& fileNames, QString const& subPath)
+{
+    return compressFile.rename(fileNames, subPath);
+}
+
 bool CompressDirModel::extract(QString const& targetPath,
                                QStringList const& fileNames,
                                bool isWithPath)
