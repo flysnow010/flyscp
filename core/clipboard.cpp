@@ -67,7 +67,6 @@ QStringList ClipBoard::fileNames(const QMimeData *mimeData)
     if(text.endsWith("\n"))
         text.remove(text.size() - 1, 1);
     return text.split("\n");
-
 }
 
 QStringList ClipBoard::fileNames()
@@ -78,5 +77,10 @@ QStringList ClipBoard::fileNames()
 QString ClipBoard::remoteSrc(const QMimeData *mimeData)
 {
     return QString::fromUtf8(mimeData->data("RemoteSrc"));
+}
+
+QString ClipBoard::compressedFileName(const QMimeData *mimeData)
+{
+    return QString::fromUtf8(mimeData->data("compressedFileName"));
 }
 

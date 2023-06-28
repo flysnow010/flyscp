@@ -20,6 +20,7 @@ public:
     static QStringList fileNames(const QMimeData *mimeData);
     static QStringList fileNames();
     static QString remoteSrc(const QMimeData *mimeData);
+    static QString compressedFileName(const QMimeData *mimeData);
 };
 
 #endif // CLIPBOARD_H
