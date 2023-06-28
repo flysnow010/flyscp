@@ -12,7 +12,17 @@ public:
 
     QString path() const { return path_; }
     QString filePath() const {
-        return fileName_.isEmpty() ? path_ : QString("%1/%2").arg(path_, fileName_);
+        if(isDir())
+        {
+            if(parent_.isEmpty())
+                return path_;
+            return QString("%1\\%2").arg(parent_, path_);
+        }
+
+        if( path_.isEmpty())
+            return fileName_;
+
+        return QString("%1\\%2").arg(path_, fileName_);
     }
     QString fileName() const { return isDir_ ? path_ : fileName_; }
     QString baseName() const { return baseName_; }
@@ -20,17 +30,26 @@ public:
     bool isDir() const { return isDir_; }
     bool isFile() const { return !isDir_; }
     bool isParent() const { return path_ == ".."; }
+    QString attributes() const { return attributes_;  }
     QString timeText() const { return timeText_;  }
     quint32 time() const { return time_;  }
     quint64 size() const { return size_;  }
     quint64 compressedSize() const { return compressedSize_;  }
+    int compressRatio() const {
+        if(size_ == 0)
+            return 0;
+        else
+            return (size_ - compressedSize_) * 100 / size_;
+    }
 private:
     CompressFileInfo(){}
+    QString parent_;
     QString path_;
     QString fileName_;
     QString baseName_;
     QString suffix_;
     bool isDir_ = false;
+    QString attributes_;
     QString timeText_;
     quint32 time_ = 0;
     quint64 size_ = 0;
@@ -60,16 +79,17 @@ public:
     };
     CompressFile();
 
-    void setFileName(QString const& filePath);
+    void setFileName(QString const& fileName);
+    QString fileName() const;
     bool setDir(QString const& dir);
 
     QString dir() const;
     bool cd(QString const& dir);
     CompressFileInfos fileInfoList(SortFlag sortFlag = NoSort);
 
-    bool rmFile(QString const& filePath);
+    bool rm(QStringList const& fileNames);
     bool rename(QString const& oldFileName, QString const& newFileName);
-    bool extract(QString const& targetPath, QString const& filePath, bool isWithPath);
+    bool extract(QString const& targetPath, QStringList const& fileNames, bool isWithPath);
     void refresh(bool isCurrent = true);
     QString filePath(QString const& fileName) const;
 private:
@@ -81,7 +101,7 @@ private:
     QString filePath_;
     CompressFileInfos fileInfos_;
     QStack<QString> dirs;
-    QString currentDir;
+    QString currentDir_;
 };
 
 #endif // COMPRESSFILEINFO_H

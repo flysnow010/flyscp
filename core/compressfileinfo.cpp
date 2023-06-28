@@ -17,10 +17,15 @@ CompressFile::CompressFile()
 {
 }
 
-void CompressFile::setFileName(QString const& filePath)
+void CompressFile::setFileName(QString const& fileName)
 {
-    filePath_ = Utils::toWindowsPath(filePath);
+    filePath_ = Utils::toWindowsPath(fileName);
     refresh(false);
+}
+
+QString CompressFile::fileName() const
+{
+    return Utils::toLinuxPath(filePath_);
 }
 
 bool CompressFile::setDir(QString const& dir)
@@ -49,14 +54,14 @@ bool CompressFile::setDir(QString const& dir)
 
 QString CompressFile::dir() const
 {
-    if(currentDir.isEmpty())
+    if(currentDir_.isEmpty())
         return filePath_;
-    return QString("%1\\%2").arg(filePath_, Utils::toWindowsPath(currentDir));
+    return QString("%1\\%2").arg(filePath_, Utils::toWindowsPath(currentDir_));
 }
 
 bool CompressFile::cd(QString const& dir)
 {
-    if(currentDir.isEmpty() && dir == "..")
+    if(currentDir_.isEmpty() && dir == "..")
         return false;
 
     if(dir == "..")
@@ -66,7 +71,7 @@ bool CompressFile::cd(QString const& dir)
     QStringList dirList;
     foreach(auto d, dirs)
         dirList << d;
-    currentDir = dirList.join("/");
+    currentDir_ = dirList.join("/");
     return true;
 }
 
@@ -77,12 +82,12 @@ CompressFileInfos CompressFile::fileInfoList(SortFlag sortFlag)
     {
         if(fileInfo->isFile())
         {
-            if(fileInfo->path() == currentDir)
+            if(fileInfo->path() == currentDir_)
                 fileInfos << fileInfo;
         }
         else if(fileInfo->isDir())
         {
-            QString subDir = getSubDir(fileInfo->path_, currentDir);
+            QString subDir = getSubDir(fileInfo->path_, currentDir_);
             if(subDir.isEmpty())
                 continue;
             QStringList paths = subDir.split(LINUX_SEP);
@@ -93,18 +98,22 @@ CompressFileInfos CompressFile::fileInfoList(SortFlag sortFlag)
                     if(!fineFileInfo(fileInfos, paths[0]))
                     {
                         CompressFileInfo::Ptr newFileInfo(new CompressFileInfo());
+                        newFileInfo->parent_ = currentDir_;
                         newFileInfo->path_ = paths[0];
                         newFileInfo->timeText_ = fileInfo->timeText_;
+                        newFileInfo->attributes_ = QString("D.....");
                         newFileInfo->isDir_ = true;
                         fileInfos << newFileInfo;
                     }
                 }
-                else if(currentDir.isEmpty())
+                else if(currentDir_.isEmpty())
                 {
                     if(!fineFileInfo(fileInfos, paths[0]))
                     {
                         CompressFileInfo::Ptr newFileInfo(new CompressFileInfo());
                         newFileInfo->path_ = paths[0];
+                        newFileInfo->timeText_ = fileInfo->timeText_;
+                        newFileInfo->attributes_ = QString("D.....");
                         newFileInfo->isDir_ = true;
                         fileInfos << newFileInfo;
                     }
@@ -120,9 +129,9 @@ CompressFileInfos CompressFile::fileInfoList(SortFlag sortFlag)
     return fileInfos;
 }
 
-bool CompressFile::rmFile(QString const& filePath)
+bool CompressFile::rm(QStringList const& fileNames)
 {
-    return FileUncompresser().remove(filePath_, filePath);
+    return FileUncompresser().remove(filePath_, fileNames);
 }
 
 bool CompressFile::rename(QString const& oldFileName, QString const& newFileName)
@@ -132,16 +141,16 @@ bool CompressFile::rename(QString const& oldFileName, QString const& newFileName
                                      filePath(newFileName));
 }
 
-bool CompressFile::extract(QString const& targetPath, QString const& filePath, bool isWithPath)
+bool CompressFile::extract(QString const& targetPath, QStringList const& fileNames, bool isWithPath)
 {
-    return FileUncompresser().extract(filePath_, targetPath, filePath, isWithPath);
+    return FileUncompresser().extract(filePath_, targetPath, fileNames, isWithPath);
 }
 
 QString CompressFile::filePath(QString const& fileName) const
 {
-    if(currentDir.isEmpty())
+    if(currentDir_.isEmpty())
         return fileName;
-    return QString("%1/%2").arg(currentDir, fileName);
+    return QString("%1/%2").arg(currentDir_, fileName);
 }
 
 void CompressFile::refresh(bool isCurrent)
@@ -150,7 +159,7 @@ void CompressFile::refresh(bool isCurrent)
 
     if(!isCurrent)
     {
-        currentDir = "";
+        currentDir_ = "";
         dirs.clear();
     }
     fileInfos_.clear();
@@ -160,12 +169,11 @@ void CompressFile::refresh(bool isCurrent)
     {
         QTextStream stream(&line);
         CompressFileInfo::Ptr info(new CompressFileInfo());
-        QString type;
         QString name;
         info->timeText_ = stream.read(dateTime.size());
         stream.skipWhiteSpace();
-        stream >> type >> info->size_ >> info->compressedSize_;
-        info->isDir_ = type.startsWith("D");
+        stream >> info->attributes_ >> info->size_ >> info->compressedSize_;
+        info->isDir_ = info->attributes_.startsWith("D");
         info->time_ = start.secsTo(QDateTime::fromString(info->timeText_, "yyyy-MM-dd HH:mm:ss"));
         stream.skipWhiteSpace();
         name = Utils::toLinuxPath(stream.readAll());
