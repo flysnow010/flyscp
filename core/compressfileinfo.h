@@ -87,7 +87,9 @@ public:
     bool cd(QString const& dir);
     CompressFileInfos fileInfoList(SortFlag sortFlag = NoSort);
 
+    bool mkdir(QString const& dir);
     bool rm(QStringList const& fileNames);
+    bool add(QStringList const& fileNames);
     bool rename(QString const& oldFileName, QString const& newFileName);
     bool extract(QString const& targetPath, QStringList const& fileNames, bool isWithPath);
     void refresh(bool isCurrent = true);
@@ -98,7 +100,7 @@ private:
     void sort(CompressFileInfos &fileInfos, SortFlag sortFlag);
     QString getCompressFile(QString const& filePath);
 private:
-    QString filePath_;
+    QString fileName_;
     CompressFileInfos fileInfos_;
     QStack<QString> dirs;
     QString currentDir_;

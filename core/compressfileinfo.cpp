@@ -1,5 +1,6 @@
 #include "compressfileinfo.h"
 #include "fileuncompresser.h"
+#include "filecompresser.h"
 #include "util/utils.h"
 
 #include <QTextStream>
@@ -18,29 +19,29 @@ CompressFile::CompressFile()
 
 void CompressFile::setFileName(QString const& fileName)
 {
-    filePath_ = Utils::toWindowsPath(fileName);
+    fileName_ = Utils::toWindowsPath(fileName);
     refresh(false);
 }
 
 QString CompressFile::fileName() const
 {
-    return filePath_;
+    return fileName_;
 }
 
 bool CompressFile::setDir(QString const& dir)
 {
-    if(dir == filePath_)
+    if(dir == fileName_)
     {
         refresh(false);
         return true;
     }
-    if(filePath_.isEmpty())
-        filePath_ = getCompressFile(dir);
+    if(fileName_.isEmpty())
+        fileName_ = getCompressFile(dir);
 
-    if(filePath_.isEmpty())
+    if(fileName_.isEmpty())
         return false;
 
-    QString subDir = getSubDir(dir, filePath_, true);
+    QString subDir = getSubDir(dir, fileName_, true);
     if(subDir.isEmpty())
         return false;
 
@@ -54,8 +55,8 @@ bool CompressFile::setDir(QString const& dir)
 QString CompressFile::dir() const
 {
     if(currentDir_.isEmpty())
-        return filePath_;
-    return QString("%1\\%2").arg(filePath_, currentDir_);
+        return fileName_;
+    return QString("%1\\%2").arg(fileName_, currentDir_);
 }
 
 bool CompressFile::cd(QString const& dir)
@@ -128,21 +129,60 @@ CompressFileInfos CompressFile::fileInfoList(SortFlag sortFlag)
     return fileInfos;
 }
 
+bool CompressFile::mkdir(QString const& dir)
+{
+    QString filePath;
+    if(currentDir_.isEmpty())
+    {
+        QDir tempDir = Utils::tempDir();
+        tempDir.mkdir(dir);
+        tempDir.cd(dir);
+        filePath = Utils::toWindowsPath(tempDir.path()) + WINDOWS_SEP;
+    }
+    else
+    {
+        QDir tempDir = Utils::tempDir();
+        tempDir.mkpath(QString("%1/%2").arg(currentDir_, dir));
+        int index = currentDir_.indexOf(WINDOWS_SEP);
+        if(index < 0)
+            filePath =  Utils::toWindowsPath(QString("%1/%2/").arg(tempDir.path(), currentDir_));
+        else
+            filePath =  Utils::toWindowsPath(QString("%1/%2/").arg(tempDir.path(), currentDir_.left(index)));
+    }
+    if(!FileCompresser().update(QStringList() << filePath, fileName_))
+        return false;
+
+    QDir tempDir = Utils::tempDir();
+    if(currentDir_.isEmpty())
+        tempDir.rmdir(dir);
+    else
+    {
+        //qDebug() << QString("%1\\%2").arg(currentDir_, dir); ???
+        tempDir.rmpath(QString("%1\\%2").arg(currentDir_, dir));
+    }
+    return true;
+}
+
 bool CompressFile::rm(QStringList const& fileNames)
 {
-    return FileUncompresser().remove(filePath_, fileNames);
+    return FileUncompresser().remove(fileName_, fileNames);
+}
+
+bool CompressFile::add(QStringList const& fileNames)
+{
+    return FileCompresser().update(fileNames, fileName_);
 }
 
 bool CompressFile::rename(QString const& oldFileName, QString const& newFileName)
 {
-    return FileUncompresser().rename(filePath_,
+    return FileUncompresser().rename(fileName_,
                                      filePath(oldFileName),
                                      filePath(newFileName));
 }
 
 bool CompressFile::extract(QString const& targetPath, QStringList const& fileNames, bool isWithPath)
 {
-    return FileUncompresser().extract(filePath_, targetPath, fileNames, isWithPath);
+    return FileUncompresser().extract(fileName_, targetPath, fileNames, isWithPath);
 }
 
 QString CompressFile::filePath(QString const& fileName) const
@@ -154,7 +194,7 @@ QString CompressFile::filePath(QString const& fileName) const
 
 void CompressFile::refresh(bool isCurrent)
 {
-    QStringList fileInfoLines = FileUncompresser().listFileInfo(filePath_);
+    QStringList fileInfoLines = FileUncompresser().listFileInfo(fileName_);
 
     if(!isCurrent)
     {
