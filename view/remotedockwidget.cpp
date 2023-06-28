@@ -54,6 +54,10 @@ RemoteDockWidget::RemoteDockWidget(QWidget *parent)
                     this, SLOT(dragMove(QDragMoveEvent*)));
     connect(ui->treeView, SIGNAL(drop(QDropEvent*)),
                     this, SLOT(drop(QDropEvent*)));
+    connect(ui->treeView->selectionModel(), &QItemSelectionModel::selectionChanged, this, [=](){
+            emit statusTextChanged(getStatusText());
+    });
+
     connect(sftp, &SFtpSession::connected, this, &RemoteDockWidget::connected);
     connect(sftp, &SFtpSession::unconnected, this, &RemoteDockWidget::unconnected);
     connect(sftp, &SFtpSession::connectionError, this, &RemoteDockWidget::connectionError);
@@ -756,6 +760,33 @@ void RemoteDockWidget::fileTransfer(QStringList const& srcFileNames,
     }
 }
 
+QString RemoteDockWidget::getStatusText()
+{
+    QModelIndexList indexs = ui->treeView->selectionModel()->selectedRows(0);
+    QStringList names;
+    int files = 0;
+    int dirs = 0;
+    qint64 fileSize = 0;
+    for(int i = 0; i < indexs.size(); i++)
+    {
+        if(model_->isParent(indexs[i].row()))
+            continue;
+
+        if(model_->isDir(indexs[i].row()))
+            dirs++;
+        else
+        {
+            files++;
+            fileSize += model_->fileSize(indexs[i].row());
+        }
+    }
+    return  QString("%1/%2,%3/%4 files,%5/%6 dirs(s)")
+            .arg(Utils::formatFileSizeKB(fileSize),
+                 Utils::formatFileSizeKB(model_->fileSizes()))
+            .arg(files).arg(model_->fileCount())
+            .arg(dirs).arg(model_->dirCount());
+}
+
 void RemoteDockWidget::updateCurrentDir(QString const& dir, QString const& caption, bool  isNavigation)
 {
     if(caption.isEmpty())
@@ -764,4 +795,5 @@ void RemoteDockWidget::updateCurrentDir(QString const& dir, QString const& capti
         titleBarWidget->setTitle(caption);
     if(!isNavigation)
         dirHistory->add(dir);
+    emit statusTextChanged(getStatusText());
 }

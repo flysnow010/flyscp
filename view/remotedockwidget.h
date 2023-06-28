@@ -69,6 +69,7 @@ public:
 
 signals:
     void closeRequest(QWidget* widget);
+    void statusTextChanged(QString const& text);
 
 public slots:
     void libDirContextMenu();
@@ -116,6 +117,7 @@ private:
                       QString const& srcFilePath,
                       QString const& dstFilePath,
                       OperateType type);
+    QString getStatusText();
     void updateCurrentDir(QString const& dir,
                           QString const& caption = QString(),
                           bool  isNavigation = false);
