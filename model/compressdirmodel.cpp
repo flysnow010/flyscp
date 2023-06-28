@@ -152,9 +152,27 @@ bool CompressDirModel::rm(QString const& filePath)
     return compressFile.rm(QStringList() << filePath);
 }
 
+bool CompressDirModel::mkdir(QString const& dir)
+{
+    return compressFile.mkdir(dir);
+}
+
 bool CompressDirModel::rm(QStringList const& fileNames)
 {
     return compressFile.rm(fileNames);
+}
+
+bool CompressDirModel::add(QStringList const& fileNames)
+{
+    return compressFile.add(fileNames);
+}
+
+bool CompressDirModel::add(QString const& fileName, bool isRemoveSrc)
+{
+    bool isOK = compressFile.add(QStringList() << fileName);
+    if(isOK && isRemoveSrc)
+        QFile::remove(fileName);
+    return isOK;
 }
 
 bool CompressDirModel::rename(QString const& oldFileName, QString const& newFileName)
@@ -197,6 +215,11 @@ qint64 CompressDirModel::fileSize(int index) const
 QString CompressDirModel::filePath(int index) const
 {
     return fileInfos_.at(index)->filePath();
+}
+
+QString CompressDirModel::fileName(int index) const
+{
+    return fileInfos_.at(index)->fileName();
 }
 
 bool CompressDirModel::setData(const QModelIndex &index, const QVariant &value, int role)

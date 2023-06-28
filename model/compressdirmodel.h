@@ -22,9 +22,13 @@ public:
 
     CompressFileInfo::Ptr fileInfo(int index);
     QString filePath(int index) const;
+    QString fileName(int index) const;
 
+    bool mkdir(QString const& dir);
     bool rm(QString const& filePath);
     bool rm(QStringList const& fileNames);
+    bool add(QStringList const& fileNames);
+    bool add(QString const& fileName, bool isRemoveSrc);
     bool rename(QString const& oldFileName, QString const& newFileName);
     bool extract(QString const& targetPath, QStringList const& fileNames, bool isWithPath);
     void refresh();
