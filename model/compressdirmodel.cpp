@@ -112,11 +112,16 @@ QString CompressDirModel::dir() const
     return compressFile.dir();
 }
 
-void CompressDirModel::setCompressFile(QFileInfo const& fileInfo)
+void CompressDirModel::setCompressFileName(QString const& fileName)
 {
-    compressFile.setFileName(fileInfo.filePath());
+    compressFile.setFileName(fileName);
     fileInfos_ = compressFile.fileInfoList(CompressFile::DirsFirst);
     setupData();
+}
+
+QString CompressDirModel::compressFileName() const
+{
+    return compressFile.fileName();
 }
 
 bool CompressDirModel::setDir(QString const& dir)
@@ -142,9 +147,14 @@ void CompressDirModel::refresh()
     }
 }
 
-bool CompressDirModel::rmFile(QString const& filePath)
+bool CompressDirModel::rm(QString const& filePath)
 {
-    return compressFile.rmFile(filePath);
+    return compressFile.rm(QStringList() << filePath);
+}
+
+bool CompressDirModel::rm(QStringList const& fileNames)
+{
+    return compressFile.rm(fileNames);
 }
 
 bool CompressDirModel::rename(QString const& oldFileName, QString const& newFileName)
@@ -153,10 +163,10 @@ bool CompressDirModel::rename(QString const& oldFileName, QString const& newFile
 }
 
 bool CompressDirModel::extract(QString const& targetPath,
-                               QString const& filePath,
+                               QStringList const& fileNames,
                                bool isWithPath)
 {
-    return compressFile.extract(targetPath, filePath, isWithPath);
+    return compressFile.extract(targetPath, fileNames, isWithPath);
 }
 
 CompressFileInfo::Ptr CompressDirModel::fileInfo(int index)

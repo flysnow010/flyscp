@@ -11,7 +11,8 @@ class CompressDirModel : public DirModel
 public:
     explicit CompressDirModel(QObject *parent = nullptr);
 
-    void setCompressFile(QFileInfo const& fileInfo);
+    void setCompressFileName(QString const& fileName);
+    QString compressFileName() const;
     bool setDir(QString const& dir);
     QString dir() const;
 
@@ -23,9 +24,10 @@ public:
     bool isParent(int index) const;
     QString filePath(int index) const;
 
-    bool rmFile(QString const& filePath);
+    bool rm(QString const& filePath);
+    bool rm(QStringList const& fileNames);
     bool rename(QString const& oldFileName, QString const& newFileName);
-    bool extract(QString const& targetPath, QString const& filePath, bool isWithPath);
+    bool extract(QString const& targetPath, QStringList const& fileNames, bool isWithPath);
     void refresh();
 
     bool setData(const QModelIndex &index, const QVariant &value, int role);
