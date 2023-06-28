@@ -1,6 +1,7 @@
 #ifndef PROPERTYDIALOG_H
 #define PROPERTYDIALOG_H
 #include "ssh/fileinfo.h"
+#include "core/compressfileinfo.h"
 #include <QDialog>
 
 namespace Ui {
@@ -15,6 +16,7 @@ public:
     ~PropertyDialog();
 
     void setFileInfo(ssh::FileInfoPtr const& fileInfo);
+    void setFileInfo(CompressFileInfo::Ptr const& fileInfo);
 
 private:
     Ui::PropertyDialog *ui;

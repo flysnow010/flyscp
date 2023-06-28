@@ -18,6 +18,10 @@ PropertyDialog::~PropertyDialog()
 
 void PropertyDialog::setFileInfo(ssh::FileInfoPtr const& fileInfo)
 {
+    ui->labelPacketedSize->hide();
+    ui->labelCompressionRatio->hide();
+    ui->labelAttributes->hide();
+
     if(fileInfo->is_dir())
     {
         ui->labelName->setText(QString("Folder name: %1").arg(QString::fromStdString(fileInfo->name())));
@@ -42,4 +46,39 @@ void PropertyDialog::setFileInfo(ssh::FileInfoPtr const& fileInfo)
     ui->labelPermissions->setText(QString("%1 %2")
                                   .arg(ui->labelPermissions->text(),
                                        Utils::permissionsText(fileInfo->permissions(), fileInfo->is_dir())));
+    adjustSize();
+}
+
+void PropertyDialog::setFileInfo(CompressFileInfo::Ptr const& fileInfo)
+{
+    ui->labelOwer->hide();
+    ui->labelGroup->hide();
+    ui->labelPermissions->hide();
+
+    if(fileInfo->isDir())
+    {
+        ui->labelName->setText(QString("Folder name: %1").arg(fileInfo->filePath()));
+        ui->labelFileSize->hide();
+        ui->labelPacketedSize->hide();
+        ui->labelCompressionRatio->hide();
+    }
+    else
+    {
+        ui->labelName->setText(QString("File name: %1").arg(fileInfo->filePath()));
+        ui->labelFileSize->setText(QString("%1 %2")
+                               .arg(ui->labelFileSize->text(),
+                                    Utils::formatFileSize(fileInfo->size())));
+        ui->labelPacketedSize->setText(QString("%1 %2")
+                               .arg(ui->labelPacketedSize->text(),
+                                    Utils::formatFileSize(fileInfo->compressedSize())));
+
+        ui->labelCompressionRatio->setText(QString("%1 %2%")
+                                       .arg(ui->labelCompressionRatio->text())
+                                       .arg(fileInfo->compressRatio()));
+    }
+    ui->labelDate->setText(QString("%1 %2")
+                           .arg(ui->labelDate->text(), fileInfo->timeText()));
+    ui->labelAttributes->setText(QString("%1 %2")
+                           .arg(ui->labelAttributes->text(), fileInfo->attributes()));
+    adjustSize();
 }

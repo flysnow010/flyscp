@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>211</width>
-    <height>148</height>
+    <height>202</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -41,6 +41,20 @@
     </widget>
    </item>
    <item>
+    <widget class="QLabel" name="labelPacketedSize">
+     <property name="text">
+      <string>Packet size:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="labelCompressionRatio">
+     <property name="text">
+      <string>Compression ratio:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QLabel" name="labelDate">
      <property name="text">
       <string>Last modification:</string>
@@ -65,6 +79,13 @@
     <widget class="QLabel" name="labelPermissions">
      <property name="text">
       <string>Permissions:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="labelAttributes">
+     <property name="text">
+      <string>Attributes:</string>
      </property>
     </widget>
    </item>
