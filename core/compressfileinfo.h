@@ -93,7 +93,7 @@ public:
     void refresh(bool isCurrent = true);
     QString filePath(QString const& fileName) const;
 private:
-    bool fineFileInfo(CompressFileInfos const& fileInfos, QString const& path);
+    bool findFileInfo(CompressFileInfos const& fileInfos, QString const& path);
     QString getSubDir(QString const& path, QString const& parent, bool isWindowSep = false);
     void sort(CompressFileInfos &fileInfos, SortFlag sortFlag);
     QString getCompressFile(QString const& filePath);
