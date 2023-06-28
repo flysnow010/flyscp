@@ -120,7 +120,11 @@ private:
     void copyFilels(QStringList const& fileNames, QString const& dstFilePath);
     void cutFiles(QStringList const& fileNames, QString const& dstFilePath);
     void fileTransfer(FileNames const& fileNames, bool isMove);
+    void extractFiles(QStringList const& fileNames,
+                      QString const& targetPath,
+                      bool isMove);
     void goToFile(QString const& fileName);
+
     QString getStatusText();
     void updateCurrentDir(QString const& dir,
                           QString const& caption = QString(),

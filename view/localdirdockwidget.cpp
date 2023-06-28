@@ -16,6 +16,7 @@
 #include "dialog/fileoperateconfirmdialog.h"
 #include "dialog/compressconfirmdialog.h"
 #include "dialog/uncompressconfirmdialog.h"
+#include "dialog/propertydialog.h"
 #include "dialog/serchfiledialog.h"
 
 #include <QMenu>
@@ -408,7 +409,7 @@ void LocalDirDockWidget::normalDoubleClick(QModelIndex const& index)
             WinShell::Open(model_->filePath(index.row()));
         else
         {
-            compressModel_->setCompressFile(fileInfo);
+            compressModel_->setCompressFileName(fileInfo.filePath());
             ui->tvCompress->show();
             ui->tvNormal->hide();
             updateCurrentDir(compressModel_->dir());
@@ -625,7 +626,7 @@ void LocalDirDockWidget::customCompressContextMenu(const QPoint &pos)
     {
         menu.addAction("View", this, [=](){
             QDir targetDir = Utils::tempDir();
-            if(compressModel_->extract(targetDir.path(), fileInfo->filePath(), false))
+            if(compressModel_->extract(targetDir.path(), QStringList() << fileInfo->filePath(), false))
             {
                 QString fileName = targetDir.filePath(fileInfo->fileName());
                 qDebug() << fileName;
@@ -636,7 +637,7 @@ void LocalDirDockWidget::customCompressContextMenu(const QPoint &pos)
         });
         menu.addAction("Edit", this, [=](){
             QDir targetDir = Utils::tempDir();
-            if(compressModel_->extract(targetDir.path(), fileInfo->filePath(), false))
+            if(compressModel_->extract(targetDir.path(), QStringList() << fileInfo->filePath(), false))
             {
                 QString fileName = targetDir.filePath(fileInfo->fileName());
                 FileNames::MakeFileNameAsParams(fileName);
@@ -656,12 +657,16 @@ void LocalDirDockWidget::customCompressContextMenu(const QPoint &pos)
         ui->tvCompress->edit(nameIndex);
     });
     menu.addAction("Delete", this, [=](){
-        compressModel_->rmFile(fileInfo->filePath());
+        compressModel_->rm(fileInfo->filePath());
         compressModel_->refresh();
     });
     menu.addSeparator();
     menu.addAction("New Folder", this, [=](){});
-    menu.addAction("Properties", this, [=](){});
+    menu.addAction("Properties", this, [=](){
+        PropertyDialog dialog;
+        dialog.setFileInfo(compressModel_->fileInfo(index.row()));
+        dialog.exec();
+    });
 
     menu.exec(QCursor::pos());
 }
@@ -888,10 +893,10 @@ void LocalDirDockWidget::copyFiles(QString const& dstFilePath)
     dialog.setPath(dstFilePath);
     if(dialog.exec() == QDialog::Accepted)
     {
-        if(ui->tvNormal->isVisible())
-            copyFilels(selectedFileNames(), dialog.path());
+        if(ui->tvCompress->isVisible())
+            extractFiles(fileNames, dialog.path(), false);
         else
-        {}
+            copyFilels(selectedFileNames(), dialog.path());
     }
 }
 
@@ -924,14 +929,16 @@ void LocalDirDockWidget::moveFiles(QString const& dstFilePath)
     dialog.setPath(dstFilePath);
     if(dialog.exec() == QDialog::Accepted)
     {
+        if(ui->tvCompress->isVisible())
+        {
+            extractFiles(fileNames, dialog.path(), true);
+            compressModel_->refresh();
+        }
+        else
         if(ui->tvNormal->isVisible())
         {
             cutFiles(selectedFileNames(), dialog.path());
             model_->refresh();
-        }
-        else
-        {
-            ;
         }
     }
 }
@@ -1207,6 +1214,36 @@ void LocalDirDockWidget::fileTransfer(FileNames const& fileNames, bool isMove)
         }
         QApplication::processEvents();
     }
+}
+
+void LocalDirDockWidget::extractFiles(QStringList const& fileNames,
+                                      QString const& targetPath,
+                                      bool isMove)
+{
+    FileUncompresser uncompresser;
+    FileProgressDialog dialog(this);
+    dialog.setStatusTextMode();
+
+    connect(&uncompresser, &FileUncompresser::progress, &dialog, &FileProgressDialog::progressText);
+    connect(&uncompresser, &FileUncompresser::finished, &dialog, &FileProgressDialog::finished);
+    connect(&uncompresser, &FileUncompresser::error, &dialog, &FileProgressDialog::error);
+
+    dialog.setModal(true);
+    dialog.show();
+
+    uncompresser.extract(compressModel_->compressFileName(), targetPath, fileNames, true);
+    while(!dialog.isFinished())
+    {
+        if(dialog.isCancel())
+        {
+            uncompresser.cancel();
+            while(!dialog.isFinished())
+                QApplication::processEvents();
+        }
+        QApplication::processEvents();
+    }
+    if(!dialog.isCancel() && isMove)
+       uncompresser.remove(compressModel_->compressFileName(), fileNames);
 }
 
 void LocalDirDockWidget::goToFile(QString const& fileName)
