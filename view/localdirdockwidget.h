@@ -73,6 +73,8 @@ public:
     void selectAll();
     void compressFiles(QString const& dstFilePath);
     void uncompressFiles(QString const& dstFilePath);
+    void extractFiles(QStringList const& fileNames,
+                      QString const& targetPath);
     void searchFiles(QString const& dstFilePath);
     void execCommand(QString const& command);
 public slots:
@@ -91,6 +93,7 @@ signals:
     void remoteDownload(QString const& remoteSrc,
                         QStringList const& fileNames,
                         QString const& targetFilePath);
+    void compressFileExtract(QStringList const& fileNames);
     void actived();
 
 protected:

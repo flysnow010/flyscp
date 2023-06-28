@@ -432,6 +432,7 @@ void RemoteDockWidget::beginDragFile(QPoint const& point)
     QModelIndex index = ui->treeView->indexAt(point);
     if(!index.isValid())
         return;
+
     QDrag *drag = new QDrag(ui->treeView);
     QStringList fileNames = selectedileNames();
     QMimeData* mimeData = new QMimeData();

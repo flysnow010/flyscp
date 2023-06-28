@@ -330,6 +330,14 @@ void MainWindow::createViewConnect()
     connect(rightDirView, &LocalDirDockWidget::dirChanged, this, [&](QString const& dir, bool){
         commandBar->setDir(dir);
     });
+    connect(leftDirView, &LocalDirDockWidget::compressFileExtract, this, [&](QStringList const& fileNames){
+        rightDirView->extractFiles(fileNames, leftDirView->dir());
+        rightDirView->refresh();
+    });
+    connect(rightDirView, &LocalDirDockWidget::compressFileExtract, this, [&](QStringList const& fileNames){
+        leftDirView->extractFiles(fileNames, rightDirView->dir());
+        leftDirView->refresh();
+    });
     connect(commandBar, &CommandBar::commanded, this, [&](QString const& commnad){
         if(leftDirView->isActived())
             leftDirView->execCommand(commnad);

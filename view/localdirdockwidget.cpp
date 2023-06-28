@@ -741,11 +741,15 @@ void LocalDirDockWidget::compressBeginDragFile(QPoint const& point)
         return;
 
     QDrag *drag = new QDrag(ui->tvCompress);
-    QStringList fileNames = ClipBoard::fileNames(selectedCompressedFileNames());
-    QMimeData* mimeData = WinShell::dropMimeData(fileNames);
+    QStringList fileNames = selectedCompressedFileNames();
+    QMimeData* mimeData = new QMimeData();
+
+    mimeData->setText(fileNames.join("\n"));
+    mimeData->setData("compressedFileName",
+                      compressModel_->compressFileName().toUtf8());
     drag->setMimeData(mimeData);
     drag->setPixmap(QPixmap(":/image/copy.png"));
-    drag->start();
+    drag->exec(Qt::CopyAction);
 }
 
 void LocalDirDockWidget::normalDragEnter(QDragEnterEvent * event)
@@ -834,7 +838,13 @@ void LocalDirDockWidget::normalDrop(QDropEvent * event)
             return;
         QString remoteSrc = ClipBoard::remoteSrc(mimeData);
         if(remoteSrc.isEmpty())
-            fileTransfer(FileNames::GetFileNames(fileNames, filePath), false);
+        {
+            QString compressedFileName = ClipBoard::compressedFileName(mimeData);
+            if(compressedFileName.isEmpty())
+                fileTransfer(FileNames::GetFileNames(fileNames, filePath), false);
+            else
+                emit compressFileExtract(fileNames);
+        }
         else
             emit remoteDownload(remoteSrc, fileNames, filePath);
     }
@@ -1257,6 +1267,12 @@ void LocalDirDockWidget::uncompressFiles(QString const& dstFilePath)
     }
 }
 
+void LocalDirDockWidget::extractFiles(QStringList const& fileNames,
+                  QString const& targetPath)
+{
+    extractFiles(fileNames, targetPath, false);
+}
+
 void LocalDirDockWidget::searchFiles(QString const& dstFilePath)
 {
     SerchFileDialog dialog;
@@ -1473,6 +1489,8 @@ void LocalDirDockWidget::compressFiles(QStringList const& fileNames, QString con
         }
         QApplication::processEvents();
     }
+    if(!dialog.isCancel())
+        compressModel_->rename(fileNames, filePath);
 }
 
 void LocalDirDockWidget::goToFile(QString const& fileName)
