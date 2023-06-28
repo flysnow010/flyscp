@@ -2,6 +2,7 @@
 #define LOCALDIRDOCKWIDGET_H
 #include "core/filename.h"
 #include "core/basedir.h"
+#include "core/compressfileinfo.h"
 #include <QDockWidget>
 
 namespace Ui {
@@ -19,6 +20,7 @@ class LocalDirDockWidget : public QDockWidget, public BaseDir
     Q_OBJECT
 
 public:
+    enum ViewMode { Normal, Compress };
     explicit LocalDirDockWidget(QWidget *parent = nullptr);
     ~LocalDirDockWidget();
 
@@ -100,10 +102,15 @@ private slots:
     void sortIndicatorChanged(int logicalIndex, Qt::SortOrder order);
     void customNormalContextMenu(const QPoint &pos);
     void customCompressContextMenu(const QPoint &pos);
-    void beginDragFile(QPoint const& point);
-    void dragEnter(QDragEnterEvent * event);
-    void dragMove(QDragMoveEvent * event);
-    void drop(QDropEvent * event);
+
+    void normalBeginDragFile(QPoint const& point);
+    void compressBeginDragFile(QPoint const& point);
+    void normalDragEnter(QDragEnterEvent * event);
+    void compressDragEnter(QDragEnterEvent * event);
+    void normalDragMove(QDragMoveEvent * event);
+    void compressDragMove(QDragMoveEvent * event);
+    void normalDrop(QDropEvent * event);
+    void compressDrop(QDropEvent * event);
 
     void cut();
     void copy();
@@ -118,6 +125,7 @@ private:
     QStringList selectedFileNames(bool isOnlyFilename = false, bool isParent = false);
     QStringList selectedCompressedFileNames();
     QString selectedFileName(bool isOnlyFilename = false) const;
+    CompressFileInfo::Ptr selectedCompressedFileName();
 
     void copyFilels(QStringList const& fileNames, QString const& dstFilePath);
     void cutFiles(QStringList const& fileNames, QString const& dstFilePath);
@@ -125,6 +133,7 @@ private:
     void extractFiles(QStringList const& fileNames,
                       QString const& targetPath,
                       bool isMove);
+    void compressFiles(QStringList const& fileNames, QString const& filePath);
     void goToFile(QString const& fileName);
 
     QString getStatusText();
@@ -138,6 +147,7 @@ private:
     CompressDirModel* compressModel_;
     TitleBarWidget* titleBarWidget;
     QFileSystemWatcher* fileSystemWatcher;
+    ViewMode viewMode_ = Normal;
 };
 
 #endif // LOCALDIRDOCKWIDGET_H

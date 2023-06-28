@@ -50,13 +50,21 @@ LocalDirDockWidget::LocalDirDockWidget(QWidget *parent)
     connect(ui->tvCompress, SIGNAL(customContextMenuRequested(QPoint)),
                     this, SLOT(customCompressContextMenu(QPoint)));
     connect(ui->tvNormal, SIGNAL(prepareDrag(QPoint)),
-                    this, SLOT(beginDragFile(QPoint)));
+                    this, SLOT(normalBeginDragFile(QPoint)));
     connect(ui->tvNormal, SIGNAL(dragEnter(QDragEnterEvent*)),
-                    this, SLOT(dragEnter(QDragEnterEvent*)));
+                    this, SLOT(normalDragEnter(QDragEnterEvent*)));
     connect(ui->tvNormal, SIGNAL(dragMove(QDragMoveEvent*)),
-                    this, SLOT(dragMove(QDragMoveEvent*)));
+                    this, SLOT(normalDragMove(QDragMoveEvent*)));
     connect(ui->tvNormal, SIGNAL(drop(QDropEvent*)),
-                    this, SLOT(drop(QDropEvent*)));
+                    this, SLOT(normalDrop(QDropEvent*)));
+    connect(ui->tvCompress, SIGNAL(prepareDrag(QPoint)),
+                    this, SLOT(compressBeginDragFile(QPoint)));
+    connect(ui->tvCompress, SIGNAL(dragEnter(QDragEnterEvent*)),
+                    this, SLOT(compressDragEnter(QDragEnterEvent*)));
+    connect(ui->tvCompress, SIGNAL(dragMove(QDragMoveEvent*)),
+                    this, SLOT(compressDragMove(QDragMoveEvent*)));
+    connect(ui->tvCompress, SIGNAL(drop(QDropEvent*)),
+                    this, SLOT(compressDrop(QDropEvent*)));
     connect(ui->tvNormal->header(), SIGNAL(sortIndicatorChanged(int,Qt::SortOrder)),
             this, SLOT(sortIndicatorChanged(int,Qt::SortOrder)));
     connect(ui->tvCompress->header(), SIGNAL(sortIndicatorChanged(int,Qt::SortOrder)),
@@ -600,85 +608,124 @@ void LocalDirDockWidget::customNormalContextMenu(const QPoint & pos)
 
     menu.exec(QCursor::pos());
 }
-#include <QDebug>
+
 void LocalDirDockWidget::customCompressContextMenu(const QPoint &pos)
 {
     QModelIndex index = ui->tvCompress->indexAt(pos);
-
-    if(!index.isValid())
-        return;
-
-    CompressFileInfo::Ptr fileInfo = compressModel_->fileInfo(index.row());
-    if(fileInfo->isParent())
-        return;
-
     QMenu menu;
-
-    if(fileInfo->isDir())
-        menu.addAction("Open", this, [=](){
-            if(compressModel_->cd(fileInfo->path()))
-                updateCurrentDir(compressModel_->dir());
-            else
-            {
-                ui->tvCompress->hide();
-                ui->tvNormal->show();
-                updateCurrentDir(model_->dir());
-            }
-        });
-    else
+    if(!index.isValid())
     {
-        menu.addAction("View", this, [=](){
-            QDir targetDir = Utils::tempDir();
-            if(compressModel_->extract(targetDir.path(), QStringList() << fileInfo->filePath(), false))
-            {
-                QString fileName = targetDir.filePath(fileInfo->fileName());
-                qDebug() << fileName;
-                FileNames::MakeFileNameAsParams(fileName);
-                WinShell::Exec(Utils::viewApp(), fileName);
-
-            }
+        QString fileName = compressModel_->compressFileName();
+        QFileInfo fileInfo(fileName);
+        QAction* action = menu.addAction(fileInfo.fileName(), this, [=]()
+        {
+            WinShell::Open(fileName);
         });
-        menu.addAction("Edit", this, [=](){
-            QDir targetDir = Utils::tempDir();
-            if(compressModel_->extract(targetDir.path(), QStringList() << fileInfo->filePath(), false))
-            {
-                QString fileName = targetDir.filePath(fileInfo->fileName());
-                FileNames::MakeFileNameAsParams(fileName);
-                WinShell::Exec(Utils::editApp(), fileName);
-            }
+        QFont font = action->font();
+        font.setBold(true);
+        action->setFont(font);
+        ContextMenuItems items = ContextMenu::FileCommands();
+        foreach(auto const& item, items)
+        {
+            menu.addAction(item.icon, item.name, [=](bool){
+                QStringList fileNames = selectedFileNames(false, true);
+                item.exec(fileNames);
+            });
+        }
+        menu.addAction("Copy File Path", this, [=](bool){
+            ClipBoard::copy(fileName);
+        });
+        ContextMenuItems sendtoItems = ContextMenu::SendTo();
+        QMenu *sendTo = new QMenu("Send to");
+        foreach(auto sendItem, sendtoItems)
+        {
+            sendTo->addAction(sendItem.icon, sendItem.name, this, [=](bool){
+                sendItem.exec(fileName);
+            });
+        }
+        menu.addSeparator();
+        menu.addMenu(sendTo);
+        menu.addSeparator();
+        menu.addAction("New Folder", this, [=](){ newFolder(); });
+        menu.addAction("New Txt File", this, [=](){ newTxtFile(); });
+        menu.addSeparator();
+        menu.addAction("Properties", this, [=](){
+            WinShell::Property(fileName);
         });
     }
-    menu.addSeparator();
-    menu.addAction("Copy to...", this, [=]() {
-        emit copyRequested();
-    });
-    menu.addAction("Move to...", this, [=](){
-        emit moveRequested();
-    });
-    menu.addAction("Rename", this, [=](){
-        QModelIndex nameIndex = compressModel_->index(index.row(), 0);
-        ui->tvCompress->edit(nameIndex);
-    });
-    menu.addAction("Delete", this, [=](){
-        compressModel_->rm(fileInfo->filePath());
-        compressModel_->refresh();
-    });
-    menu.addSeparator();
-    menu.addAction("New Folder", this, [=](){});
-    menu.addAction("Properties", this, [=](){
-        PropertyDialog dialog;
-        dialog.setFileInfo(compressModel_->fileInfo(index.row()));
-        dialog.exec();
-    });
+    else
+    {
+        CompressFileInfo::Ptr fileInfo = compressModel_->fileInfo(index.row());
+        if(fileInfo->isParent())
+            return;
+
+        if(fileInfo->isDir())
+            menu.addAction("Open", this, [=](){
+                if(compressModel_->cd(fileInfo->path()))
+                    updateCurrentDir(compressModel_->dir());
+                else
+                {
+                    ui->tvCompress->hide();
+                    ui->tvNormal->show();
+                    updateCurrentDir(model_->dir());
+                }
+            });
+        else
+        {
+            menu.addAction("View", this, [=](){
+                QDir targetDir = Utils::tempDir();
+                if(compressModel_->extract(targetDir.path(), QStringList() << fileInfo->filePath(), false))
+                {
+                    QString fileName = targetDir.filePath(fileInfo->fileName());
+                    FileNames::MakeFileNameAsParams(fileName);
+                    WinShell::Exec(Utils::viewApp(), fileName);
+                }
+            });
+            menu.addAction("Edit", this, [=](){
+                QDir targetDir = Utils::tempDir();
+                if(compressModel_->extract(targetDir.path(), QStringList() << fileInfo->filePath(), false))
+                {
+                    QString fileName = targetDir.filePath(fileInfo->fileName());
+                    FileNames::MakeFileNameAsParams(fileName);
+                    WinShell::Exec(Utils::editApp(), fileName);
+                }
+            });
+        }
+        menu.addSeparator();
+        menu.addAction("Copy to...", this, [=]() {
+            emit copyRequested();
+        });
+        menu.addAction("Move to...", this, [=](){
+            emit moveRequested();
+        });
+        menu.addAction("Rename", this, [=](){
+            QModelIndex nameIndex = compressModel_->index(index.row(), 0);
+            ui->tvCompress->edit(nameIndex);
+        });
+        menu.addAction("Delete", this, [=](){
+            compressModel_->rm(fileInfo->filePath());
+            compressModel_->refresh();
+        });
+        menu.addSeparator();
+        menu.addAction("New Folder", this, [=](){ newFolder(); });
+        menu.addAction("New Txt File", this, [=](){ newTxtFile(); });
+        menu.addSeparator();
+        menu.addAction("Properties", this, [=](){
+            PropertyDialog dialog;
+            dialog.setFileInfo(compressModel_->fileInfo(index.row()));
+            dialog.exec();
+        });
+    }
 
     menu.exec(QCursor::pos());
 }
 
-void LocalDirDockWidget::beginDragFile(QPoint const& point)
+void LocalDirDockWidget::normalBeginDragFile(QPoint const& point)
 {
     QModelIndex index = ui->tvNormal->indexAt(point);
     if(!index.isValid())
         return;
+
     QDrag *drag = new QDrag(ui->tvNormal);
     QStringList fileNames = ClipBoard::fileNames(selectedFileNames());
     QMimeData* mimeData = WinShell::dropMimeData(fileNames);
@@ -687,14 +734,35 @@ void LocalDirDockWidget::beginDragFile(QPoint const& point)
     drag->exec(Qt::LinkAction | Qt::MoveAction | Qt::CopyAction , Qt::CopyAction);
 }
 
-void LocalDirDockWidget::dragEnter(QDragEnterEvent * event)
+void LocalDirDockWidget::compressBeginDragFile(QPoint const& point)
+{
+    QModelIndex index = ui->tvCompress->indexAt(point);
+    if(!index.isValid())
+        return;
+
+    QDrag *drag = new QDrag(ui->tvCompress);
+    QStringList fileNames = ClipBoard::fileNames(selectedCompressedFileNames());
+    QMimeData* mimeData = WinShell::dropMimeData(fileNames);
+    drag->setMimeData(mimeData);
+    drag->setPixmap(QPixmap(":/image/copy.png"));
+    drag->start();
+}
+
+void LocalDirDockWidget::normalDragEnter(QDragEnterEvent * event)
 {
     QMimeData const* mimeData = event->mimeData();
     if(mimeData)
         event->acceptProposedAction();
 }
 
-void LocalDirDockWidget::dragMove(QDragMoveEvent * event)
+void LocalDirDockWidget::compressDragEnter(QDragEnterEvent * event)
+{
+    QMimeData const* mimeData = event->mimeData();
+    if(mimeData)
+        event->acceptProposedAction();
+}
+
+void LocalDirDockWidget::normalDragMove(QDragMoveEvent * event)
 {
     QModelIndex index = ui->tvNormal->indexAt(event->pos());
     bool isSelf = (event->source() == ui->tvNormal);
@@ -714,7 +782,27 @@ void LocalDirDockWidget::dragMove(QDragMoveEvent * event)
     }
 }
 
-void LocalDirDockWidget::drop(QDropEvent * event)
+void LocalDirDockWidget::compressDragMove(QDragMoveEvent * event)
+{
+    QModelIndex index = ui->tvCompress->indexAt(event->pos());
+    bool isSelf = (event->source() == ui->tvCompress);
+    if(index.isValid())
+    {
+        if(isSelf && compressModel_->fileInfo(index.row())->isFile())
+            event->ignore();
+        else
+            event->acceptProposedAction();
+    }
+    else
+    {
+        if(isSelf)
+            event->ignore();
+        else
+            event->acceptProposedAction();
+    }
+}
+
+void LocalDirDockWidget::normalDrop(QDropEvent * event)
 {
     QModelIndex index = ui->tvNormal->indexAt(event->pos());
     QString filePath;
@@ -762,6 +850,34 @@ void LocalDirDockWidget::drop(QDropEvent * event)
     model_->refresh();
 }
 
+void LocalDirDockWidget::compressDrop(QDropEvent * event)
+{
+    QModelIndex index = ui->tvCompress->indexAt(event->pos());
+    QString filePath;
+    QString subFilePath;
+    if(!index.isValid())
+        filePath = compressModel_->dir();
+    else
+    {
+        if(compressModel_->fileInfo(index.row())->isFile())
+            filePath = compressModel_->dir();
+        else
+        {
+            subFilePath = compressModel_->fileName(index.row());
+            filePath = QString("%1\\%2").arg(compressModel_->dir(), subFilePath);
+        }
+    }
+
+    QMimeData const* mimeData = event->mimeData();
+    if(!mimeData)
+        return;
+    QStringList fileNames = ClipBoard::fileNames(mimeData);
+    if(!Utils::question(QString("Copy %1 files or folders to\n%2").arg(fileNames.size()).arg(filePath)))
+        return;
+    compressFiles(fileNames, subFilePath);
+    compressModel_->refresh();
+}
+
 void LocalDirDockWidget::cut()
 {
     QStringList fileNames = selectedFileNames(false, true);
@@ -786,24 +902,46 @@ void LocalDirDockWidget::paste()
 
 void LocalDirDockWidget::delFilesWithConfirm()
 {
-    QStringList fileNames = selectedFileNames(true);
+    QStringList fileNames;
+    if(ui->tvNormal->isVisible())
+        fileNames = selectedFileNames(true);
+    else
+        fileNames = selectedCompressedFileNames();
     QString tipText;
     if(fileNames.size() > 1)
         tipText = QString("Are you sure you want to delete %1 files or folders?\n\n%2").arg(fileNames.size())
                 .arg(fileNames.join("\n"));
-    else
+    else if(fileNames.size() > 0)
     {
-        QFileInfo fileInfo(selectedFileName());
+        QModelIndex index;
         QString type;
-        if(fileInfo.isDir())
-            type = "folder";
+        if(ui->tvNormal->isVisible())
+        {
+            index = ui->tvNormal->currentIndex();
+            type = model_->isDir(index.row()) ? "folder" : "file";
+        }
         else
-            type = "file";
+        {
+            index = ui->tvCompress->currentIndex();
+            type = compressModel_->isDir(index.row()) ? "folder" : "file";
+        }
         tipText = QString("Are you sure you want to delete the %1 %2?").arg(type, fileNames.first());
     }
-
+    if(tipText.isEmpty())
+    {
+        Utils::warring("No files or folders selected!");
+        return;
+    }
     if(Utils::question(tipText))
-        delFiles();
+    {
+        if(ui->tvNormal->isVisible())
+            delFiles();
+        else
+        {
+            compressModel_->rm(fileNames);
+            compressModel_->refresh();
+        }
+    }
 }
 
 void LocalDirDockWidget::delFiles()
@@ -840,29 +978,70 @@ void LocalDirDockWidget::newFolder()
     QString path = Utils::getText("New folder");
     if(path.isEmpty())
         return;
-    if(model_->mkdirs(path))
-        model_->refresh();
+    if(ui->tvNormal->isVisible())
+    {
+        if(model_->mkdirs(path))
+            model_->refresh();
+    }
+    else
+    {
+        if(compressModel_->mkdir(path))
+            compressModel_->refresh();
+    }
 }
 
 void LocalDirDockWidget::viewFile()
 {
-    QString fileName = selectedFileName();
-    QFileInfo fileInfo(fileName);
-
-    if(fileInfo.isFile())
+    if(ui->tvNormal->isVisible())
     {
-        FileNames::MakeFileNameAsParams(fileName);
-        WinShell::Exec(Utils::viewApp(), fileName);
+        QString fileName = selectedFileName();
+        QFileInfo fileInfo(fileName);
+
+        if(fileInfo.isFile())
+        {
+            FileNames::MakeFileNameAsParams(fileName);
+            WinShell::Exec(Utils::viewApp(), fileName);
+        }
+    }
+    else
+    {
+        CompressFileInfo::Ptr fileInfo = selectedCompressedFileName();
+        if(!fileInfo || fileInfo->isDir())
+            return;
+
+        QDir targetDir = Utils::tempDir();
+        if(compressModel_->extract(targetDir.path(), QStringList() << fileInfo->filePath(), false))
+        {
+            QString fileName = targetDir.filePath(fileInfo->fileName());
+            FileNames::MakeFileNameAsParams(fileName);
+            WinShell::Exec(Utils::viewApp(), fileName);
+        }
     }
 }
 void LocalDirDockWidget::editFile()
 {
-    QString fileName = selectedFileName();
-    QFileInfo fileInfo(fileName);
-    if(fileInfo.isFile())
+    if(ui->tvNormal->isVisible())
     {
-        FileNames::MakeFileNameAsParams(fileName);
-        WinShell::Exec(Utils::editApp(), fileName);
+        QString fileName = selectedFileName();
+        QFileInfo fileInfo(fileName);
+        if(fileInfo.isFile())
+        {
+            FileNames::MakeFileNameAsParams(fileName);
+            WinShell::Exec(Utils::editApp(), fileName);
+        }
+    }
+    else
+    {
+        CompressFileInfo::Ptr fileInfo = selectedCompressedFileName();
+        if(!fileInfo || fileInfo->isDir())
+            return;
+        QDir targetDir = Utils::tempDir();
+        if(compressModel_->extract(targetDir.path(), QStringList() << fileInfo->filePath(), false))
+        {
+            QString fileName = targetDir.filePath(fileInfo->fileName());
+            FileNames::MakeFileNameAsParams(fileName);
+            WinShell::Exec(Utils::editApp(), fileName);
+        }
     }
 }
 
@@ -1112,11 +1291,23 @@ void LocalDirDockWidget::newTxtFile()
     QString fileName = Utils::getText("New File", "*.txt");
     if(fileName.isEmpty())
         return;
-    QFile file(model_->filePath(fileName));
-    if(file.open(QIODevice::WriteOnly))
+    if(ui->tvNormal->isVisible())
     {
-        file.close();
-        model_->refresh();
+        QFile file(model_->filePath(fileName));
+        if(file.open(QIODevice::WriteOnly))
+        {
+            file.close();
+            model_->refresh();
+        }
+    }
+    else
+    {
+        QString filePath = Utils::tempDir().filePath(fileName);
+        QFile file(filePath);
+        if(file.open(QIODevice::WriteOnly))
+            file.close();
+        if(compressModel_->add(filePath, true))
+            compressModel_->refresh();
     }
 }
 
@@ -1173,6 +1364,15 @@ QString LocalDirDockWidget::selectedFileName(bool isOnlyFilename) const
     if(isOnlyFilename)
         return model_->fileName(index.row());
     return model_->filePath(index.row());
+}
+
+CompressFileInfo::Ptr LocalDirDockWidget::selectedCompressedFileName()
+{
+    QModelIndex index = ui->tvCompress->currentIndex();
+    if(!index.isValid())
+        return CompressFileInfo::Ptr();
+
+    return compressModel_->fileInfo(index.row());
 }
 
 void LocalDirDockWidget::copyFilels(QStringList const& fileNames, QString const& dstFilePath)
@@ -1247,6 +1447,32 @@ void LocalDirDockWidget::extractFiles(QStringList const& fileNames,
     }
     if(!dialog.isCancel() && isMove)
        uncompresser.remove(compressModel_->compressFileName(), fileNames);
+}
+
+void LocalDirDockWidget::compressFiles(QStringList const& fileNames, QString const& filePath)
+{
+    FileCompresser compresser;
+    FileProgressDialog dialog(this);
+    dialog.setStatusTextMode();
+
+    connect(&compresser, &FileCompresser::progress, &dialog, &FileProgressDialog::progressText);
+    connect(&compresser, &FileCompresser::finished, &dialog, &FileProgressDialog::finished);
+    connect(&compresser, &FileCompresser::error, &dialog, &FileProgressDialog::error);
+
+    dialog.setModal(true);
+    dialog.show();
+
+    compresser.update(fileNames, compressModel_->compressFileName(), false);
+    while(!dialog.isFinished())
+    {
+        if(dialog.isCancel())
+        {
+            compresser.cancel();
+            while(!dialog.isFinished())
+                QApplication::processEvents();
+        }
+        QApplication::processEvents();
+    }
 }
 
 void LocalDirDockWidget::goToFile(QString const& fileName)
