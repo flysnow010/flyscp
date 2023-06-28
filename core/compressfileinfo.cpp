@@ -145,9 +145,11 @@ bool CompressFile::mkdir(QString const& dir)
         tempDir.mkpath(QString("%1/%2").arg(currentDir_, dir));
         int index = currentDir_.indexOf(WINDOWS_SEP);
         if(index < 0)
-            filePath =  Utils::toWindowsPath(QString("%1/%2/").arg(tempDir.path(), currentDir_));
+            filePath =  Utils::toWindowsPath(QString("%1/%2/")
+                                             .arg(tempDir.path(), currentDir_));
         else
-            filePath =  Utils::toWindowsPath(QString("%1/%2/").arg(tempDir.path(), currentDir_.left(index)));
+            filePath =  Utils::toWindowsPath(QString("%1/%2/")
+                                             .arg(tempDir.path(), currentDir_.left(index)));
     }
     if(!FileCompresser().update(QStringList() << filePath, fileName_))
         return false;
@@ -170,19 +172,56 @@ bool CompressFile::rm(QStringList const& fileNames)
 
 bool CompressFile::add(QStringList const& fileNames)
 {
-    return FileCompresser().update(fileNames, fileName_);
+    QStringList renameFileNames;
+
+    if(FileCompresser().update(fileNames, fileName_))
+    {
+        if(!currentDir_.isEmpty())
+            rename(fileNames, QString());
+        return true;
+    }
+    return false;
 }
 
-bool CompressFile::rename(QString const& oldFileName, QString const& newFileName)
+bool CompressFile::rename(QString const& oldFileName,
+                          QString const& newFileName)
 {
     return FileUncompresser().rename(fileName_,
                                      filePath(oldFileName),
                                      filePath(newFileName));
 }
 
-bool CompressFile::extract(QString const& targetPath, QStringList const& fileNames, bool isWithPath)
+bool CompressFile::rename(QStringList const& fileNames,
+                          QString const& subPath)
 {
-    return FileUncompresser().extract(fileName_, targetPath, fileNames, isWithPath);
+    if(currentDir_.isEmpty())
+        return false;
+
+    QStringList renameFileNames;
+    foreach(auto fileName, fileNames)
+    {
+        QString oldFileName = QFileInfo(fileName).fileName();
+        QString newFileName;
+        if(subPath.isEmpty())
+            newFileName  = QString("%1\\%2")
+                    .arg(currentDir_, oldFileName);
+        else
+            newFileName  = QString("%1\\%2\\%3")
+                    .arg(currentDir_, subPath, oldFileName);
+        renameFileNames << oldFileName << newFileName;
+    }
+
+    return FileUncompresser().rename(fileName_, renameFileNames);
+}
+
+bool CompressFile::extract(QString const& targetPath,
+                           QStringList const& fileNames,
+                           bool isWithPath)
+{
+    return FileUncompresser().extract(fileName_,
+                                      targetPath,
+                                      fileNames,
+                                      isWithPath);
 }
 
 QString CompressFile::filePath(QString const& fileName) const
@@ -213,7 +252,8 @@ void CompressFile::refresh(bool isCurrent)
         stream.skipWhiteSpace();
         stream >> info->attributes_ >> info->size_ >> info->compressedSize_;
         info->isDir_ = info->attributes_.startsWith("D");
-        info->time_ = start.secsTo(QDateTime::fromString(info->timeText_, "yyyy-MM-dd HH:mm:ss"));
+        info->time_ = start.secsTo(QDateTime::fromString(info->timeText_,
+                                                         "yyyy-MM-dd HH:mm:ss"));
         stream.skipWhiteSpace();
         name = stream.readAll();
         QFileInfo fileInfo(name);
@@ -238,7 +278,8 @@ struct CompressFileInfoCompare
         : flag(f)
     {}
 
-    bool operator() (CompressFileInfo::Ptr const& l, CompressFileInfo::Ptr const& r)
+    bool operator() (CompressFileInfo::Ptr const& l,
+                     CompressFileInfo::Ptr const& r)
     {
         if(flag == CompressFile::NoSort)
             return false;
@@ -275,7 +316,8 @@ struct CompressFileInfoCompare
         }
     }
 
-    bool compare(CompressFileInfo::Ptr const& l, CompressFileInfo::Ptr const& r)
+    bool compare(CompressFileInfo::Ptr const& l,
+                 CompressFileInfo::Ptr const& r)
     {
         uint32_t sort = flag & CompressFile::SortByMask;
         if(sort == CompressFile::Name)
@@ -293,9 +335,11 @@ struct CompressFileInfoCompare
     CompressFile::SortFlag flag;
 };
 
-void CompressFile::sort(CompressFileInfos &fileInfos, SortFlag sortFlag)
+void CompressFile::sort(CompressFileInfos &fileInfos,
+                        SortFlag sortFlag)
 {
-    std::sort(fileInfos.begin(), fileInfos.end(), CompressFileInfoCompare(sortFlag));
+    std::sort(fileInfos.begin(), fileInfos.end(),
+              CompressFileInfoCompare(sortFlag));
 }
 
 QString CompressFile::getCompressFile(QString const& filePath)
@@ -313,7 +357,9 @@ QString CompressFile::getCompressFile(QString const& filePath)
     return QString();
 }
 
-QString CompressFile::getSubDir(QString const& path, QString const& parent, bool isWindowSep)
+QString CompressFile::getSubDir(QString const& path,
+                                QString const& parent,
+                                bool isWindowSep)
 {
     QString sep = isWindowSep ? QString("\\") : QString("/");
 
@@ -325,7 +371,8 @@ QString CompressFile::getSubDir(QString const& path, QString const& parent, bool
     return QString();
 }
 
-bool CompressFile::findFileInfo(CompressFileInfos const& fileInfos, QString const& path)
+bool CompressFile::findFileInfo(CompressFileInfos const& fileInfos,
+                                QString const& path)
 {
     foreach(auto fileInfo, fileInfos)
     {

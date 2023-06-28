@@ -91,6 +91,7 @@ public:
     bool rm(QStringList const& fileNames);
     bool add(QStringList const& fileNames);
     bool rename(QString const& oldFileName, QString const& newFileName);
+    bool rename(QStringList const& fileNames, QString const& subPath);
     bool extract(QString const& targetPath, QStringList const& fileNames, bool isWithPath);
     void refresh(bool isCurrent = true);
     QString filePath(QString const& fileName) const;
