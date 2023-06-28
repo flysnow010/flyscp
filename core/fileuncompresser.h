@@ -37,6 +37,7 @@ public:
     QStringList listFileInfo(QString const& fileName);
     bool remove(QString const& archiveFileName, QStringList const& fileNames);
     bool rename(QString const& archiveFileName, QString const& oldName, QString const& newName);
+    bool rename(QString const& archiveFileName, QStringList const& fileNames);
     bool extract(QString const& archiveFileName,
                  QString const& targetPath,
                  QStringList const& fileNames, bool isWithPath);

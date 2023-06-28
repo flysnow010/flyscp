@@ -189,6 +189,28 @@ bool FileUncompresser::rename(QString const& archiveFileName, QString const& old
     return isOK_;
 }
 
+bool FileUncompresser::rename(QString const& archiveFileName, QStringList const& fileNames)
+{
+    if(fileNames.size() % 2)
+        return false;
+
+    QStringList args;
+    args << "rn"  << archiveFileName;
+    foreach(auto fileName, fileNames)
+        args << fileName;
+    argsList.clear();
+    argsList << args;
+    qDebug() << args.join(" ");
+    mode = Rename;
+    currentIndex = 0;
+    isOK_ = true;
+    process->setProgram(Utils::compressApp());
+    process->setArguments(nextArgs());
+    process->start();
+    process->waitForFinished();
+    return isOK_;
+}
+
 bool FileUncompresser::extract(QString const& archiveFileName,
                                QString const& targetPath,
                                QStringList const& fileNames,
