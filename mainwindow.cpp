@@ -630,7 +630,12 @@ void MainWindow::netsettings()
         int index = dialog.connectIndex();
         SSHSettings::Ptr settings = sshSettingsMangaer_->settings(index);
         if(settings)
+        {
+            settings->passWord = Utils::getPassword(QString("Password for %1").arg(settings->name));
+            if(settings->passWord.isEmpty())
+                return;
             createRemoteDirWidget(*settings);
+        }
     }
     updateConnectMenu();
 }
