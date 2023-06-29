@@ -364,6 +364,18 @@ void LocalDirModel::setupModelData(TreeItem *parent)
 
 void LocalDirModel::modifyFileInfos(QFileInfoList &fileInfos)
 {
+    if(!isShowHidden())
+    {
+        for(int i = 0; i < fileInfos.size(); )
+        {
+            QString fileName = fileInfos[i].fileName();
+            if(!fileName.startsWith(".")
+                    || fileName == ParentPath)
+                i++;
+            else
+                fileInfos.removeAt(i);
+        }
+    }
     int dirIndex = -1;
     for(int i = 0; i < fileInfos.size(); i++)
     {
