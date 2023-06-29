@@ -40,6 +40,7 @@ RemoteDockWidget::RemoteDockWidget(QWidget *parent)
     ui->setupUi(this);
     ui->treeView->setModel(model_);
     setTitleBarWidget(titleBarWidget);
+    titleBarWidget->showFavoriteButton(false);
     connect(ui->treeView, SIGNAL(doubleClicked(QModelIndex)),
                     this, SLOT(viewClick(QModelIndex)));
     connect(ui->treeView, SIGNAL(customContextMenuRequested(QPoint)),
@@ -335,6 +336,17 @@ void RemoteDockWidget::start(SSHSettings const& settings)
     sftp->start(settings);
     loadSettings();
 }
+
+void RemoteDockWidget::setActived(bool isActived)
+{
+    titleBarWidget->setActived(isActived);
+}
+
+bool RemoteDockWidget::isActived() const
+{
+    return titleBarWidget->isActived();
+}
+
 
 void RemoteDockWidget::saveSettings()
 {

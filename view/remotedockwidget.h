@@ -63,6 +63,8 @@ public:
     void setItemSelectedColor(QString const& back,
                       QString const& mark,
                       QString const&cursor) override;
+    void setActived(bool isActived) override;
+    bool isActived() const override;
 
     void start(SSHSettings const& settings);
     QString const& name() const { return name_; }

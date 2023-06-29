@@ -56,13 +56,14 @@ public:
     void setItemSelectedColor(QString const& back,
                       QString const& mark,
                       QString const&cursor) override;
+    void setActived(bool isActived) override;
+    bool isActived() const override;
 
     QString currentFileName() const { return selectedFileName(); }
     void resizeSection(int logicalIndex, int size);
     void saveSettings(QString const& name);
     void loadSettings(QString const& name);
-    void setActived(bool isActived);
-    bool isActived() const;
+
 
     void viewFile();
     void editFile();
