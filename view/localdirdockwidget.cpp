@@ -485,7 +485,12 @@ void LocalDirDockWidget::sortIndicatorChanged(int logicalIndex, Qt::SortOrder or
 
 void LocalDirDockWidget::customNormalContextMenu(const QPoint & pos)
 {
+//    QStringList fileNames = selectedFileNames(false, true);
+//    ContextMenu::show(fileNames, (void *)winId(), QCursor::pos());
+//    return;
     QModelIndex index = ui->tvNormal->indexAt(pos);
+
+
     QMenu menu;
     ContextMenuItems items;
     QString fileName;

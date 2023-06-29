@@ -143,7 +143,7 @@ void ShellItem::contextMenu(void* handle, int x, int y) const
         HMENU hPopup = CreatePopupMenu();
         if(hPopup)
         {
-            hr = pcm->QueryContextMenu(hPopup, 0, 1, 0x7fff, CMF_DEFAULTONLY | CMF_EXPLORE);
+            hr = pcm->QueryContextMenu(hPopup, 0, 1, 0x7fff, CMF_NORMAL | CMF_EXPLORE);
 
             if(SUCCEEDED(hr))
             {

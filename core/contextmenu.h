@@ -34,6 +34,7 @@ public:
     static ContextMenuItems DirCommands();
     static ContextMenuItems SendTo();
     static void PrintCommand(ContextMenuItems const& items);
+    static void show(QStringList const& fileNames, void *handle, QPoint const& p);
 private:
     static void GetShellContextItems(QString const& fileName, ContextMenuItems & items, bool isSort = false);
     static void GetShellExContextItems(QString const& fileName, ContextMenuItems & items);

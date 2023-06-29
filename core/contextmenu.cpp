@@ -26,7 +26,7 @@ struct ContextMenuHelper
             pDesktop->Release();
     }
 
-    inline bool open(QStringList const& fileNames)
+    inline bool open(QStringList const& fileNames, bool isOpenDataObject = true, bool isOpenParent = false)
     {
         HRESULT hr;
 
@@ -40,10 +40,22 @@ struct ContextMenuHelper
             if(FAILED(hr))
                 return false;
         }
-        hr = pDesktop->GetUIObjectOf(0, fileNames.size(), (PCUITEMID_CHILD_ARRAY)pidlDrives,
+        if(isOpenParent && fileNames.size() > 0)
+        {
+            QFileInfo fileInfo(fileNames[0]);
+            QString fileName = Utils::toWindowsPath(fileInfo.path());
+            hr = pDesktop->ParseDisplayName(0, 0, (LPWSTR)(fileName.toStdWString().c_str()),
+                                0, (LPITEMIDLIST*)&pidlParent, 0);
+            if(FAILED(hr))
+                return false;
+        }
+        if(isOpenDataObject)
+        {
+            hr = pDesktop->GetUIObjectOf(0, fileNames.size(), (PCUITEMID_CHILD_ARRAY)pidlDrives,
                                        IID_IDataObject, 0, (void **)&pDataObject);
-        if(FAILED(hr))
-            return false;
+            if(FAILED(hr))
+                return false;
+        }
         return true;
     }
 
@@ -60,6 +72,77 @@ struct ContextMenuHelper
                 ILFree(pidlDrives[i]);
             pidlDrives = 0;
         }
+        if(pidlParent)
+        {
+            ILFree(pidlParent);
+            pidlParent = 0;
+        }
+    }
+
+    void showContextMenu(QStringList const& fileNames, void* handle, int x, int y)
+    {
+        if(!open(fileNames, false, false))
+            return;
+
+//        IShellFolder* pParentFolder;
+//        HRESULT  hr = pDesktop->BindToObject(pidlParent, 0, IID_IShellFolder, (LPVOID*)&pParentFolder);
+//        if(FAILED(hr))
+//        {
+//            close();
+//            return;
+//        }
+
+        IContextMenu   *pcm;
+        HRESULT hr = pDesktop->GetUIObjectOf(0,
+                                 fileNames.size(),
+                                 (PCUITEMID_CHILD_ARRAY)pidlDrives,
+                                 IID_IContextMenu,
+                                 0,
+                                 (LPVOID*)&pcm);
+        if(SUCCEEDED(hr))
+        {
+            HMENU hPopup = CreatePopupMenu();
+            if(hPopup)
+            {
+                hr = pcm->QueryContextMenu(hPopup, 0, 1, 0x7fff,  CMF_NORMAL);
+
+                if(SUCCEEDED(hr))
+                {
+                    IContextMenu2  *pcm2;
+                    pcm->QueryInterface(IID_IContextMenu2, (LPVOID*)&pcm2);
+                    UINT  idCmd;
+
+                    idCmd = TrackPopupMenu( hPopup,
+                                            TPM_LEFTALIGN | TPM_RETURNCMD | TPM_RIGHTBUTTON,
+                                            x,
+                                            y,
+                                            0,
+                                            (HWND)handle,
+                                            0);
+                    if(pcm2)
+                    {
+                        pcm2->Release();
+                        pcm2 = NULL;
+                    }
+                    if(idCmd && (idCmd != (UINT)-1))
+                    {
+                        CMINVOKECOMMANDINFO  cmi;
+                        cmi.cbSize = sizeof(CMINVOKECOMMANDINFO);
+                        cmi.fMask = 0;
+                        cmi.hwnd = 0;
+                        cmi.lpVerb = (LPCSTR)(INT_PTR)(idCmd - 1);
+                        cmi.lpParameters = NULL;
+                        cmi.lpDirectory = NULL;
+                        cmi.nShow = SW_SHOWNORMAL;
+                        cmi.dwHotKey = 0;
+                        cmi.hIcon = NULL;
+                        pcm->InvokeCommand(&cmi);
+                    }
+                }
+                DestroyMenu(hPopup);
+            }
+        }
+        close();
     }
 
     ContextMenuItems sendToMenuItems()
@@ -163,6 +246,7 @@ struct ContextMenuHelper
 private:
     ContextMenuHelper()
         : pDesktop(0)
+        , pidlParent(0)
         , pidlDrives(0)
         , pDataObject(0)
         , size(0)
@@ -183,6 +267,7 @@ private:
         return text;
     }
     IShellFolder* pDesktop;
+    LPITEMIDLIST   pidlParent;
     LPITEMIDLIST* pidlDrives;
     IDataObject* pDataObject;
     int size;
@@ -216,6 +301,11 @@ ContextMenuItems ContextMenu::DirCommands()
 ContextMenuItems ContextMenu::SendTo()
 {
     return ContextMenuHelper::Instatnce()->sendToMenuItems();
+}
+
+void ContextMenu::show(QStringList const& fileNames, void *handle, QPoint const& p)
+{
+    ContextMenuHelper::Instatnce()->showContextMenu(fileNames, handle, p.x(), p.y());
 }
 
 void ContextMenu::GetShellContextItems(QString const& fileName,
