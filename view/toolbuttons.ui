@@ -153,6 +153,13 @@
     </widget>
    </item>
    <item>
+    <widget class="Line" name="line_5">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QToolButton" name="btnNewFile">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -172,7 +179,7 @@
     </widget>
    </item>
    <item>
-    <widget class="Line" name="line_5">
+    <widget class="Line" name="line_6">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
@@ -194,13 +201,6 @@
      </property>
      <property name="autoRaise">
       <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="Line" name="line_6">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
      </property>
     </widget>
    </item>
