@@ -35,6 +35,8 @@ public:
     virtual void fileFont(QFont const& font) = 0;
     virtual void setItemColor(QString const& fore, QString const& back, QString const& alternate) = 0;
     virtual void setItemSelectedColor(QString const& back, QString const& mark, QString const&cursor) = 0;
+    virtual void setActived(bool isActived) = 0;
+    virtual bool isActived() const = 0;
 };
 
 #endif // BASEDIR_H
