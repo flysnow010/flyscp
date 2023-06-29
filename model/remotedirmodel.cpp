@@ -37,7 +37,7 @@ void RemoteDirModel::setDir(ssh::DirPtr const& dir)
 
 void RemoteDirModel::refresh()
 {
-    uint32_t filter = ssh::Dir::AllEntries | ssh::Dir::NoSymLinks | ssh::Dir::NoDot;
+    uint32_t filter = getFilters();
     ssh::Dir::SortFlag sortFlag = ssh::Dir::DirsFirst;
     if(dir_->is_root())
         filter |= ssh::Dir::NoDotDot;
@@ -73,7 +73,7 @@ void RemoteDirModel::sortItems(int index, bool isDescendingOrder)
         sortFlag |= ssh::Dir::Property;
     if(!isDescendingOrder)
         sortFlag |=  ssh::Dir::Reversed;
-    uint32_t filter = ssh::Dir::AllEntries | ssh::Dir::NoSymLinks | ssh::Dir::NoDot;
+    uint32_t filter = getFilters();
     if(dir_->is_root())
         filter |= ssh::Dir::NoDotDot;
     fileInfos_ = dir_->fileinfos(static_cast<ssh::Dir::Filter>(filter),
@@ -380,6 +380,16 @@ void RemoteDirModel::setupModelData(TreeItem *parent)
         TreeItem* item = new TreeItem(rowData, parent);
         parent->appendChild(item);
     }
+}
+
+uint32_t RemoteDirModel::getFilters()
+{
+    uint32_t filters = ssh::Dir::AllEntries | ssh::Dir::NoSymLinks | ssh::Dir::NoDot;
+    if(isShowHidden())
+        filters |= ssh::Dir::Hidden;
+    if(isShowSystem())
+        filters |= ssh::Dir::System;
+    return filters;
 }
 
 void RemoteDirModel::cancheIcon(QString const& suffix, QIcon const& icon)

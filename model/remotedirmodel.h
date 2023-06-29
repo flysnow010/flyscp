@@ -47,6 +47,8 @@ protected:
     QVariant toolTip(const QModelIndex &index) const override;
     void setupModelData(TreeItem *parent) override;
 private:
+    uint32_t getFilters();
+private:
     ssh::DirPtr dir_;
     ssh::FileInfos fileInfos_;
     QMap<QString, QIcon> iconMap;
