@@ -11,8 +11,9 @@
 #include "core/dirhistory.h"
 #include "core/dirfavorite.h"
 #include "core/filename.h"
+#include "core/optionsmanager.h"
 #include "core/remotefiletransfer.h"
-#include "core/sftpfilemanager.h" //for test
+#include "core/sftpfilemanager.h"
 #include "util/utils.h"
 #include "dialog/fileprogressdialog.h"
 
@@ -31,7 +32,8 @@ RemoteDockWidget::RemoteDockWidget(QWidget *parent)
     : QDockWidget(parent)
     , ui(new Ui::RemoteDockWidget)
     , model_(new RemoteDirModel(this))
-    , titleBarWidget(new TitleBarWidget(false))
+    , titleBarWidget(new TitleBarWidget(false, this))
+    , hideBarWidget(new QWidget(this))
     , sftp(new SFtpSession(this))
     , dirFavorite(new DirFavorite())
     , dirHistory(new DirHistory())
@@ -39,8 +41,8 @@ RemoteDockWidget::RemoteDockWidget(QWidget *parent)
 {
     ui->setupUi(this);
     ui->treeView->setModel(model_);
+
     setTitleBarWidget(titleBarWidget);
-    titleBarWidget->showFavoriteButton(false);
     connect(ui->treeView, SIGNAL(doubleClicked(QModelIndex)),
                     this, SLOT(viewClick(QModelIndex)));
     connect(ui->treeView, SIGNAL(customContextMenuRequested(QPoint)),
@@ -73,6 +75,7 @@ RemoteDockWidget::RemoteDockWidget(QWidget *parent)
     {
         setDir(dir);
     });
+    applyOptions();
 }
 
 RemoteDockWidget::~RemoteDockWidget()
@@ -128,12 +131,19 @@ void RemoteDockWidget::refresh()
 
 void RemoteDockWidget::showHeader(bool isShow)
 {
-    ui->treeView->setHeaderHidden(isShow);
+    ui->treeView->setHeaderHidden(!isShow);
 }
 
 void RemoteDockWidget::showCurrentDir(bool isShow)
 {
     titleBarWidget->setVisible(isShow);
+    if(!isShow)
+    {
+        setTitleBarWidget(hideBarWidget);
+        titleBarWidget->showLibDirButton(false);
+    }
+    else
+        setTitleBarWidget(titleBarWidget);
 }
 
 void RemoteDockWidget::showDeskNavigationButton(bool isShow)
@@ -230,19 +240,19 @@ void RemoteDockWidget::setItemSelectedColor(QString const& back,
                   QString const&cursor)
 {
     ui->treeView->setStyleSheet(QString("QTreeView{ background: %1;}"
-                                        "QTreeView::item:selected:active:first{ "
-                                        "border: 1px solid  %2;"
+                                        "QTreeView::item:selected:active:first{"
+                                        "border: 1px ridge  %2;"
                                         "border-right-width: 0px;"
                                         "color: %4;"
                                         "background: %3;}"
-                                        "QTreeView::item:selected:active{ "
-                                        "border: 1px solid  %2;"
+                                        "QTreeView::item:selected:active{"
+                                        "border: 1px ridge  %2;"
                                         "border-left-width: 0px;"
                                         "border-right-width: 0px;"
                                         "color: %4;"
                                         "background: %3;}"
-                                        "QTreeView::item:selected:active:last{ "
-                                        "border: 1px solid  %2;"
+                                        "QTreeView::item:selected:active:last{"
+                                        "border: 1px ridge  %2;"
                                         "border-left-width: 0px;"
                                         "color: %4;"
                                         "background: %3;}"
@@ -634,12 +644,6 @@ void RemoteDockWidget::rename()
     if(!fileInfo)
         return;
     ui->treeView->edit(ui->treeView->currentIndex());
-//    QString fileName = Utils::getText(tr("New filename"), QString::fromStdString(fileInfo->name()));
-//    if(fileName.isEmpty())
-//        return;
-
-//    model_->rename(fileInfo->name(), fileName.toStdString());
-//    model_->refresh();
 }
 
 void RemoteDockWidget::copyFilepath()
@@ -809,4 +813,46 @@ void RemoteDockWidget::updateCurrentDir(QString const& dir, QString const& capti
     if(!isNavigation)
         dirHistory->add(dir);
     emit statusTextChanged(getStatusText());
+}
+
+void RemoteDockWidget::applyOptions()
+{
+    {
+        LayoutOption const& o = theOptionManager.layoutOption();
+        RemoteDockWidget::showHeader(o.isShowSortHeader);
+        RemoteDockWidget::showCurrentDir(o.isShowCurrentDir);
+        RemoteDockWidget::showDeskNavigationButton(o.isShowDeskNavigationButton);
+        RemoteDockWidget::showFavoriteButton(o.isShowFavoriteButton);
+        RemoteDockWidget::showHistoryButton(o.isShowHistoryButton);
+    }
+    {
+        DisplayOption const& o = theOptionManager.displayOption();
+        RemoteDockWidget::showHiddenAndSystem(o.isShowHideAndSystemFile);
+        RemoteDockWidget::showParentInRoot(o.isShowParentDirInRootDrive);
+        RemoteDockWidget::showToolTips(o.isShowFilenameTooltips);
+        RemoteDockWidget::setDirSoryByTime(!o.isDirSortByName);
+    }
+    {
+        IconsOption const& o = theOptionManager.iconOption();
+        RemoteDockWidget::showAllIconWithExeAndLink(o.isShowAllIconIncludeExeAndLink);
+        RemoteDockWidget::showAllIcon(o.isShowAllIcon);
+        RemoteDockWidget::showStandardIcon(o.isShowStandardIcon);
+        RemoteDockWidget::showNoneIcon(o.isNoShowIcon);
+        RemoteDockWidget::showIconForFyleSystem(o.isShowIconForFilesystem);
+        RemoteDockWidget::showIconForVirtualFolder(o.isShowOverlayIcon);
+        RemoteDockWidget::fileIconSize(o.fileIconSize);
+    }
+    {
+        FontOption const& o = theOptionManager.fontOption();
+        RemoteDockWidget::fileFont(o.fileList.font());
+    }
+    {
+        ColorOption const& o = theOptionManager.colorOption();
+        RemoteDockWidget::setItemColor(o.fontColor, o.background1Color, o.background2Color);
+        RemoteDockWidget::setItemSelectedColor(o.background1Color, o.markColor, o.cursorColor);
+    }
+    {
+        OperationOption const& o = theOptionManager.operationOption();
+        RemoteDockWidget::setRenameFileName(o.isSelectFileNameWhenRenaming);
+    }
 }

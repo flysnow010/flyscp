@@ -123,10 +123,12 @@ private:
     void updateCurrentDir(QString const& dir,
                           QString const& caption = QString(),
                           bool  isNavigation = false);
+    void applyOptions();
 private:
     Ui::RemoteDockWidget *ui;
     RemoteDirModel* model_;
     TitleBarWidget* titleBarWidget;
+    QWidget*        hideBarWidget;
     SFtpSession* sftp;
     DirFavorite* dirFavorite;
     DirHistory* dirHistory;
