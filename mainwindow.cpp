@@ -725,23 +725,23 @@ void MainWindow::updateDisplay(DisplayOption const& o, bool isRefresh)
     }
 }
 
-void MainWindow::updateIcons(IconsOption const& option, bool isRefresh)
+void MainWindow::updateIcons(IconsOption const& o, bool isRefresh)
 {
-    leftPanelWidget->showAllIconWithExeAndLink(option.isShowAllIconIncludeExeAndLink);
-    leftPanelWidget->showAllIcon(option.isShowAllIcon);
-    leftPanelWidget->showStandardIcon(option.isShowStandardIcon);
-    leftPanelWidget->showNoneIcon(option.isNoShowIcon);
-    leftPanelWidget->showIconForFyleSystem(option.isShowIconForFilesystem);
-    leftPanelWidget->showIconForVirtualFolder(option.isShowOverlayIcon);
-    leftPanelWidget->fileIconSize(option.fileIconSize);
-    ui->toolBar->setIconSize(QSize(option.toolbarIconSize, option.toolbarIconSize));
-    rightPanelWidget->showAllIconWithExeAndLink(option.isShowAllIconIncludeExeAndLink);
-    rightPanelWidget->showAllIcon(option.isShowAllIcon);
-    rightPanelWidget->showStandardIcon(option.isShowStandardIcon);
-    rightPanelWidget->showNoneIcon(option.isNoShowIcon);
-    rightPanelWidget->showIconForFyleSystem(option.isShowIconForFilesystem);
-    rightPanelWidget->showIconForVirtualFolder(option.isShowOverlayIcon);
-    rightPanelWidget->fileIconSize(option.fileIconSize);
+    leftPanelWidget->showAllIconWithExeAndLink(o.isShowAllIconIncludeExeAndLink);
+    leftPanelWidget->showAllIcon(o.isShowAllIcon);
+    leftPanelWidget->showStandardIcon(o.isShowStandardIcon);
+    leftPanelWidget->showNoneIcon(o.isNoShowIcon);
+    leftPanelWidget->showIconForFyleSystem(o.isShowIconForFilesystem);
+    leftPanelWidget->showIconForVirtualFolder(o.isShowOverlayIcon);
+    leftPanelWidget->fileIconSize(o.fileIconSize);
+    ui->toolBar->setIconSize(QSize(o.toolbarIconSize, o.toolbarIconSize));
+    rightPanelWidget->showAllIconWithExeAndLink(o.isShowAllIconIncludeExeAndLink);
+    rightPanelWidget->showAllIcon(o.isShowAllIcon);
+    rightPanelWidget->showStandardIcon(o.isShowStandardIcon);
+    rightPanelWidget->showNoneIcon(o.isNoShowIcon);
+    rightPanelWidget->showIconForFyleSystem(o.isShowIconForFilesystem);
+    rightPanelWidget->showIconForVirtualFolder(o.isShowOverlayIcon);
+    rightPanelWidget->fileIconSize(o.fileIconSize);
 
     if(isRefresh)
     {
@@ -750,28 +750,28 @@ void MainWindow::updateIcons(IconsOption const& option, bool isRefresh)
     }
 }
 
-void MainWindow::updateFonts(FontOption const& option)
+void MainWindow::updateFonts(FontOption const& o)
 {
-    QFont font = option.mainWindow.font();
+    QFont font = o.mainWindow.font();
     toolButtons->setButtonFont(font);
     commandBar->setDirFont(font);
     leftPanelWidget->setDriveFont(font);
     rightPanelWidget->setDriveFont(font);
-    leftPanelWidget->fileFont(option.fileList.font());
-    rightPanelWidget->fileFont(option.fileList.font());
+    leftPanelWidget->fileFont(o.fileList.font());
+    rightPanelWidget->fileFont(o.fileList.font());
 }
 
-void MainWindow::updateColors(ColorOption const& option, bool isRefresh)
+void MainWindow::updateColors(ColorOption const& o, bool isRefresh)
 {
-    leftPanelWidget->setItemColor(option.fontColor,
-                                  option.background1Color, option.background2Color);
-    leftPanelWidget->setItemSelectedColor(option.background1Color,
-                                  option.markColor, option.cursorColor);
+    leftPanelWidget->setItemColor(o.fontColor,
+                                  o.background1Color, o.background2Color);
+    leftPanelWidget->setItemSelectedColor(o.background1Color,
+                                  o.markColor, o.cursorColor);
 
-    rightPanelWidget->setItemColor(option.fontColor,
-                                  option.background1Color, option.background2Color);
-    rightPanelWidget->setItemSelectedColor(option.background1Color,
-                                   option.markColor, option.cursorColor);
+    rightPanelWidget->setItemColor(o.fontColor,
+                                  o.background1Color, o.background2Color);
+    rightPanelWidget->setItemSelectedColor(o.background1Color,
+                                   o.markColor, o.cursorColor);
     if(isRefresh)
     {
         leftPanelWidget->refresh();
@@ -784,11 +784,11 @@ void MainWindow::updateLang(LanguageOption const& option)
     Q_UNUSED(option)
 }
 
-void MainWindow::updateOperation(OperationOption const& option)
+void MainWindow::updateOperation(OperationOption const& o)
 {
-    leftPanelWidget->setGoToRoot(option.isGoToRootWhenChangeDrive);
-    leftPanelWidget->setRenameFileName(option.isSelectFileNameWhenRenaming);
+    leftPanelWidget->setGoToRoot(o.isGoToRootWhenChangeDrive);
+    leftPanelWidget->setRenameFileName(o.isSelectFileNameWhenRenaming);
 
-    rightPanelWidget->setGoToRoot(option.isGoToRootWhenChangeDrive);
-    rightPanelWidget->setRenameFileName(option.isSelectFileNameWhenRenaming);
+    rightPanelWidget->setGoToRoot(o.isGoToRootWhenChangeDrive);
+    rightPanelWidget->setRenameFileName(o.isSelectFileNameWhenRenaming);
 }
