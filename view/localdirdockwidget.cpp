@@ -30,7 +30,8 @@ LocalDirDockWidget::LocalDirDockWidget(QWidget *parent)
     , ui(new Ui::LocalDirDockWidget)
     , model_(new LocalDirModel(this))
     , compressModel_(new CompressDirModel(this))
-    , titleBarWidget(new TitleBarWidget())
+    , titleBarWidget(new TitleBarWidget(true, this))
+    , hideBarWidget(new QWidget(this))
     , fileSystemWatcher(new QFileSystemWatcher(this))
 {
     ui->setupUi(this);
@@ -172,6 +173,10 @@ void LocalDirDockWidget::showHeader(bool isShow)
 void LocalDirDockWidget::showCurrentDir(bool isShow)
 {
     titleBarWidget->setVisible(isShow);
+    if(!isShow)
+        setTitleBarWidget(hideBarWidget);
+    else
+        setTitleBarWidget(titleBarWidget);
 }
 
 void LocalDirDockWidget::showDeskNavigationButton(bool isShow)
@@ -262,13 +267,17 @@ void LocalDirDockWidget::showOverlayIcon(bool isShow)
 void LocalDirDockWidget::fileIconSize(int size)
 {
     ui->tvNormal->setIconSize(QSize(size, size));
+    ui->tvCompress->setIconSize(QSize(size, size));
 }
 
 void LocalDirDockWidget::fileFont(QFont const& font)
 {
     ui->tvNormal->setFont(font);
+    ui->tvCompress->setFont(font);
     if(ui->tvNormal->header())
         ui->tvNormal->header()->setFont(font);
+    if(ui->tvCompress->header())
+        ui->tvCompress->header()->setFont(font);
 }
 
 void LocalDirDockWidget::setItemColor(QString const& fore,
@@ -290,18 +299,18 @@ void LocalDirDockWidget::setItemSelectedColor(QString const& back,
                   QString const&cursor)
 {
     QString styleSheet = QString("QTreeView{ background: %1;}"
-                                 "QTreeView::item:selected:active:first{ "
+                                 "QTreeView::item:selected:active:first{"
                                  "border: 1px ridge  %2;"
                                  "border-right-width: 0px;"
                                  "color: %4;"
                                  "background: %3;}"
-                                 "QTreeView::item:selected:active{ "
+                                 "QTreeView::item:selected:active{"
                                  "border: 1px ridge  %2;"
                                  "border-left-width: 0px;"
                                  "border-right-width: 0px;"
                                  "color: %4;"
                                  "background: %3;}"
-                                 "QTreeView::item:selected:active:last{ "
+                                 "QTreeView::item:selected:active:last{"
                                  "border: 1px ridge  %2;"
                                  "border-left-width: 0px;"
                                  "color: %4;"

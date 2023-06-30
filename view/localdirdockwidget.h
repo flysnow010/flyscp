@@ -150,6 +150,7 @@ private:
     LocalDirModel* model_;
     CompressDirModel* compressModel_;
     TitleBarWidget* titleBarWidget;
+    QWidget*        hideBarWidget;
     QFileSystemWatcher* fileSystemWatcher;
     ViewMode viewMode_ = Normal;
 };
