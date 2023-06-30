@@ -30,7 +30,7 @@ LocalDirDockWidget::LocalDirDockWidget(QWidget *parent)
     , ui(new Ui::LocalDirDockWidget)
     , model_(new LocalDirModel(this))
     , compressModel_(new CompressDirModel(this))
-    , titleBarWidget(new TitleBarWidget(true, this))
+    , titleBarWidget(new TitleBarWidget())
     , hideBarWidget(new QWidget(this))
     , fileSystemWatcher(new QFileSystemWatcher(this))
 {
@@ -99,6 +99,7 @@ LocalDirDockWidget::LocalDirDockWidget(QWidget *parent)
 
 LocalDirDockWidget::~LocalDirDockWidget()
 {
+    delete titleBarWidget;
     delete ui;
 }
 

@@ -32,7 +32,7 @@ RemoteDockWidget::RemoteDockWidget(QWidget *parent)
     : QDockWidget(parent)
     , ui(new Ui::RemoteDockWidget)
     , model_(new RemoteDirModel(this))
-    , titleBarWidget(new TitleBarWidget(false, this))
+    , titleBarWidget(new TitleBarWidget(false))
     , hideBarWidget(new QWidget(this))
     , sftp(new SFtpSession(this))
     , dirFavorite(new DirFavorite())
@@ -82,6 +82,7 @@ RemoteDockWidget::~RemoteDockWidget()
 {
     saveSettings();
     sftp->stop();
+    delete titleBarWidget;
     delete dirFavorite;
     delete dirHistory;
     delete ui;

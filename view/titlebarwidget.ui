@@ -31,10 +31,11 @@
    </property>
    <item>
     <widget class="QToolButton" name="btnLibDir">
-     <property name="font">
-      <font>
-       <family>Webdings</family>
-      </font>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
      <property name="text">
       <string/>
@@ -81,6 +82,12 @@
    </item>
    <item>
     <widget class="QToolButton" name="btnFavoritesDir">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="text">
       <string/>
      </property>
@@ -101,10 +108,11 @@
    </item>
    <item>
     <widget class="QToolButton" name="btnHistoryDir">
-     <property name="font">
-      <font>
-       <family>Webdings</family>
-      </font>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
      <property name="text">
       <string/>
