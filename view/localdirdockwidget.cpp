@@ -495,11 +495,7 @@ void LocalDirDockWidget::sortIndicatorChanged(int logicalIndex, Qt::SortOrder or
 
 void LocalDirDockWidget::customNormalContextMenu(const QPoint & pos)
 {
-//    QStringList fileNames = selectedFileNames(false, true);
-//    ContextMenu::show(fileNames, (void *)winId(), QCursor::pos());
-//    return;
     QModelIndex index = ui->tvNormal->indexAt(pos);
-
 
     QMenu menu;
     ContextMenuItems items;
@@ -620,8 +616,14 @@ void LocalDirDockWidget::customNormalContextMenu(const QPoint & pos)
         else
             WinShell::Property(fileName);
     });
+    menu.addSeparator();
+    QPoint cursorPos = QCursor::pos();
+    menu.addAction("Show more items", this, [&](bool) {
+        QStringList fileNames = selectedFileNames(false, true);
+        ContextMenu::show(fileNames, (void *)winId(), cursorPos);
+    });
 
-    menu.exec(QCursor::pos());
+    menu.exec(cursorPos);
 }
 
 void LocalDirDockWidget::customCompressContextMenu(const QPoint &pos)

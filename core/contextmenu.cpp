@@ -1,4 +1,5 @@
 #include "contextmenu.h"
+#include "shellitem.h"
 #include "util/utils.h"
 #include <Shlobj.h>
 #include <shlwapi.h>
@@ -26,7 +27,7 @@ struct ContextMenuHelper
             pDesktop->Release();
     }
 
-    inline bool open(QStringList const& fileNames, bool isOpenDataObject = true, bool isOpenParent = false)
+    inline bool open(QStringList const& fileNames, bool isOpenDataObject = true)
     {
         HRESULT hr;
 
@@ -40,15 +41,6 @@ struct ContextMenuHelper
             if(FAILED(hr))
                 return false;
         }
-        if(isOpenParent && fileNames.size() > 0)
-        {
-            QFileInfo fileInfo(fileNames[0]);
-            QString fileName = Utils::toWindowsPath(fileInfo.path());
-            hr = pDesktop->ParseDisplayName(0, 0, (LPWSTR)(fileName.toStdWString().c_str()),
-                                0, (LPITEMIDLIST*)&pidlParent, 0);
-            if(FAILED(hr))
-                return false;
-        }
         if(isOpenDataObject)
         {
             hr = pDesktop->GetUIObjectOf(0, fileNames.size(), (PCUITEMID_CHILD_ARRAY)pidlDrives,
@@ -58,6 +50,7 @@ struct ContextMenuHelper
         }
         return true;
     }
+
 
     inline void close()
     {
@@ -70,32 +63,46 @@ struct ContextMenuHelper
         {
             for(int i = 0; i < size; i++)
                 ILFree(pidlDrives[i]);
+            free(pidlDrives);
             pidlDrives = 0;
-        }
-        if(pidlParent)
-        {
-            ILFree(pidlParent);
-            pidlParent = 0;
         }
     }
 
     void showContextMenu(QStringList const& fileNames, void* handle, int x, int y)
     {
-        if(!open(fileNames, false, false))
+        QString parentPath = Utils::toWindowsPath(QFileInfo(fileNames[0]).path());
+        LPSHELLFOLDER pParentFolder = getParentFolder(parentPath);
+        if(!pParentFolder)
             return;
 
-//        IShellFolder* pParentFolder;
-//        HRESULT  hr = pDesktop->BindToObject(pidlParent, 0, IID_IShellFolder, (LPVOID*)&pParentFolder);
-//        if(FAILED(hr))
-//        {
-//            close();
-//            return;
-//        }
+        LPITEMIDLIST* pidlFiles = (LPITEMIDLIST *)malloc(sizeof(LPITEMIDLIST) * fileNames.size());
+        {
+            LPENUMIDLIST pEnum;
+            HRESULT hr = pParentFolder->EnumObjects(0, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &pEnum);
+            if(SUCCEEDED(hr))
+            {
+                LPITEMIDLIST pidl;
+                STRRET str;
+                int index = 0;
+                while(pEnum->Next(1, &pidl, 0) == S_OK)
+                {
+                    pParentFolder->GetDisplayNameOf(pidl, SHGDN_FORPARSING, &str);
+                    QString fileName = Utils::toLinuxPath(strToString(pidl, &str));
+                    if(!fileNames.contains(fileName))
+                        CoTaskMemFree(pidl);
+                    else
+                    {
+                        if(index < fileNames.size())
+                            pidlFiles[index++] = pidl;
+                    }
+                }
+            }
+        }
 
         IContextMenu   *pcm;
-        HRESULT hr = pDesktop->GetUIObjectOf(0,
+        HRESULT hr = pParentFolder->GetUIObjectOf(0,
                                  fileNames.size(),
-                                 (PCUITEMID_CHILD_ARRAY)pidlDrives,
+                                 (PCUITEMID_CHILD_ARRAY)pidlFiles,
                                  IID_IContextMenu,
                                  0,
                                  (LPVOID*)&pcm);
@@ -142,7 +149,103 @@ struct ContextMenuHelper
                 DestroyMenu(hPopup);
             }
         }
-        close();
+        for(int i = 0; i < size; i++)
+            ILFree(pidlFiles[i]);
+        free(pidlFiles);
+        pParentFolder->Release();
+    }
+
+    LPSHELLFOLDER getParentFolder(QString const& filePath)
+    {
+        LPSHELLFOLDER pDrives = getSpecialFolder(CSIDL_DRIVES);
+        ShellItem::Ptr item;
+        if(pDrives)
+        {
+            LPENUMIDLIST pEnum;
+            HRESULT hr = pDrives->EnumObjects(0, SHCONTF_FOLDERS, &pEnum);
+            if (SUCCEEDED(hr))
+            {
+                LPITEMIDLIST pidl;
+                STRRET str;
+
+                QString childPath;
+                while(pEnum->Next(1, &pidl, 0) == S_OK)
+                {
+                    pDrives->GetDisplayNameOf(pidl, SHGDN_FORPARSING, &str);
+                    childPath = strToString(pidl, &str);
+                    if(childPath.size() <= 3 && filePath.startsWith(childPath))
+                    {
+                        item = ShellItem::Ptr(new ShellItem());
+                        item->pidlRel = pidl;
+                        pDrives->AddRef();
+                        item->pParentFolder = pDrives;
+                        break;
+                    }
+                }
+
+                while(true)
+                {
+                    if(childPath == filePath)
+                        break;
+
+                   if(!getChildParent(item, childPath, filePath))
+                       break;
+                }
+                pEnum->Release();
+            }
+        }
+        if(item)
+        {
+            LPSHELLFOLDER pParentFolder = 0;
+            item->pParentFolder->BindToObject(item->pidlRel, 0, IID_IShellFolder,
+                                                                         (LPVOID*)&pParentFolder);
+            return pParentFolder;
+        }
+        return 0;
+    }
+
+    bool getChildParent(ShellItem::Ptr & item, QString &childPath, QString const& filePath)
+    {
+        if(!item)
+            return  false;
+
+        LPSHELLFOLDER  pParentFolder = NULL;
+        HRESULT hr = item->pParentFolder->BindToObject(item->pidlRel, 0, IID_IShellFolder,
+                                                             (LPVOID*)&pParentFolder);
+        if(SUCCEEDED(hr))
+        {
+            LPENUMIDLIST   pEnum;
+            hr = pParentFolder->EnumObjects(NULL, SHCONTF_FOLDERS, &pEnum);
+            if(SUCCEEDED(hr))
+            {
+                LPITEMIDLIST   pidl;
+                DWORD          dwFetched = 1;
+                STRRET str;
+                while(S_OK == (pEnum->Next(1, &pidl, &dwFetched)) && dwFetched)
+                {
+                     pParentFolder->GetDisplayNameOf(pidl, SHGDN_FORPARSING, &str);
+                     childPath = strToString(pidl, &str);
+                     int index = filePath.indexOf(childPath);
+                     if(index >= 0)
+                     {
+                        if(filePath == childPath || filePath.at(childPath.size()) == '\\')
+                        {
+                            ShellItem::Ptr newItem(new ShellItem());
+                            newItem->pidlRel = pidl;
+                            pParentFolder->AddRef();
+                            newItem->pParentFolder = pParentFolder;
+                            item = newItem;
+                            pEnum->Release();
+                            pParentFolder->Release();
+                            return true;
+                        }
+                     }
+                }
+                pEnum->Release();
+            }
+            pParentFolder->Release();
+        }
+        return false;
     }
 
     ContextMenuItems sendToMenuItems()
@@ -151,13 +254,13 @@ struct ContextMenuHelper
         LPSHELLFOLDER psf = getSpecialFolder(CSIDL_SENDTO);
         if(psf)
         {
-            LPENUMIDLIST peidl;
-            HRESULT hr = psf->EnumObjects(0, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &peidl);
+            LPENUMIDLIST pEnum;
+            HRESULT hr = psf->EnumObjects(0, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &pEnum);
             if (SUCCEEDED(hr))
             {
                 LPITEMIDLIST pidl;
                 STRRET str;
-                while(peidl->Next(1, &pidl, 0) == S_OK)
+                while(pEnum->Next(1, &pidl, 0) == S_OK)
                 {
                     ContextMenuItem item;
                     psf->GetDisplayNameOf(pidl, SHGDN_NORMAL, &str);
@@ -168,6 +271,7 @@ struct ContextMenuHelper
                     items << item;
                     CoTaskMemFree(pidl);
                 }
+                pEnum->Release();
             }
             psf->Release();
         }
@@ -229,6 +333,7 @@ struct ContextMenuHelper
         QFileInfo fileInfo(fileName.toLower());
         return QFileIconProvider().icon(fileInfo);
     }
+
     LPSHELLFOLDER getSpecialFolder(int idFolder)
     {
         LPITEMIDLIST pidl;
@@ -246,7 +351,6 @@ struct ContextMenuHelper
 private:
     ContextMenuHelper()
         : pDesktop(0)
-        , pidlParent(0)
         , pidlDrives(0)
         , pDataObject(0)
         , size(0)
@@ -267,7 +371,6 @@ private:
         return text;
     }
     IShellFolder* pDesktop;
-    LPITEMIDLIST   pidlParent;
     LPITEMIDLIST* pidlDrives;
     IDataObject* pDataObject;
     int size;
