@@ -618,7 +618,7 @@ void LocalDirDockWidget::customNormalContextMenu(const QPoint & pos)
     });
     menu.addSeparator();
     QPoint cursorPos = QCursor::pos();
-    menu.addAction("Show more items", this, [&](bool) {
+    menu.addAction("Show More Items", this, [&](bool) {
         QStringList fileNames = selectedFileNames(false, true);
         ContextMenu::show(fileNames, (void *)winId(), cursorPos);
     });
