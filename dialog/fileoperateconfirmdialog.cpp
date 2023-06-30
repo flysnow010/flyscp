@@ -7,6 +7,7 @@ FileOperateConfirmDialog::FileOperateConfirmDialog(QWidget *parent) :
     ui(new Ui::FileOperateConfirmDialog)
 {
     ui->setupUi(this);
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     connect(ui->btnBrowsePath, &QToolButton::clicked, [=]{
         QString path = Utils::getPath("Select a path", ui->lineEditPath->text());
         if(!path.isEmpty())
