@@ -37,19 +37,23 @@ public:
                 QString const& archiveFileName,
                 bool isWaitForFinished = true);
     void cancel();
+
 signals:
     void progress(QString const& text);
     void error(QString const& error);
     void finished();
+
 private:
     void onError(QString const& error);
     QString errorToText(int errorCode) const;
     QStringList nextArgs() const;
     void setArgs(QStringList & args, CompressParam const& param);
     QStringList getFileNames(QString const&fileName,
-                          CompressParam const& param);
-    QString getFileName(QString const& fileName, QString const& newSuffix);
-    QString getNewFileName(QString const& targetFilePath, QString const& fileName);
+                             CompressParam const& param);
+    QString getFileName(QString const& fileName,
+                        QString const& newSuffix);
+    QString getNewFileName(QString const& targetFilePath,
+                           QString const& fileName);
     void addArgs(QStringList & args);
 private:
     QProcess* process;

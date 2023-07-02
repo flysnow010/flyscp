@@ -1,13 +1,14 @@
 #ifndef COMPRESSDIRMODEL_H
 #define COMPRESSDIRMODEL_H
-
 #include "dirmodel.h"
 #include "core/compressfileinfo.h"
+
 #include <QIcon>
 
 class QFileInfo;
 class CompressDirModel : public DirModel
 {
+    Q_OBJECT
 public:
     explicit CompressDirModel(QObject *parent = nullptr);
 
@@ -28,13 +29,20 @@ public:
     bool rm(QString const& filePath);
     bool rm(QStringList const& fileNames);
     bool add(QStringList const& fileNames);
-    bool add(QString const& fileName, bool isRemoveSrc);
-    bool rename(QString const& oldFileName, QString const& newFileName);
-    bool rename(QStringList const& fileNames, QString const& subPath);
-    bool extract(QString const& targetPath, QStringList const& fileNames, bool isWithPath);
+    bool add(QString const& fileName,
+             bool isRemoveSrc);
+    bool rename(QString const& oldFileName,
+                QString const& newFileName);
+    bool rename(QStringList const& fileNames,
+                QString const& subPath);
+    bool extract(QString const& targetPath,
+                 QStringList const& fileNames,
+                 bool isWithPath);
     void refresh();
 
-    bool setData(const QModelIndex &index, const QVariant &value, int role) override;
+    bool setData(const QModelIndex &index,
+                 const QVariant &value,
+                 int role) override;
     bool isParent(int index) const override;
     bool isDir(int index) const override;
     bool isFile(int index) const override;

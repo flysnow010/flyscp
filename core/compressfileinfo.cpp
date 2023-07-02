@@ -46,9 +46,11 @@ bool CompressFile::setDir(QString const& dir)
         return false;
 
     refresh(false);
+
     QStringList dirs = subDir.split(WINDOWS_SEP);
     foreach(auto d, dirs)
         cd(d);
+
     return true;
 }
 
@@ -68,7 +70,9 @@ bool CompressFile::cd(QString const& dir)
         dirs.pop();
     else
         dirs.push(dir);
+
     QStringList dirList;
+
     foreach(auto d, dirs)
         dirList << d;
     currentDir_ = dirList.join(WINDOWS_SEP);
@@ -90,6 +94,7 @@ CompressFileInfos CompressFile::fileInfoList(SortFlag sortFlag)
             QString subDir = getSubDir(fileInfo->path_, currentDir_, true);
             if(subDir.isEmpty())
                 continue;
+
             QStringList paths = subDir.split(WINDOWS_SEP);
             if(!paths.isEmpty())
             {
@@ -122,10 +127,12 @@ CompressFileInfos CompressFile::fileInfoList(SortFlag sortFlag)
         }
     }
     sort(fileInfos, sortFlag);
+
     CompressFileInfo::Ptr parent(new CompressFileInfo());
     parent->isDir_ = true;
     parent->path_ = "..";
     fileInfos.push_front(parent);
+
     return fileInfos;
 }
 
@@ -158,10 +165,9 @@ bool CompressFile::mkdir(QString const& dir)
     if(currentDir_.isEmpty())
         tempDir.rmdir(dir);
     else
-    {
-        //qDebug() << QString("%1\\%2").arg(currentDir_, dir); ???
         tempDir.rmpath(QString("%1\\%2").arg(currentDir_, dir));
-    }
+
+    //qDebug() << QString("%1\\%2").arg(currentDir_, dir); ???
     return true;
 }
 
@@ -241,13 +247,15 @@ void CompressFile::refresh(bool isCurrent)
         dirs.clear();
     }
     fileInfos_.clear();
+
     QString dateTime("2023-06-24 15:49:00");
     QDateTime start(QDate(1970, 1,1), QTime(0, 0, 0));
+
     foreach(auto line, fileInfoLines)
     {
         QTextStream stream(&line);
         CompressFileInfo::Ptr info(new CompressFileInfo());
-        QString name;
+
         info->timeText_ = stream.read(dateTime.size());
         stream.skipWhiteSpace();
         stream >> info->attributes_ >> info->size_ >> info->compressedSize_;
@@ -255,8 +263,10 @@ void CompressFile::refresh(bool isCurrent)
         info->time_ = start.secsTo(QDateTime::fromString(info->timeText_,
                                                          "yyyy-MM-dd HH:mm:ss"));
         stream.skipWhiteSpace();
-        name = stream.readAll();
+
+        QString name = stream.readAll();
         QFileInfo fileInfo(name);
+
         if(info->isDir())
             info->path_ = name;
         else
@@ -349,11 +359,13 @@ QString CompressFile::getCompressFile(QString const& filePath)
     {
         if(QFile::exists(path))
             return path;
+
         int index = path.lastIndexOf(WINDOWS_SEP);
         if(index < 0)
             break;
         path = path.left(index);
     }
+
     return QString();
 }
 
@@ -365,9 +377,11 @@ QString CompressFile::getSubDir(QString const& path,
 
     if(parent.isEmpty())
         return path;
+
     int index = path.indexOf(parent + sep);
     if(index >= 0)
         return path.mid(index + 1 + parent.size());
+
     return QString();
 }
 

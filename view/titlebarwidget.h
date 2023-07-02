@@ -12,7 +12,8 @@ class TitleBarWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit TitleBarWidget(bool isWindows = true, QWidget *parent = nullptr);
+    explicit TitleBarWidget(bool isWindows = true,
+                            QWidget *parent = nullptr);
     ~TitleBarWidget();
 
     void setTitle(QString const& title);
@@ -29,7 +30,8 @@ signals:
     void dirSelected(QString const& dir);
     void actived();
 protected:
-     bool eventFilter(QObject *obj, QEvent *event) override;
+     bool eventFilter(QObject *obj,
+                      QEvent *event) override;
 private:
     void selectDir(int x);
 private:

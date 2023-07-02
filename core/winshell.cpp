@@ -200,7 +200,10 @@ QMimeData* WinShell::dropMimeData(QStringList const& fileNames)
 
 void WinShell::Open(QString const& fileName)
 {
-    ShellExecute(0, L"open", fileName.toStdWString().c_str(), 0,
+    ShellExecute(0,
+                 L"open",
+                 fileName.toStdWString().c_str(),
+                 0,
                  QFileInfo(fileName).path().toStdWString().c_str(),
                  SW_SHOWNORMAL);
 }
@@ -208,6 +211,7 @@ void WinShell::Open(QString const& fileName)
 void WinShell::OpenWith(QString const& fileName)
 {
     SHELLEXECUTEINFO shellExecInfo;
+
     memset(&shellExecInfo, 0, sizeof(shellExecInfo));
 
     shellExecInfo.cbSize = sizeof(shellExecInfo);
@@ -222,8 +226,12 @@ void WinShell::OpenWith(QString const& fileName)
 void WinShell::OpenByExplorer(QString const& fileName)
 {
     QString filePath = Utils::toWindowsPath(fileName);
-    ShellExecute(0, L"open", L"explorer",
-                 filePath.toStdWString().c_str(), 0, SW_SHOWNORMAL);
+    ShellExecute(0,
+                 L"open",
+                 L"explorer",
+                 filePath.toStdWString().c_str(),
+                 0,
+                 SW_SHOWNORMAL);
 }
 
 void WinShell::Exec(QString const& appName, QStringList const& params)
@@ -349,6 +357,7 @@ ShellMenuItems WinShell::shellMenuItems()
     }
     return items;
 }
+
 static QString strToString(LPITEMIDLIST pidl, STRRET *str)
 {
     LPTSTR pszText;
@@ -361,6 +370,7 @@ static QString strToString(LPITEMIDLIST pidl, STRRET *str)
     }
     return text;
 }
+
 void WinShell::shellSubMenuItems(ShellMenuItem const& item,
                                  ShellMenuItems & menuItems,
                                  bool isOnlyDir)
@@ -410,5 +420,6 @@ void WinShell::shellSubMenuItems(ShellMenuItem const& item,
         pEnum->Release();
     }
     pParentFolder->Release();
+
     std::sort(menuItems.begin(), menuItems.end());
 }

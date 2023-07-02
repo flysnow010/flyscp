@@ -87,12 +87,13 @@ FileUncompresser::FileUncompresser(QObject *parent)
 }
 
 bool FileUncompresser::uncompress(QStringList const& fileNames,
-                UncompressParam const& param,
-                QString const& targetFilePath)
+                                  UncompressParam const& param,
+                                  QString const& targetFilePath)
 {
     mode = Uncompress;
     process->setProgram(Utils::compressApp());
     argsList.clear();
+
     foreach(auto const& fileName, fileNames)
     {
         QStringList args;
@@ -115,9 +116,11 @@ bool FileUncompresser::uncompress(QStringList const& fileNames,
             args <<  param.overwriteMode() << "-y";
         argsList << args;
     }
+
     currentIndex = 0;
     process->setArguments(nextArgs());
     process->start();
+
     return true;
 }
 
@@ -129,11 +132,13 @@ bool FileUncompresser::isEncrypted(QString const& fileName)
     argsList << args;
     mode = CheckEncrypt;
     isEncrypted_ = false;
+
     currentIndex = 0;
     process->setProgram(Utils::compressApp());
     process->setArguments(nextArgs());
     process->start();
     process->waitForFinished();
+
     return isEncrypted_;
 }
 
@@ -144,16 +149,19 @@ QStringList FileUncompresser::listFileInfo(QString const& fileName)
     argsList.clear();
     argsList << args;
     mode = List;
+
     currentIndex = 0;
     process->setProgram(Utils::compressApp());
     process->setArguments(nextArgs());
     fileInfos.clear();
     process->start();
     process->waitForFinished();
+
     return fileInfos;
 }
 
-bool FileUncompresser::remove(QString const& archiveFileName, QStringList const& fileNames)
+bool FileUncompresser::remove(QString const& archiveFileName,
+                              QStringList const& fileNames)
 {
     QStringList args;
     args << "d"  << archiveFileName;
@@ -161,35 +169,40 @@ bool FileUncompresser::remove(QString const& archiveFileName, QStringList const&
         args << fileName;
     argsList.clear();
     argsList << args;
-    qDebug()<< args.join(" ");
     mode = Delete;
+
     currentIndex = 0;
     isOK_ = true;
     process->setProgram(Utils::compressApp());
     process->setArguments(nextArgs());
     process->start();
     process->waitForFinished();
+
     return isOK_;
 }
 
-bool FileUncompresser::rename(QString const& archiveFileName, QString const& oldName, QString const& newName)
+bool FileUncompresser::rename(QString const& archiveFileName,
+                              QString const& oldName,
+                              QString const& newName)
 {
     QStringList args;
     args << "rn"  << archiveFileName << oldName << newName;
     argsList.clear();
     argsList << args;
-    qDebug() << args.join(" ");
     mode = Rename;
+
     currentIndex = 0;
     isOK_ = true;
     process->setProgram(Utils::compressApp());
     process->setArguments(nextArgs());
     process->start();
     process->waitForFinished();
+
     return isOK_;
 }
 
-bool FileUncompresser::rename(QString const& archiveFileName, QStringList const& fileNames)
+bool FileUncompresser::rename(QString const& archiveFileName,
+                              QStringList const& fileNames)
 {
     if(fileNames.size() % 2)
         return false;
@@ -200,14 +213,15 @@ bool FileUncompresser::rename(QString const& archiveFileName, QStringList const&
         args << fileName;
     argsList.clear();
     argsList << args;
-    qDebug() << args.join(" ");
     mode = Rename;
+
     currentIndex = 0;
     isOK_ = true;
     process->setProgram(Utils::compressApp());
     process->setArguments(nextArgs());
     process->start();
     process->waitForFinished();
+
     return isOK_;
 }
 
@@ -229,12 +243,14 @@ bool FileUncompresser::extract(QString const& archiveFileName,
     argsList.clear();
     argsList << args;
     mode = Extract;
+
     currentIndex = 0;
     isOK_ = true;
     process->setProgram(Utils::compressApp());
     process->setArguments(nextArgs());
     process->start();
     process->waitForFinished();
+
     return isOK_;
 }
 
@@ -277,7 +293,8 @@ QString FileUncompresser::errorToText(int errorCode) const
     return QString();
 }
 
-bool FileUncompresser::isCompressFiles(QStringList const& fileNames, QString &unCompressfileName)
+bool FileUncompresser::isCompressFiles(QStringList const& fileNames,
+                                       QString &unCompressfileName)
 {
     static QStringList suffixs = QStringList()
             << "7z"                                //7z

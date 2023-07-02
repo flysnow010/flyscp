@@ -36,6 +36,7 @@ void UnCompressConfirmDialog::setSettings(UncompressParam const& param)
 UncompressParam UnCompressConfirmDialog::settings() const
 {
     UncompressParam param;
+
     param.isWithPath = ui->cbAlongPath->isChecked();
     param.isCreateDir = ui->cbCreateDir->isChecked();
     if(ui->rbOverWrite->isChecked())
@@ -45,6 +46,7 @@ UncompressParam UnCompressConfirmDialog::settings() const
     else if(ui->rbAutoRename->isChecked())
         param.mode = UncompressParam::AutoRename;
     param.filter = ui->comboBoxFilter->currentText();
+
     return param;
 }
 

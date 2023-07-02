@@ -13,6 +13,7 @@ NetworkSettingsDialog::NetworkSettingsDialog(QWidget *parent)
 {
     ui->setupUi(this);
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+
     ui->treeView->setModel(model_);
     loadSettings();
     createConnects();
@@ -51,11 +52,13 @@ void NetworkSettingsDialog::createConnects()
             model_->refresh();
         }
     });
+
     connect(ui->btnRename, &QPushButton::clicked, this, [=](){
         QModelIndex index = ui->treeView->currentIndex();
         QModelIndex nameIndex = model_->index(index.row(), 0);
         ui->treeView->edit(nameIndex);
     });
+
     connect(ui->btnEdit, &QPushButton::clicked, this, [=](){
         int index = ui->treeView->currentIndex().row();
         if(index >= 0)
@@ -70,6 +73,7 @@ void NetworkSettingsDialog::createConnects()
             }
         }
     });
+
     connect(ui->btnDelete, &QPushButton::clicked, this, [=](){
         int index = ui->treeView->currentIndex().row();
         if(index >= 0)

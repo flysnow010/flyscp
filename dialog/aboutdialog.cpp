@@ -7,7 +7,7 @@ AboutDialog::AboutDialog(QWidget *parent) :
 {
     ui->setupUi(this);
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
-    ui->buildLabel->setText(QString("Build on %1 %2").arg(__DATE__, __TIME__));
+    ui->buildLabel->setText(QString(tr("Build on %1 %2")).arg(__DATE__, __TIME__));
 }
 
 AboutDialog::~AboutDialog()

@@ -2,12 +2,14 @@
 #include <QFileInfo>
 #include <QDir>
 
-FileNames FileNames::GetFileNames(QString const& fileName, QString const& filePath)
+FileNames FileNames::GetFileNames(QString const& fileName,
+                                  QString const& filePath)
 {
     return GetFileNames(QStringList() << fileName, filePath);
 }
 
-FileNames FileNames::GetFileNames(QStringList const& fileNames, QString const& filePath)
+FileNames FileNames::GetFileNames(QStringList const& fileNames,
+                                  QString const& filePath)
 {
     FileNames  newFileNames;
     QDir dir(filePath);
@@ -27,7 +29,8 @@ FileNames FileNames::GetFileNames(QStringList const& fileNames, QString const& f
             if(fileInfo.isDir())
                 filename = QString("%1_copy").arg(fileInfo.completeBaseName());
             else
-                filename = QString("%1_copy.%2").arg(fileInfo.completeBaseName(), fileInfo.suffix());
+                filename = QString("%1_copy.%2").arg(fileInfo.completeBaseName(),
+                                                     fileInfo.suffix());
             fileName.dst = dir.filePath(filename);
         }
         newFileNames << fileName;
@@ -35,7 +38,8 @@ FileNames FileNames::GetFileNames(QStringList const& fileNames, QString const& f
     return newFileNames;
 }
 
-void FileNames::MakeFileNames(FileNames const& fileNames, FileNames & newFileNames)
+void FileNames::MakeFileNames(FileNames const& fileNames,
+                              FileNames & newFileNames)
 {
     for(int i = 0; i < fileNames.size(); i++)
     {
@@ -47,7 +51,8 @@ void FileNames::MakeFileNames(FileNames const& fileNames, FileNames & newFileNam
     }
 }
 
-void FileNames::MakeFileNames(QStringList const& fileNames, QStringList & newFileNames)
+void FileNames::MakeFileNames(QStringList const& fileNames,
+                              QStringList & newFileNames)
 {
     for(int i = 0; i < fileNames.size(); i++)
     {
@@ -58,7 +63,8 @@ void FileNames::MakeFileNames(QStringList const& fileNames, QStringList & newFil
     }
 }
 
-void FileNames::FindFilenames(FileName const& fileName, FileNames &fileNames)
+void FileNames::FindFilenames(FileName const& fileName,
+                              FileNames &fileNames)
 {
     QDir srcDir = QDir(fileName.src);
     QDir dstDir = QDir(fileName.dst);
@@ -77,7 +83,8 @@ void FileNames::FindFilenames(FileName const& fileName, FileNames &fileNames)
     }
 }
 
-void FileNames::FindFilenames(QString const& fileName, QStringList &fileNames)
+void FileNames::FindFilenames(QString const& fileName,
+                              QStringList &fileNames)
 {
     QDir dir = QDir(fileName);
 

@@ -16,8 +16,10 @@ public:
     ~PermissionsDialog();
 
     void setFileName(QString const& fileName);
+
     void setPermissions(quint32 permissions, bool isDir);
     quint16 permissions() const;
+
     bool isRecursively() const;
 private:
     void updatePermissions();

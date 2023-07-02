@@ -10,8 +10,10 @@ public:
     explicit ColorToolButton(QWidget *parent = nullptr);
 
     void setDefaultColor(QColor const& color);
+
 signals:
     void selectedColor(QColor const& color);
+
 private:
     QIcon createColorIcon(QColor const& color);
     QAction* createGridColorAction(QMenu* menu);

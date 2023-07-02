@@ -24,12 +24,18 @@ typedef QList<FileInfo> FileInfos;
 class FileNames : public QList<FileName>
 {
 public:
-    static FileNames GetFileNames(QString const& fileName, QString const& filePath);
-    static FileNames GetFileNames(QStringList const& fileNames, QString const& filePath);
-    static void MakeFileNames(FileNames const& fileNames, FileNames & newFileNames);
-    static void MakeFileNames(QStringList const& fileNames, QStringList & newFileNames);
-    static void FindFilenames(FileName const& fileName, FileNames &fileNames);
-    static void FindFilenames(QString const& fileName, QStringList &fileNames);
+    static FileNames GetFileNames(QString const& fileName,
+                                  QString const& filePath);
+    static FileNames GetFileNames(QStringList const& fileNames,
+                                  QString const& filePath);
+    static void MakeFileNames(FileNames const& fileNames,
+                              FileNames & newFileNames);
+    static void MakeFileNames(QStringList const& fileNames,
+                              QStringList & newFileNames);
+    static void FindFilenames(FileName const& fileName,
+                              FileNames &fileNames);
+    static void FindFilenames(QString const& fileName,
+                              QStringList &fileNames);
     static void MakeFileNamesAsParams(QStringList & fileNames);
     static void MakeFileNameAsParams(QString & fileName);
 };

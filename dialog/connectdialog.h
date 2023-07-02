@@ -1,7 +1,7 @@
 #ifndef CONNECTDIALOG_H
 #define CONNECTDIALOG_H
-
 #include <QDialog>
+
 #include "core/connecttype.h"
 #include "core/sshsettings.h"
 

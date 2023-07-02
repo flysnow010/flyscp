@@ -32,6 +32,7 @@ void SSHSettingsManager::upSettings(int index)
         settingsList_[index] = settings;
     }
 }
+
 void SSHSettingsManager::downSettings(int index)
 {
     int newIndex = index + 1;

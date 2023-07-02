@@ -6,7 +6,7 @@
 
 struct UncompressParam
 {
-    enum OverwriteMode{ OverWrite, Skip, AutoRename };
+    enum OverwriteMode { OverWrite, Skip, AutoRename };
 
     bool isWithPath = true;
     bool isCreateDir = false;
@@ -28,19 +28,25 @@ public:
 
     enum Mode { Uncompress, CheckEncrypt, List, Delete, Extract, Rename };
 
-    static bool isCompressFiles(QStringList const& fileNames, QString &unCompressfileName);
+    static bool isCompressFiles(QStringList const& fileNames,
+                                QString &unCompressfileName);
     bool uncompress(QStringList const& fileNames,
                     UncompressParam const& param,
                     QString const& targetFilePath);
 
     bool isEncrypted(QString const& fileName);
     QStringList listFileInfo(QString const& fileName);
-    bool remove(QString const& archiveFileName, QStringList const& fileNames);
-    bool rename(QString const& archiveFileName, QString const& oldName, QString const& newName);
-    bool rename(QString const& archiveFileName, QStringList const& fileNames);
+    bool remove(QString const& archiveFileName,
+                QStringList const& fileNames);
+    bool rename(QString const& archiveFileName,
+                QString const& oldName,
+                QString const& newName);
+    bool rename(QString const& archiveFileName,
+                QStringList const& fileNames);
     bool extract(QString const& archiveFileName,
                  QString const& targetPath,
-                 QStringList const& fileNames, bool isWithPath);
+                 QStringList const& fileNames,
+                 bool isWithPath);
 
     void cancel();
 signals:

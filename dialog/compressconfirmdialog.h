@@ -17,15 +17,18 @@ public:
     ~CompressConfirmDialog();
 
     void setFileNames(QStringList const& fileNames);
+
     void setTargetFileName(QString const& fileName);
     QString targetFileName();
 
     void setSettings(CompressParam const& param);
     CompressParam settings() const;
+
     static QString CurrentSuffix();
     static void setCurrentSuffix(QString const& suffix);
 private:
-    void changeSuffix(QString const& suffix, bool isCanEncryption = false);
+    void changeSuffix(QString const& suffix,
+                      bool isCanEncryption = false);
     void setLabel(int size);
 private:
     Ui::CompressConfirmDialog *ui;

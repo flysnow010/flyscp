@@ -8,6 +8,7 @@ namespace Ui {
 class OptionsDialog;
 }
 class QLabel;
+class QTreeWidgetItem;
 class OptionsDialog : public QDialog
 {
     Q_OBJECT
@@ -67,10 +68,18 @@ private:
     void setCurrntTreeItem(int index);
     void saveSettings();
     void loadSettings();
+    void updateUI();
 private:
     Ui::OptionsDialog *ui;
     QSize colorSize;
     ColorOption colorOption;
+    QTreeWidgetItem* layout;
+    QTreeWidgetItem* display;
+    QTreeWidgetItem* icons;
+    QTreeWidgetItem* font;
+    QTreeWidgetItem* color;
+    QTreeWidgetItem* language;
+    QTreeWidgetItem* operation;
 };
 
 #endif // OPTIONSDIALOG_H

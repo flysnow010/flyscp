@@ -2,7 +2,8 @@
 
 #include "treeitem.h"
 
-TreeItem::TreeItem(const QList<QVariant> &data, TreeItem *parent)
+TreeItem::TreeItem(const QList<QVariant> &data,
+                   TreeItem *parent)
     : itemData(data),
       parentItem(parent)
 {
@@ -39,7 +40,8 @@ QVariant TreeItem::data(int column) const
     return itemData.value(column);
 }
 
-bool TreeItem::setData(int column, QVariant const& value)
+bool TreeItem::setData(int column,
+                       QVariant const& value)
 {
     if(column < 0 || column >= itemData.size())
         return false;

@@ -13,18 +13,12 @@ struct ContextMenuItem
     QString parameters;
     void exec(QString const& fileName) const;
     void exec(QStringList const& fileNames) const;
-    bool operator == (ContextMenuItem const& r)
-    {
-        return this->name == r.name;
-    }
+    bool operator == (ContextMenuItem const& r) { return name == r.name; }
 
-    bool operator < (ContextMenuItem const& r)
-    {
-        return this->name < r.name;
-    }
+    bool operator < (ContextMenuItem const& r) { return name < r.name; }
 };
-
 typedef QList<ContextMenuItem> ContextMenuItems;
+
 class ContextMenu
 {
 public:
@@ -34,14 +28,21 @@ public:
     static ContextMenuItems DirCommands();
     static ContextMenuItems SendTo();
     static void PrintCommand(ContextMenuItems const& items);
-    static void show(QStringList const& fileNames, void *handle, QPoint const& p);
+    static void show(QStringList const& fileNames,
+                     void *handle, QPoint const& p);
 private:
-    static void GetShellContextItems(QString const& fileName, ContextMenuItems & items, bool isSort = false);
-    static void GetShellExContextItems(QString const& fileName, ContextMenuItems & items);
-    static void GetShellExContextItem(QString const& fileName, ContextMenuItem & item);
-    static void GetShellExContextMenu(QString const& fileName, QString const& glsid,
+    static void GetShellContextItems(QString const& fileName,
+                                     ContextMenuItems & items,
+                                     bool isSort = false);
+    static void GetShellExContextItems(QString const& fileName,
+                                       ContextMenuItems & items);
+    static void GetShellExContextItem(QString const& fileName,
+                                      ContextMenuItem & item);
+    static void GetShellExContextMenu(QString const& fileName,
+                                      QString const& glsid,
                                       QString const& docFileName);
-    static void GetCommand(QString const& command, ContextMenuItem &item);
+    static void GetCommand(QString const& command,
+                           ContextMenuItem &item);
     static QString GetName(QString const& name);
     static QIcon   GetIcon(QString const& name);
 };

@@ -5,6 +5,7 @@
 #include "core/dirhistory.h"
 #include "core/dirfavorite.h"
 #include "core/winshell.h"
+
 #include <QDir>
 #include <QHBoxLayout>
 #include <QToolButton>
@@ -14,6 +15,7 @@
 #include <QMenu>
 #include <QLabel>
 #include <QStorageInfo>
+
 #include <climits>
 
 PanelWidget::PanelWidget(QWidget *parent)
@@ -32,8 +34,10 @@ PanelWidget::PanelWidget(QWidget *parent)
     initDrivers();
     connect(buttonGroup, SIGNAL(buttonClicked(QAbstractButton*)),
             this, SLOT(buttonClicked(QAbstractButton*)));
-    connect(ui->tabWidget, &QTabWidget::currentChanged, this, &PanelWidget::currentChanged);
-    connect(ui->tabWidget, &QTabWidget::tabCloseRequested, this, &PanelWidget::tabCloseRequested);
+    connect(ui->tabWidget, &QTabWidget::currentChanged,
+            this, &PanelWidget::currentChanged);
+    connect(ui->tabWidget, &QTabWidget::tabCloseRequested,
+            this, &PanelWidget::tabCloseRequested);
 }
 
 PanelWidget::~PanelWidget()
@@ -43,7 +47,9 @@ PanelWidget::~PanelWidget()
     delete ui;
 }
 
-void PanelWidget::addDirTab(QWidget* widget, QIcon const& icon, QString const& text)
+void PanelWidget::addDirTab(QWidget* widget,
+                            QIcon const& icon,
+                            QString const& text)
 {
     ui->tabWidget->addTab(widget, icon, text);
     ui->tabWidget->setCurrentIndex(ui->tabWidget->count() - 1);
@@ -59,8 +65,11 @@ void PanelWidget::saveSettings(QString const& name)
 {
     QSettings settings(QCoreApplication::applicationName(),
                        QCoreApplication::applicationVersion());
+
     settings.beginGroup(name);
+
     QStringList const& dirNames = dirHistory->dirs();
+
     settings.beginWriteArray("historyDirNames", dirNames.size());
     for(int i = 0; i < dirNames.size(); i++)
     {
@@ -68,7 +77,9 @@ void PanelWidget::saveSettings(QString const& name)
         settings.setValue("dirName", dirNames[i]);
     }
     settings.endArray();
+
     QList<FavoriteItem> items = dirFavorite->favoriteItems();
+
     settings.beginWriteArray("favoriteItems", items.size());
     for(int i = 0; i < items.size(); i++)
     {
@@ -78,6 +89,7 @@ void PanelWidget::saveSettings(QString const& name)
         settings.setValue("fileName", items[i].fileName);
     }
     settings.endArray();
+
     settings.endGroup();
 }
 
@@ -85,7 +97,9 @@ void PanelWidget::loadSettings(QString const& name)
 {
     QSettings settings(QCoreApplication::applicationName(),
                        QCoreApplication::applicationVersion());
+
     settings.beginGroup(name);
+
     QStringList dirNames;
     int size = settings.beginReadArray("historyDirNames");
     for(int i = 0; i < size; i++)
@@ -94,6 +108,7 @@ void PanelWidget::loadSettings(QString const& name)
         dirNames << settings.value("dirName").toString();
     }
     settings.endArray();
+
     size = settings.beginReadArray("favoriteItems");
     QList<FavoriteItem> items;
     for(int i = 0; i < size; i++)
@@ -107,7 +122,9 @@ void PanelWidget::loadSettings(QString const& name)
     }
     dirFavorite->setFavoriteItems(items);
     settings.endArray();
+
     settings.endGroup();
+
     dirHistory->setDirs(dirNames);
 }
 
@@ -116,6 +133,7 @@ void PanelWidget::preDir()
     BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
     if(!dir)
         return;
+
     QString newDir = dirHistory->pre(dir->dir());
     if(!newDir.isEmpty())
         dir->setDir(newDir, QString(), true);
@@ -126,6 +144,7 @@ void PanelWidget::nextDir()
     BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
     if(!dir)
         return;
+
     QString newDir = dirHistory->next(dir->dir());
     if(!newDir.isEmpty())
         dir->setDir(newDir, QString(), true);
@@ -135,6 +154,7 @@ void PanelWidget::addDirToHistory(QString const& dir, bool isNavigation)
 {
     if(!isNavigation)
         dirHistory->add(dir);
+
     updateTexts(ui->tabWidget->currentWidget());
 }
 
@@ -146,32 +166,27 @@ void PanelWidget::libDirContextMenu()
 
     QMenu menu;
 
-#if 0
-    QList<WinLibDir> libDirs = WinShell::winLibDirs();
-    foreach(auto const& libDir, libDirs)
-    {
-        menu.addAction(libDir.icon(), libDir.caption, this, [=](bool){
-            dir->setDir(libDir.filePath, libDir.showPath());
-        });
-    }
-#else
     ShellMenuItems menuItems = WinShell::shellMenuItems();
     QApplication::setOverrideCursor(Qt::WaitCursor);
     foreach(auto const& menuItem, menuItems)
     {
         if(menuItem.isDir())
-            menu.addAction(menuItem.icon, menuItem.caption, this, [=](bool){
+            menu.addAction(menuItem.icon, menuItem.caption,
+                           this, [=](bool)
+            {
                 dir->setDir(menuItem.filePath, menuItem.showPath());
             });
         else
         {
             QMenu* subMenu = new QMenu(menuItem.caption);
             QAction* menuAction = subMenu->menuAction();
+
             menuAction->setIcon(menuItem.icon);
-            connect(menuAction,  &QAction::triggered, this, [=](){
-                menuItem.exec();
-            });
-            connect(menuAction,  &QAction::hovered, this, [=](){
+            connect(menuAction,  &QAction::triggered,
+                    this, [=](){ menuItem.exec(); });
+            connect(menuAction,  &QAction::hovered,
+                    this, [=]()
+            {
                 if(subMenu->isEmpty())
                 {
                     ShellMenuItems childMenuItems;
@@ -181,11 +196,13 @@ void PanelWidget::libDirContextMenu()
                     foreach(auto const& childMenuItem, childMenuItems)
                     {
                         if(childMenuItem.isDir())
-                            subMenu->addAction(childMenuItem.icon, childMenuItem.caption, this, [=](bool){
+                            subMenu->addAction(childMenuItem.icon, childMenuItem.caption,
+                                               this, [=](bool){
                                 dir->setDir(childMenuItem.filePath, childMenuItem.showPath());
                             });
-                       else
-                            subMenu->addAction(childMenuItem.icon, childMenuItem.caption, this, [=](bool){
+                        else
+                            subMenu->addAction(childMenuItem.icon, childMenuItem.caption,
+                                               this, [=](bool) {
                                 childMenuItem.exec();
                             });
                     }
@@ -194,18 +211,18 @@ void PanelWidget::libDirContextMenu()
             menu.addAction(menuAction);
         }
     }
-#endif
+
     QApplication::restoreOverrideCursor();
     menu.exec(QCursor::pos());
 }
 
 void PanelWidget::favoritesDirContextMenu()
 {
-    QMenu menu;
     BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
     if(!dir)
         return;
 
+    QMenu menu;
     QString currentFileName = dir->dir();
     QList<FavoriteItem> items = dirFavorite->favoriteItems();
     bool isCurrent = false;
@@ -229,17 +246,17 @@ void PanelWidget::favoritesDirContextMenu()
     item.fileName = currentFileName;
 
     if(isCurrent)
-        menu.addAction("Remove current folder", this, [&](bool){
+        menu.addAction(tr("Remove current folder"), this, [&](bool){
             dirFavorite->removeItem(item);
         });
     else
-        menu.addAction("Add current folder", this, [&](bool){
-            QString caption = Utils::getText("Cation of new menu", item.caption);
+        menu.addAction(tr("Add current folder"), this, [&](bool){
+            QString caption = Utils::getText(tr("Caption of new menu"), item.caption);
             if(!caption.isEmpty())
                 item.caption = caption;
             dirFavorite->addItem(item);
     });
-    menu.addAction("Settings");
+    menu.addAction(tr("Settings"));
     menu.exec(QCursor::pos());
 }
 
@@ -281,7 +298,8 @@ void PanelWidget::updateTexts(QWidget* widget)
             {
                 buttons[i]->setChecked(true);
                 QStorageInfo storeInfo(QString("%1:/").arg(buttons[i]->text()));
-                QString diskInfo = QString(tr("[%1] %2 available, %3 in total")).arg(buttons[i]->toolTip(),
+                QString diskInfo = QString(tr("[%1] %2 available, %3 in total"))
+                        .arg(buttons[i]->toolTip(),
                              Utils::formatFileSize(storeInfo.bytesFree()),
                              Utils::formatFileSize(storeInfo.bytesTotal()));
                 labelDiskInfo->setText(diskInfo);
@@ -294,6 +312,7 @@ void PanelWidget::updateTexts(QWidget* widget)
 void PanelWidget::initDrivers()
 {
     QHBoxLayout* layout = new QHBoxLayout();
+
     layout->setMargin(3);
     layout->setSpacing(5);
     for(char ch = 'a'; ch <= 'z'; ch++)
@@ -311,6 +330,7 @@ void PanelWidget::initDrivers()
 
     QFileIconProvider fip;
     ShellMenuItems drivers = WinShell::computerShellItems();
+
     for(int i = 0; i < drivers.size(); i++)
     {
         if(drivers[i].isDrive())
@@ -334,9 +354,6 @@ void PanelWidget::initDrivers()
     QToolButton *topButton = new QToolButton();
     topButton->setText("..");
     layout->addWidget(topButton);
-//    QFont font = labelDiskInfo->font();
-//    font.setBold(true);
-//    labelDiskInfo->setFont(font);
     layout->addWidget(labelDiskInfo);
     layout->addStretch();
 
@@ -392,74 +409,46 @@ void PanelWidget::showDriveButtons(bool isShow)
     ui->driverWidget->setVisible(isShow);
 }
 
+#define CALL_FUNCTION(function, param) \
+    for(int i = 0; i < ui->tabWidget->count(); i++){ \
+        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i)); \
+        if(dir) \
+            dir->function(param); \
+    }
+
 void PanelWidget::showHeader(bool isShow)
 {
-    for(int i = 0; i < ui->tabWidget->count(); i++)
-    {
-        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
-        if(dir)
-            dir->showHeader(isShow);
-    }
+    CALL_FUNCTION(showHeader, isShow)
 }
 
 void PanelWidget::showCurrentDir(bool isShow)
 {
-    for(int i = 0; i < ui->tabWidget->count(); i++)
-    {
-        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
-        if(dir)
-            dir->showCurrentDir(isShow);
-    }
+    CALL_FUNCTION(showCurrentDir, isShow)
 }
 
 void PanelWidget::showDeskNavigationButton(bool isShow)
 {
-    for(int i = 0; i < ui->tabWidget->count(); i++)
-    {
-        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
-        if(dir)
-            dir->showDeskNavigationButton(isShow);
-    }
+    CALL_FUNCTION(showDeskNavigationButton, isShow)
 }
 
 void PanelWidget::showFavoriteButton(bool isShow)
 {
-    for(int i = 0; i < ui->tabWidget->count(); i++)
-    {
-        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
-        if(dir)
-            dir->showFavoriteButton(isShow);
-    }
+    CALL_FUNCTION(showFavoriteButton, isShow)
 }
 
 void PanelWidget::showHistoryButton(bool isShow)
 {
-    for(int i = 0; i < ui->tabWidget->count(); i++)
-    {
-        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
-        if(dir)
-            dir->showHistoryButton(isShow);
-    }
+    CALL_FUNCTION(showHistoryButton, isShow)
 }
 
 void PanelWidget::showHiddenAndSystem(bool isShow)
 {
-    for(int i = 0; i < ui->tabWidget->count(); i++)
-    {
-        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
-        if(dir)
-            dir->showHiddenAndSystem(isShow);
-    }
+    CALL_FUNCTION(showHiddenAndSystem, isShow)
 }
 
 void PanelWidget::showToolTips(bool isShow)
 {
-    for(int i = 0; i < ui->tabWidget->count(); i++)
-    {
-        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
-        if(dir)
-            dir->showToolTips(isShow);
-    }
+    CALL_FUNCTION(showToolTips, isShow)
 }
 
 void PanelWidget::showDriveToolTips(bool isShow)
@@ -469,122 +458,62 @@ void PanelWidget::showDriveToolTips(bool isShow)
 
 void PanelWidget::showParentInRoot(bool isShow)
 {
-    for(int i = 0; i < ui->tabWidget->count(); i++)
-    {
-        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
-        if(dir)
-            dir->showParentInRoot(isShow);
-    }
+    CALL_FUNCTION(showParentInRoot, isShow)
 }
 
 void PanelWidget::setDirSoryByTime(bool isOn)
 {
-    for(int i = 0; i < ui->tabWidget->count(); i++)
-    {
-        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
-        if(dir)
-            dir->setDirSoryByTime(isOn);
-    }
+    CALL_FUNCTION(setDirSoryByTime, isOn)
 }
 
 void PanelWidget::setRenameFileName(bool isOn)
 {
-    for(int i = 0; i < ui->tabWidget->count(); i++)
-    {
-        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
-        if(dir)
-            dir->setRenameFileName(isOn);
-    }
+    CALL_FUNCTION(setRenameFileName, isOn)
 }
 
 void PanelWidget::showAllIconWithExeAndLink(bool isShow)
 {
-    for(int i = 0; i < ui->tabWidget->count(); i++)
-    {
-        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
-        if(dir)
-            dir->showAllIconWithExeAndLink(isShow);
-    }
+    CALL_FUNCTION(showAllIconWithExeAndLink, isShow)
 }
 
 void PanelWidget::showAllIcon(bool isShow)
 {
-    for(int i = 0; i < ui->tabWidget->count(); i++)
-    {
-        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
-        if(dir)
-            dir->showAllIcon(isShow);
-    }
+    CALL_FUNCTION(showAllIcon, isShow)
 }
 
 void PanelWidget::showStandardIcon(bool isShow)
 {
-    for(int i = 0; i < ui->tabWidget->count(); i++)
-    {
-        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
-        if(dir)
-            dir->showStandardIcon(isShow);
-    }
+    CALL_FUNCTION(showStandardIcon, isShow)
 }
 
 void PanelWidget::showNoneIcon(bool isShow)
 {
-    for(int i = 0; i < ui->tabWidget->count(); i++)
-    {
-        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
-        if(dir)
-            dir->showNoneIcon(isShow);
-    }
+    CALL_FUNCTION(showNoneIcon, isShow)
 }
 
 void PanelWidget::showIconForFyleSystem(bool isShow)
 {
-    for(int i = 0; i < ui->tabWidget->count(); i++)
-    {
-        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
-        if(dir)
-            dir->showIconForFyleSystem(isShow);
-    }
+    CALL_FUNCTION(showIconForFyleSystem, isShow)
 }
 
 void PanelWidget::showIconForVirtualFolder(bool isShow)
 {
-    for(int i = 0; i < ui->tabWidget->count(); i++)
-    {
-        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
-        if(dir)
-            dir->showIconForVirtualFolder(isShow);
-    }
+    CALL_FUNCTION(showIconForVirtualFolder, isShow)
 }
 
 void PanelWidget::showOverlayIcon(bool isShow)
 {
-    for(int i = 0; i < ui->tabWidget->count(); i++)
-    {
-        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
-        if(dir)
-            dir->showOverlayIcon(isShow);
-    }
+    CALL_FUNCTION(showOverlayIcon, isShow)
 }
 
 void PanelWidget::fileIconSize(int size)
 {
-    for(int i = 0; i < ui->tabWidget->count(); i++)
-    {
-        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
-        if(dir)
-            dir->fileIconSize(size);
-    }
+    CALL_FUNCTION(fileIconSize, size)
 }
 
 void PanelWidget::fileFont(QFont const& font)
 {
-    for(int i = 0; i < ui->tabWidget->count(); i++)
-    {
-        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
-        if(dir)
-            dir->fileFont(font);
-    }
+    CALL_FUNCTION(fileFont, font)
 }
 
 void PanelWidget::setDriveFont(QFont const& font)
@@ -627,6 +556,18 @@ void PanelWidget::refresh()
         BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
         if(dir)
             dir->refresh();
+    }
+}
+
+void PanelWidget::retranslateUi()
+{
+    ui->retranslateUi(this);
+    updateTexts(ui->tabWidget->currentWidget());
+    for(int i = 0; i < ui->tabWidget->count(); i++)
+    {
+        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
+        if(dir)
+            dir->retranslateUi();
     }
 }
 
@@ -685,6 +626,7 @@ void PanelWidget::closeTab(QWidget *w)
    int index = ui->tabWidget->indexOf(w);
    if(index < 0)
        return;
+
    tabCloseRequested(index);
 }
 
@@ -694,6 +636,7 @@ void PanelWidget::tabCloseRequested(int index)
     BaseDir* dir = dynamic_cast<BaseDir *>(w);
     if(!dir || !dir->isRemote())
         return;
+
     w->deleteLater();
     ui->tabWidget->removeTab(index);
     emit tabCountChanged(ui->tabWidget->count());
@@ -701,7 +644,8 @@ void PanelWidget::tabCloseRequested(int index)
 
 bool PanelWidget::eventFilter(QObject *obj, QEvent *event)
 {
-    if(event->type() == QEvent::ToolTip || event->type() == QEvent::StatusTip)
+    if(event->type() == QEvent::ToolTip
+            || event->type() == QEvent::StatusTip)
         return !isShowTips_;
     return QWidget::eventFilter(obj, event);
 }

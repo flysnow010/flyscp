@@ -10,7 +10,8 @@ class RemoteFileTransfer : public QObject
 {
     Q_OBJECT
 public:
-    explicit RemoteFileTransfer(RemoteFileManager* worker, QObject *parent = nullptr);
+    explicit RemoteFileTransfer(RemoteFileManager* worker,
+                                QObject *parent = nullptr);
     ~RemoteFileTransfer();
 
 public:
@@ -33,9 +34,12 @@ signals:
                        QString const& filePath,
                        bool isDst);
 
-    void totalProgress(QString const& srcFilename, QString const& dstFilename,
-                       int totalSize, int totalSizeTransferred);
-    void fileProgress(qint64 totalFileSize, qint64 totalBytesTransferred);
+    void totalProgress(QString const& srcFilename,
+                       QString const& dstFilename,
+                       int totalSize,
+                       int totalSizeTransferred);
+    void fileProgress(qint64 totalFileSize,
+                      qint64 totalBytesTransferred);
     void error(QString const& e);
     void finished();
 private:

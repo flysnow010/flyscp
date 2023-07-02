@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QTranslator>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -20,6 +21,7 @@ class FontOption;
 class ColorOption;
 class LanguageOption;
 class OperationOption;
+class QTranslator;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -28,9 +30,13 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    static void InstallTranstoirs(bool isInited = false);
 protected:
-    bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
-    bool eventFilter(QObject *obj, QEvent *event) override;
+    bool nativeEvent(const QByteArray &eventType,
+                     void *message,
+                     long *result) override;
+    bool eventFilter(QObject *obj,
+                     QEvent *event) override;
 private slots:
     void newFolder();
     void newFile();
@@ -68,10 +74,11 @@ private:
     void updateIcons(IconsOption const& option, bool isRefresh = true);
     void updateFonts(FontOption const& option);
     void updateColors(ColorOption const& option, bool isRefresh = true);
-    void updateLang(LanguageOption const& option);
     void updateOperation(OperationOption const& option);
 private:
     Ui::MainWindow *ui;
+    static QTranslator appTranslator;
+    static QTranslator sysTranslator;
     SSHSettingsManager *sshSettingsMangaer_;
     QMenu* connectMenu;
     QMenu* diffMenu;

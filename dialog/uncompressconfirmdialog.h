@@ -17,6 +17,7 @@ public:
 
     void setTargetPath(QString const& filePath);
     QString targetPath() const;
+
     void setSettings(UncompressParam const& param);
     UncompressParam settings() const;
 private:

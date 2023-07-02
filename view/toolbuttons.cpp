@@ -16,6 +16,11 @@ ToolButtons::ToolButtons(QWidget *parent) :
     connect(ui->btnExit, SIGNAL(clicked()), SIGNAL(exitClicked()));
 }
 
+ToolButtons::~ToolButtons()
+{
+    delete ui;
+}
+
 void ToolButtons::setButtonFont(QFont const& font)
 {
     ui->btnView->setFont(font);
@@ -28,7 +33,9 @@ void ToolButtons::setButtonFont(QFont const& font)
     ui->btnExit->setFont(font);
 }
 
-ToolButtons::~ToolButtons()
+void ToolButtons::retranslateUi()
 {
-    delete ui;
+    ui->retranslateUi(this);
 }
+
+

@@ -21,7 +21,6 @@ public:
 
     bool operator < (ShellItem const& r);
     void exec() const;
-    void contextMenu(void* handle, int x, int y) const;
 
     static LPITEMIDLIST clone(LPCITEMIDLIST pidl);
     static LPITEMIDLIST concat(LPCITEMIDLIST pidl1, LPCITEMIDLIST pidl2);

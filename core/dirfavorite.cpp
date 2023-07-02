@@ -2,5 +2,4 @@
 
 DirFavorite::DirFavorite()
 {
-
 }

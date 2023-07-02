@@ -27,7 +27,8 @@ void NetSettingsModel::refresh()
     setupData();
 }
 
-bool NetSettingsModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool NetSettingsModel::setData(const QModelIndex &index,
+                               const QVariant &value, int role)
 {
     if(index.column() == 0 && role == Qt::EditRole)
     {
@@ -59,7 +60,10 @@ void NetSettingsModel::setupModelData(TreeItem *parent)
     {
         QList<QVariant> rowData;
         SSHSettings::Ptr settings = settingsManager->settings(i);
-        rowData << settings->name << settings->userName << settings->hostName << settings->port;
+        rowData << settings->name
+                << settings->userName
+                << settings->hostName
+                << settings->port;
         TreeItem* item = new TreeItem(rowData, parent);
         parent->appendChild(item);
     }

@@ -5,7 +5,8 @@
 #include <QMouseEvent>
 #include <QFontMetrics>
 
-TitleBarWidget::TitleBarWidget(bool isWindows, QWidget *parent)
+TitleBarWidget::TitleBarWidget(bool isWindows,
+                               QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::TitleBarWidget)
     , actived_(false)
@@ -13,9 +14,13 @@ TitleBarWidget::TitleBarWidget(bool isWindows, QWidget *parent)
 {
     ui->setupUi(this);
 
-    connect(ui->btnLibDir, SIGNAL(clicked()), this, SIGNAL(libDirButtonClicked()));
-    connect(ui->btnFavoritesDir, SIGNAL(clicked()), this, SIGNAL(favoritesDirButtonCLicked()));
-    connect(ui->btnHistoryDir, SIGNAL(clicked()), this, SIGNAL(historyDirButtonClicked()));
+    connect(ui->btnLibDir, SIGNAL(clicked()),
+            this, SIGNAL(libDirButtonClicked()));
+    connect(ui->btnFavoritesDir, SIGNAL(clicked()),
+            this, SIGNAL(favoritesDirButtonCLicked()));
+    connect(ui->btnHistoryDir, SIGNAL(clicked()),
+            this, SIGNAL(historyDirButtonClicked()));
+
     setActived(false);
     ui->labelTitle->installEventFilter(this);
 }
@@ -77,7 +82,8 @@ void TitleBarWidget::setActived(bool isActived)
                       "border-radius: 0px;}");
 }
 
-bool TitleBarWidget::eventFilter(QObject *obj, QEvent *event)
+bool TitleBarWidget::eventFilter(QObject *obj,
+                                 QEvent *event)
 {
     if (event->type() == QEvent::MouseButtonPress)
     {

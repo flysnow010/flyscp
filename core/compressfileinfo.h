@@ -1,8 +1,10 @@
 #ifndef COMPRESSFILEINFO_H
 #define COMPRESSFILEINFO_H
-#include <QStringList>
+
 #include <QList>
 #include <QStack>
+#include <QStringList>
+
 #include <memory>
 
 class CompressFileInfo
@@ -36,13 +38,11 @@ public:
     quint64 size() const { return size_;  }
     quint64 compressedSize() const { return compressedSize_;  }
     int compressRatio() const {
-        if(size_ == 0)
-            return 0;
-        else
-            return (size_ - compressedSize_) * 100 / size_;
+        return size_ == 0 ? 0 : (size_ - compressedSize_) * 100 / size_;
     }
 private:
     CompressFileInfo(){}
+
     QString parent_;
     QString path_;
     QString fileName_;
@@ -90,14 +90,21 @@ public:
     bool mkdir(QString const& dir);
     bool rm(QStringList const& fileNames);
     bool add(QStringList const& fileNames);
-    bool rename(QString const& oldFileName, QString const& newFileName);
-    bool rename(QStringList const& fileNames, QString const& subPath);
-    bool extract(QString const& targetPath, QStringList const& fileNames, bool isWithPath);
+    bool rename(QString const& oldFileName,
+                QString const& newFileName);
+    bool rename(QStringList const& fileNames,
+                QString const& subPath);
+    bool extract(QString const& targetPath,
+                 QStringList const& fileNames,
+                 bool isWithPath);
     void refresh(bool isCurrent = true);
     QString filePath(QString const& fileName) const;
 private:
-    bool findFileInfo(CompressFileInfos const& fileInfos, QString const& path);
-    QString getSubDir(QString const& path, QString const& parent, bool isWindowSep = false);
+    bool findFileInfo(CompressFileInfos const& fileInfos,
+                      QString const& path);
+    QString getSubDir(QString const& path,
+                      QString const& parent,
+                      bool isWindowSep = false);
     void sort(CompressFileInfos &fileInfos, SortFlag sortFlag);
     QString getCompressFile(QString const& filePath);
 private:

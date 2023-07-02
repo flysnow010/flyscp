@@ -1,6 +1,7 @@
 #include "filecompresser.h"
 #include "filename.h"
 #include "util/utils.h"
+
 #include <QStringList>
 #include <QFileInfo>
 #include <QDir>
@@ -63,8 +64,7 @@ bool FileCompresser::compress(QStringList const& fileNames,
               CompressParam const& param,
               QString const& targetFilePath)
 {
-    QString app = Utils::compressApp();
-    process->setProgram(app);
+    process->setProgram(Utils::compressApp());
     if(param.isSignle)
     {
         foreach(auto const& fileName, fileNames)
@@ -118,9 +118,11 @@ bool FileCompresser::compress(QStringList const& fileNames,
         }
         targetFileNames << targetFilePath;
     }
+
     currentIndex = 0;
     process->setArguments(nextArgs());
     process->start();
+
     return true;
 }
 
@@ -128,18 +130,20 @@ bool FileCompresser::update(QStringList const& fileNames,
                             QString const& archiveFileName,
                             bool isWaitForFinished)
 {
-    QString app = Utils::compressApp();
-    process->setProgram(app);
     QStringList args;
+
     args << "a" << archiveFileName;
     foreach(auto fileName, fileNames)
         args << fileName;
     addArgs(args);
+
     currentIndex = 0;
+    process->setProgram(Utils::compressApp());
     process->setArguments(nextArgs());
     process->start();
     if(isWaitForFinished)
         process->waitForFinished();
+
     return true;
 }
 
@@ -154,13 +158,13 @@ void FileCompresser::cancel()
     process->kill();
     process->waitForFinished(1000);
     onError("User stopped the process");
+
     foreach(auto const& fileName, targetFileNames)
-    {
         QFile::remove(fileName);
-    }
 }
 
-void FileCompresser::setArgs(QStringList & args, CompressParam const& param)
+void FileCompresser::setArgs(QStringList & args,
+                             CompressParam const& param)
 {
     if(param.isMultiVolume)
         args << param.volumeText();
@@ -179,7 +183,7 @@ void FileCompresser::setArgs(QStringList & args, CompressParam const& param)
 }
 
 QStringList FileCompresser::getFileNames(QString const&fileName,
-                      CompressParam const& param)
+                                         CompressParam const& param)
 {
     QStringList newFileNames;
     QFileInfo fileInfo(fileName);
@@ -211,13 +215,15 @@ QStringList FileCompresser::getFileNames(QString const&fileName,
     return newFileNames;
 }
 
-QString FileCompresser::getFileName(QString const& fileName, QString const& newSuffix)
+QString FileCompresser::getFileName(QString const& fileName,
+                                    QString const& newSuffix)
 {
     QFileInfo fileInfo(fileName);
     return fileInfo.dir().filePath(fileInfo.baseName() + newSuffix);
 }
 
-QString FileCompresser::getNewFileName(QString const& targetFilePath, QString const& fileName)
+QString FileCompresser::getNewFileName(QString const& targetFilePath,
+                                       QString const& fileName)
 {
     QFileInfo fileInfo(targetFilePath);
     return fileInfo.dir().filePath(

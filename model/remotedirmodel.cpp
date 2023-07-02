@@ -1,6 +1,7 @@
 #include "remotedirmodel.h"
 #include "treeitem.h"
 #include "util/utils.h"
+
 #include <QBrush>
 #include <QDateTime>
 #include <QFileIconProvider>
@@ -52,7 +53,8 @@ QString RemoteDirModel::dirName()
     return QString();
 }
 
-void RemoteDirModel::sortItems(int index, bool isDescendingOrder)
+void RemoteDirModel::sortItems(int index,
+                               bool isDescendingOrder)
 {
     uint32_t sortFlag = ssh::Dir::DirsFirst;
 
@@ -76,6 +78,7 @@ void RemoteDirModel::sortItems(int index, bool isDescendingOrder)
     uint32_t filter = getFilters();
     if(dir_->is_root())
         filter |= ssh::Dir::NoDotDot;
+
     fileInfos_ = dir_->fileinfos(static_cast<ssh::Dir::Filter>(filter),
                                    static_cast<ssh::Dir::SortFlag>(sortFlag));
     setupData();
@@ -190,7 +193,8 @@ bool RemoteDirModel::rmFile(std::string const& filename)
     return false;
 }
 
-bool RemoteDirModel::rename(std::string const& original, std::string const& newname)
+bool RemoteDirModel::rename(std::string const& original,
+                            std::string const& newname)
 {
     if(dir_)
     {
@@ -201,7 +205,8 @@ bool RemoteDirModel::rename(std::string const& original, std::string const& newn
     return false;
 }
 
-bool RemoteDirModel::chmod(const char *file, uint16_t mode)
+bool RemoteDirModel::chmod(const char *file,
+                           uint16_t mode)
 {
     if(dir_)
     {
@@ -247,7 +252,9 @@ QVariant RemoteDirModel::icon(const QModelIndex &index) const
     return QVariant();
 }
 
-bool RemoteDirModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool RemoteDirModel::setData(const QModelIndex &index,
+                             const QVariant &value,
+                             int role)
 {
     if(index.column() == 0 && role == Qt::EditRole)
     {
@@ -261,7 +268,8 @@ bool RemoteDirModel::setData(const QModelIndex &index, const QVariant &value, in
             if(!isRenameBaseName() || suffix.empty())
                 newFileName = newName.toStdString();
             else
-               newFileName = QString("%1.%2").arg(newName, QString::fromStdString(suffix)).toStdString();
+               newFileName = QString("%1.%2").arg(newName,
+                                                  QString::fromStdString(suffix)).toStdString();
             if(rename(oldFileName, newFileName))
             {
                 TreeItem *item = static_cast<TreeItem*>(index.internalPointer());

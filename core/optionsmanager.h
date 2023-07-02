@@ -19,7 +19,7 @@ struct LayoutOption
 
     QString showStyle = "windowsvista";//windowsvista Windows Fusion
 
-    bool operator != (LayoutOption const& r) const
+    inline bool operator != (LayoutOption const& r) const
     {
         return isShowToolBar != r.isShowToolBar
                 || isShowToolBar != r.isShowToolBar
@@ -47,7 +47,7 @@ struct DisplayOption
     bool isShowDriveTooltips = true;
     bool isShowFilenameTooltips = true;
 
-    bool operator != (DisplayOption const& r) const
+    inline bool operator != (DisplayOption const& r) const
     {
         return isShowHideAndSystemFile != r.isShowHideAndSystemFile
                 || isShowParentDirInRootDrive != r.isShowParentDirInRootDrive
@@ -75,7 +75,7 @@ struct IconsOption
     int fileIconSize = 16;//16,20,24,32
     int toolbarIconSize = 16;//16,20,24,32
 
-    bool operator != (IconsOption const& r) const
+    inline bool operator != (IconsOption const& r) const
     {
         return isShowAllIconIncludeExeAndLink != r.isShowAllIconIncludeExeAndLink
                 || isShowExeLinkNotOnUDisk != r.isShowExeLinkNotOnUDisk
@@ -118,7 +118,7 @@ struct FontInfo
     }
     inline QString caption() const { return QString("%1,%2").arg(name).arg(size); }
 
-    bool operator != (FontInfo const& r) const
+    inline bool operator != (FontInfo const& r) const
     {
         return name != r.name
                 || size != r.size
@@ -128,6 +128,7 @@ struct FontInfo
     void save(QSettings & settings, QString const& type);
     void load(QSettings & settings, QString const& type);
 };
+
 struct FontOption
 {
     FontInfo fileList;
@@ -136,7 +137,7 @@ struct FontOption
 
     void save(QSettings & settings);
     void load(QSettings & settings);
-    bool operator != (FontOption const& r) const
+    inline bool operator != (FontOption const& r) const
     {
         return fileList != r.fileList
                 || mainWindow != r.mainWindow
@@ -152,7 +153,7 @@ struct ColorOption
     QString markColor = "#C7E3FA";
     QString cursorColor = "#FF8728";
 
-    bool operator != (ColorOption const& r) const
+    inline bool operator != (ColorOption const& r) const
     {
         return fontColor != r.fontColor
                 || background1Color != r.background1Color
@@ -166,8 +167,9 @@ struct ColorOption
 
 struct LanguageOption
 {
-    QString language;
-    bool operator != (LanguageOption const& r) const
+    QString language = "English";
+
+    inline bool operator != (LanguageOption const& r) const
     {
         return language != r.language;
     }
@@ -182,7 +184,7 @@ struct OperationOption
     bool isSelectFileNameWhenRenaming = false;
     bool isLeftButtonSelect = true;
 
-    bool operator != (OperationOption const& r) const
+    inline bool operator != (OperationOption const& r) const
     {
         return isOnlyOneMainProgramRun != r.isOnlyOneMainProgramRun
                 || isGoToRootWhenChangeDrive != r.isGoToRootWhenChangeDrive
@@ -209,11 +211,11 @@ public:
     inline void setOperationOption(OperationOption const& option) { operationOption_ = option; }
 
     inline LayoutOption const& layoutOption() const { return layoutOption_; }
-    inline DisplayOption const&  displayOption() const { return displayOption_; }
-    inline IconsOption const&  iconOption() const { return iconOption_; }
+    inline DisplayOption const& displayOption() const { return displayOption_; }
+    inline IconsOption const& iconOption() const { return iconOption_; }
     inline FontOption const& fontOption() const { return fontOption_; }
-    inline ColorOption const&  colorOption() const { return colorOption_; }
-    inline LanguageOption const&  languageOption() const { return languageOption_; }
+    inline ColorOption const& colorOption() const { return colorOption_; }
+    inline LanguageOption const& languageOption() const { return languageOption_; }
     inline OperationOption const& operationOption() const { return operationOption_; }
 private:
     OptionsManager();

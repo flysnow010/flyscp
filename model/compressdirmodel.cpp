@@ -1,6 +1,8 @@
 #include "compressdirmodel.h"
 #include "util/utils.h"
+
 #include <QFileInfo>
+
 namespace  {
 int const NONE_INDEX = -1;
 int const NAME_INDEX = 0;
@@ -63,12 +65,15 @@ bool CompressDirModel::cd(QString const& dir)
 {
     if(!compressFile.cd(dir))
         return false;
+
     fileInfos_ = compressFile.fileInfoList(CompressFile::DirsFirst);
     setupData();
+
     return true;
 }
 
-void CompressDirModel::sortItems(int index, bool isDescendingOrder)
+void CompressDirModel::sortItems(int index,
+                                 bool isDescendingOrder)
 {
      uint32_t sortFlag = CompressFile::DirsFirst;
 
@@ -87,6 +92,7 @@ void CompressDirModel::sortItems(int index, bool isDescendingOrder)
         sortFlag |= CompressFile::Type;
     if(!isDescendingOrder)
         sortFlag |=  CompressFile::Reversed;
+
     fileInfos_ = compressFile.fileInfoList( static_cast<CompressFile::SortFlag>(sortFlag));
     sortIndex = index;
     isDescending = isDescendingOrder;
@@ -167,7 +173,8 @@ bool CompressDirModel::add(QStringList const& fileNames)
     return compressFile.add(fileNames);
 }
 
-bool CompressDirModel::add(QString const& fileName, bool isRemoveSrc)
+bool CompressDirModel::add(QString const& fileName,
+                           bool isRemoveSrc)
 {
     bool isOK = compressFile.add(QStringList() << fileName);
     if(isOK && isRemoveSrc)
@@ -175,12 +182,14 @@ bool CompressDirModel::add(QString const& fileName, bool isRemoveSrc)
     return isOK;
 }
 
-bool CompressDirModel::rename(QString const& oldFileName, QString const& newFileName)
+bool CompressDirModel::rename(QString const& oldFileName,
+                              QString const& newFileName)
 {
     return compressFile.rename(oldFileName, newFileName);
 }
 
-bool CompressDirModel::rename(QStringList const& fileNames, QString const& subPath)
+bool CompressDirModel::rename(QStringList const& fileNames,
+                              QString const& subPath)
 {
     return compressFile.rename(fileNames, subPath);
 }
@@ -227,7 +236,9 @@ QString CompressDirModel::fileName(int index) const
     return fileInfos_.at(index)->fileName();
 }
 
-bool CompressDirModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool CompressDirModel::setData(const QModelIndex &index,
+                               const QVariant &value,
+                               int role)
 {
     if(index.column() == 0 && role == Qt::EditRole)
     {

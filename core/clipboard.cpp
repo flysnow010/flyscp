@@ -5,10 +5,11 @@
 #include <QStringList>
 
 #include <oleidl.h>
+
 #define FILE_URL_HEADER "file:///"
+
 ClipBoard::ClipBoard()
 {
-
 }
 
 bool ClipBoard::canPaste()

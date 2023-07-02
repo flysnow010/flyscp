@@ -22,8 +22,10 @@ public:
 public slots:
     void totalProgress(QString const& srcFilename,
                        QString const& dstFilename,
-                       int totalSize, int totalSizeTransferred);
-    void fileProgress(qint64 totalFileSize, qint64 totalBytesTransferred);
+                       int totalSize,
+                       int totalSizeTransferred);
+    void fileProgress(qint64 totalFileSize,
+                      qint64 totalBytesTransferred);
     void progressText(QString const& text);
     void finished();
     void error(QString const& e);

@@ -7,7 +7,8 @@
 class TreeItem
 {
 public:
-    TreeItem(const QList<QVariant> &data, TreeItem *parent = 0);
+    TreeItem(const QList<QVariant> &data,
+             TreeItem *parent = 0);
     ~TreeItem();
 
     void appendChild(TreeItem *child);
@@ -16,7 +17,8 @@ public:
     int childCount() const;
     int columnCount() const;
     QVariant data(int column) const;
-    bool setData(int column, QVariant const& value);
+    bool setData(int column,
+                 QVariant const& value);
     int row() const;
     TreeItem *parent();
 

@@ -13,26 +13,37 @@ PermissionsDialog::PermissionsDialog(QWidget *parent)
     ui->setupUi(this);
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
-    connect(ui->buttonBox, &QDialogButtonBox::clicked, this, [=](QAbstractButton * button){
-        if(ui->buttonBox->buttonRole(button) == QDialogButtonBox::ApplyRole)
+    connect(ui->buttonBox, &QDialogButtonBox::clicked,
+            this, [=](QAbstractButton * button)
+    {
+        if(ui->buttonBox->buttonRole(button)
+                == QDialogButtonBox::ApplyRole)
            QDialog::accept();
     });
 
-    connect(ui->checkBoxUserRead, &QCheckBox::stateChanged, this, [=](int state){
+    connect(ui->checkBoxUserRead, &QCheckBox::stateChanged,
+            this, [=](int state)
+    {
         if(state == Qt::Checked)
             permissions_ |= ssh::FileInfo::User_Read;
         else
             permissions_ &= (~ssh::FileInfo::User_Read);
         updatePermissions();
     });
-    connect(ui->checkBoxUserWrite, &QCheckBox::stateChanged, this, [=](int state){
+
+    connect(ui->checkBoxUserWrite, &QCheckBox::stateChanged,
+            this, [=](int state)
+    {
         if(state == Qt::Checked)
             permissions_ |= ssh::FileInfo::User_Write;
         else
             permissions_ &= (~ssh::FileInfo::User_Write);
         updatePermissions();
     });
-    connect(ui->checkBoxUserExecute, &QCheckBox::stateChanged, this, [=](int state){
+
+    connect(ui->checkBoxUserExecute, &QCheckBox::stateChanged,
+            this, [=](int state)
+    {
         if(state == Qt::Checked)
             permissions_ |= ssh::FileInfo::User_Exe;
         else
@@ -40,21 +51,29 @@ PermissionsDialog::PermissionsDialog(QWidget *parent)
         updatePermissions();
     });
 
-    connect(ui->checkBoxGroupRead, &QCheckBox::stateChanged, this, [=](int state){
+    connect(ui->checkBoxGroupRead, &QCheckBox::stateChanged,
+            this, [=](int state)
+    {
         if(state == Qt::Checked)
             permissions_ |= ssh::FileInfo::Group_Read;
         else
             permissions_ &= (~ssh::FileInfo::Group_Read);
         updatePermissions();
     });
-    connect(ui->checkBoxGroupWrite, &QCheckBox::stateChanged, this, [=](int state){
+
+    connect(ui->checkBoxGroupWrite, &QCheckBox::stateChanged,
+            this, [=](int state)
+    {
         if(state == Qt::Checked)
             permissions_ |= ssh::FileInfo::Group_Write;
         else
             permissions_ &= (~ssh::FileInfo::Group_Write);
         updatePermissions();
     });
-    connect(ui->checkBoxGroupExecute, &QCheckBox::stateChanged, this, [=](int state){
+
+    connect(ui->checkBoxGroupExecute, &QCheckBox::stateChanged,
+            this, [=](int state)
+    {
         if(state == Qt::Checked)
             permissions_ |= ssh::FileInfo::Group_Exe;
         else
@@ -62,21 +81,29 @@ PermissionsDialog::PermissionsDialog(QWidget *parent)
         updatePermissions();
     });
 
-    connect(ui->checkBoxOtherRead, &QCheckBox::stateChanged, this, [=](int state){
+    connect(ui->checkBoxOtherRead, &QCheckBox::stateChanged,
+            this, [=](int state)
+    {
         if(state == Qt::Checked)
             permissions_ |= ssh::FileInfo::Other_Read;
         else
             permissions_ &= (~ssh::FileInfo::Other_Read);
         updatePermissions();
     });
-    connect(ui->checkBoxOtherWrite, &QCheckBox::stateChanged, this, [=](int state){
+
+    connect(ui->checkBoxOtherWrite, &QCheckBox::stateChanged,
+            this, [=](int state)
+    {
         if(state == Qt::Checked)
             permissions_ |= ssh::FileInfo::Other_Write;
         else
             permissions_ &= (~ssh::FileInfo::Other_Write);
         updatePermissions();
     });
-    connect(ui->checkBoxOtherExecute, &QCheckBox::stateChanged, this, [=](int state){
+
+    connect(ui->checkBoxOtherExecute, &QCheckBox::stateChanged,
+            this, [=](int state)
+    {
         if(state == Qt::Checked)
             permissions_ |= ssh::FileInfo::Other_Exe;
         else
@@ -92,7 +119,8 @@ PermissionsDialog::~PermissionsDialog()
 
 void PermissionsDialog::setFileName(QString const& fileName)
 {
-    ui->labelName->setText(QString("%1 \"%2\"").arg(ui->labelName->text(), fileName));
+    ui->labelName->setText(QString(tr("%1 \"%2\""))
+                           .arg(ui->labelName->text(), fileName));
 }
 
 void PermissionsDialog::setPermissions(quint32 permissions, bool isDir)

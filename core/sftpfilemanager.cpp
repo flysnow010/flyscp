@@ -10,7 +10,6 @@ SFtpFileManager::SFtpFileManager(SFtpSession* sftp, QObject *parent)
     : RemoteFileManager(parent)
     , sftpSession(sftp)
 {
-
 }
 
 void SFtpFileManager::uploadFiles(QStringList const& srcFileNames,
@@ -26,31 +25,49 @@ void SFtpFileManager::uploadFiles(QStringList const& srcFileNames,
         if(singled())
             break;
 
-        emit totalProgress(newFileNames[i].src, newFileNames[i].dst, newFileNames.size(), i);
+        emit totalProgress(newFileNames[i].src,
+                           newFileNames[i].dst,
+                           newFileNames.size(),
+                           i);
         uploadFile(newFileNames[i].src, newFileNames[i].dst);
-        emit totalProgress(newFileNames[i].src, newFileNames[i].dst, newFileNames.size(), i + 1);
+        emit totalProgress(newFileNames[i].src,
+                           newFileNames[i].dst,
+                           newFileNames.size(),
+                           i + 1);
     }
     emit finished();
 }
 
-void SFtpFileManager::downloadFiles(QStringList const& srcFileNames, QString const& srcFilePath,
-                                      QString const& dstFilePath)
+void SFtpFileManager::downloadFiles(QStringList const& srcFileNames,
+                                    QString const& srcFilePath,
+                                    QString const& dstFilePath)
 {
-    FileNames newFileNames = getFileNames(srcFileNames, srcFilePath, dstFilePath);
+    FileNames newFileNames = getFileNames(srcFileNames,
+                                          srcFilePath,
+                                          dstFilePath);
 
     for(int i = 0; i < newFileNames.size(); i++)
     {
         if(singled())
             break;
-        emit totalProgress(newFileNames[i].src, newFileNames[i].dst, newFileNames.size(), i);
+
+        emit totalProgress(newFileNames[i].src,
+                           newFileNames[i].dst,
+                           newFileNames.size(),
+                           i);
         QDir().mkpath(QFileInfo(newFileNames[i].dst).path());
         downloadFile(newFileNames[i].src, newFileNames[i].dst);
-        emit totalProgress(newFileNames[i].src, newFileNames[i].dst, newFileNames.size(), i + 1);
+        emit totalProgress(newFileNames[i].src,
+                           newFileNames[i].dst,
+                           newFileNames.size(),
+                           i + 1);
     }
     emit finished();
 }
 
-void SFtpFileManager::deleteFiles(QStringList const& fileNames, QString const& filePath, bool isDst)
+void SFtpFileManager::deleteFiles(QStringList const& fileNames,
+                                  QString const& filePath,
+                                  bool isDst)
 {
     Q_UNUSED(isDst)
     FileInfos newFileInfos = getFileNames(fileNames, filePath);
@@ -60,18 +77,25 @@ void SFtpFileManager::deleteFiles(QStringList const& fileNames, QString const& f
         if(singled())
             break;
 
-        emit totalProgress(newFileInfos[i].fileName, QString(), newFileInfos.size(), i);
+        emit totalProgress(newFileInfos[i].fileName,
+                           QString(),
+                           newFileInfos.size(),
+                           i);
         std::string filename = newFileInfos[i].fileName.toStdString();
         if(newFileInfos[i].isDir)
             dir->rmdir(filename.c_str());
         else
             dir->rmfile(filename.c_str());
-        emit totalProgress(newFileInfos[i].fileName, QString(), newFileInfos.size(), i + 1);
+        emit totalProgress(newFileInfos[i].fileName,
+                           QString(),
+                           newFileInfos.size(),
+                           i + 1);
     }
     emit finished();
 }
 
-bool SFtpFileManager::uploadFile(QString const& srcFileName, QString const& dstfileName)
+bool SFtpFileManager::uploadFile(QString const& srcFileName,
+                                 QString const& dstfileName)
 {
     QFile file(srcFileName);
     if(!file.open(QIODevice::ReadOnly))
@@ -100,7 +124,8 @@ bool SFtpFileManager::uploadFile(QString const& srcFileName, QString const& dstf
     return true;
 }
 
-bool SFtpFileManager::downloadFile(QString const& srcFileName, QString const& dstfileName)
+bool SFtpFileManager::downloadFile(QString const& srcFileName,
+                                   QString const& dstfileName)
 {
     ssh::File::Ptr remotefile = sftpSession->openForRead(srcFileName.toStdString().c_str());
     if(!remotefile)
@@ -128,8 +153,8 @@ bool SFtpFileManager::downloadFile(QString const& srcFileName, QString const& ds
 }
 
 FileNames SFtpFileManager::getFileNames(QStringList const& srcFileNames,
-                       QString const& srcFilePath,
-                       QString const& dstFilePath)
+                                        QString const& srcFilePath,
+                                        QString const& dstFilePath)
 {
     ssh::DirPtr dirPtr = sftpSession->dir(srcFilePath.toStdString());
     if(!dirPtr)
@@ -161,7 +186,7 @@ FileNames SFtpFileManager::getFileNames(QStringList const& srcFileNames,
 }
 
 FileNames SFtpFileManager::getFileNames(QString const& srcFilePath,
-                       QString const& dstFilePath)
+                                        QString const& dstFilePath)
 {
     ssh::DirPtr dirPtr = sftpSession->dir(srcFilePath.toStdString());
     if(!dirPtr)
@@ -171,6 +196,7 @@ FileNames SFtpFileManager::getFileNames(QString const& srcFilePath,
     QDir srcDir(srcFilePath);
     QDir dstDir(dstFilePath);
     ssh::FileInfos fileInfos = dirPtr->fileinfos();
+
     for(auto const& fileInfo: fileInfos)
     {
         QString name = QString::fromStdString(fileInfo->name());
@@ -186,11 +212,12 @@ FileNames SFtpFileManager::getFileNames(QString const& srcFilePath,
             fileSizes[childFilePath] = fileInfo->size();
         }
     }
+
     return newFileNames;
 }
 
 FileInfos SFtpFileManager::getFileNames(QStringList const& fileNames,
-                                          QString const& filePath)
+                                        QString const& filePath)
 {
     ssh::DirPtr dirPtr = sftpSession->dir(filePath.toStdString());
     if(!dirPtr)
@@ -199,6 +226,7 @@ FileInfos SFtpFileManager::getFileNames(QStringList const& fileNames,
     FileInfos newFileInfos;
     ssh::FileInfos fileInfos = dirPtr->fileinfos();
     QDir dir(filePath);
+
     foreach(auto fileName, fileNames)
     {
         ssh::FileInfoPtr fileInfo = fileInfos.find(fileName.toStdString());
@@ -213,6 +241,7 @@ FileInfos SFtpFileManager::getFileNames(QStringList const& fileNames,
             newFileInfos << FileInfo(childFilePath, true);
         }
     }
+
     return newFileInfos;
 }
 
@@ -237,6 +266,7 @@ FileInfos SFtpFileManager::getFileNames(QString const& filePath)
             newFileInfos << FileInfo(childFilePath, true);
         }
     }
+
     return newFileInfos;
 }
 
@@ -266,8 +296,7 @@ void SFtpFileManager::mkdirs(FileNames const& fileNames, QString const& dstFileP
         }
     }
     newdirnames.sort();
+
     foreach(auto const& dirname, newdirnames)
-    {
         sftpSession->mkdir(dirname.toStdString());
-    }
 }

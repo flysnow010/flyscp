@@ -38,6 +38,11 @@ QString Utils::sshSettingsPath()
     return path;
 }
 
+QString Utils::languagePath()
+{
+    return QString("%1/languages").arg(QApplication::applicationDirPath());
+}
+
 QString Utils::compressApp()
 {
     return QString("%1/7z.exe").arg(QApplication::applicationDirPath());
@@ -255,11 +260,13 @@ QString Utils::permissionsText(quint32 permissions, bool isDir)
 QString Utils::getText(QString const& label, QString const& value)
 {
     QInputDialog dialog;
+
     dialog.setInputMode(QInputDialog::TextInput);
     dialog.setWindowTitle(QApplication::applicationName());
     dialog.setLabelText(label);
     dialog.setTextValue(value);
     dialog.setWindowFlags(dialog.windowFlags() & ~Qt::WindowContextHelpButtonHint);
+
     if(dialog.exec() == QDialog::Accepted)
         return dialog.textValue();
     return QString();
@@ -290,7 +297,8 @@ QString Utils::getSaveFile(QString const& caption)
 
 bool Utils::question(QString const& text)
 {
-    if(QMessageBox::question(0, QApplication::applicationName(), text) == QMessageBox::Yes)
+    if(QMessageBox::question(0, QApplication::applicationName(), text)
+            == QMessageBox::Yes)
         return true;
     return false;
 }

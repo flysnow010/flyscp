@@ -1,4 +1,5 @@
 #include "optionsdialog.h"
+#include "core/languagemanager.h"
 #include "util/utils.h"
 
 #include "ui_optionsdialog.h"
@@ -33,13 +34,13 @@ OptionsDialog::OptionsDialog(QWidget *parent)
     qRegisterMetaType<OperationOption>("OperationOption");
     ui->treeWidget->clear();
 
-    QTreeWidgetItem* layout = new QTreeWidgetItem(QStringList() << "Layout");
-    QTreeWidgetItem* display = new QTreeWidgetItem(QStringList() << "Display");
-    QTreeWidgetItem* icons = new QTreeWidgetItem(QStringList() << "Icons");
-    QTreeWidgetItem* font = new QTreeWidgetItem(QStringList() << "Font");
-    QTreeWidgetItem* color = new QTreeWidgetItem(QStringList() << "Color");
-    QTreeWidgetItem* language = new QTreeWidgetItem(QStringList() << "Language");
-    QTreeWidgetItem* operation = new QTreeWidgetItem(QStringList() << "Operation");
+    layout = new QTreeWidgetItem(QStringList() << tr("Layout"));
+    display = new QTreeWidgetItem(QStringList() << tr("Display"));
+    icons = new QTreeWidgetItem(QStringList() << tr("Icons"));
+    font = new QTreeWidgetItem(QStringList() << tr("Font"));
+    color = new QTreeWidgetItem(QStringList() << tr("Color"));
+    language = new QTreeWidgetItem(QStringList() << tr("Language"));
+    operation = new QTreeWidgetItem(QStringList() << tr("Operation"));
 
     layout->setData(0, Qt::UserRole, LayoutPage);
     display->setData(0, Qt::UserRole, DisplayPage);
@@ -56,7 +57,6 @@ OptionsDialog::OptionsDialog(QWidget *parent)
     ui->treeWidget->addTopLevelItem(display);
     ui->treeWidget->addTopLevelItem(operation);
     display->setExpanded(true);
-
 
     ui->treeWidget->setCurrentItem(layout);
 
@@ -94,7 +94,8 @@ void OptionsDialog::createConnects()
     connect(ui->treeWidget, &QTreeWidget::itemSelectionChanged, this, [=](){
         QTreeWidgetItem *item = ui->treeWidget->currentItem();
         if(item)
-            ui->stackedWidget->setCurrentIndex(item->data(0, Qt::UserRole).toInt());
+            ui->stackedWidget->setCurrentIndex(
+                        item->data(0, Qt::UserRole).toInt());
     });
     connect(ui->btnApply, &QPushButton::clicked, this, [=](){
         if(ui->stackedWidget->currentIndex() == LayoutPage)
@@ -113,53 +114,79 @@ void OptionsDialog::createConnects()
             updateUIToOperationOption();
     });
 
-    connect(ui->cbbFileIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(setFileIconSize(int)));
-    connect(ui->cbbToolBarIconSize, SIGNAL(currentIndexChanged(int)), this, SLOT(setToolBarIconSize(int)));
+    connect(ui->cbbFileIconSize, SIGNAL(currentIndexChanged(int)),
+            this, SLOT(setFileIconSize(int)));
+    connect(ui->cbbToolBarIconSize, SIGNAL(currentIndexChanged(int)),
+            this, SLOT(setToolBarIconSize(int)));
+
     connect(ui->btnFileList, &QPushButton::clicked, this, [=](){
         bool ok;
-        QFont font = QFontDialog::getFont(&ok, ui->labelFileListText->font(), this);
+        QFont font = QFontDialog::getFont(&ok,
+                                          ui->labelFileListText->font(),
+                                          this);
         if (ok)
         {
             ui->labelFileListText->setFont(font);
-            ui->labelFileListFont->setText(QString("%1,%2").arg(font.family()).arg(font.pointSize()));
+            ui->labelFileListFont->setText(QString("%1,%2")
+                                           .arg(font.family())
+                                           .arg(font.pointSize()));
         }
     });
+
     connect(ui->btnMainWindow, &QPushButton::clicked, this, [=](){
         bool ok;
-        QFont font = QFontDialog::getFont(&ok, ui->labelMainWindowText->font(), this);
+        QFont font = QFontDialog::getFont(&ok,
+                                          ui->labelMainWindowText->font(),
+                                          this);
         if (ok)
         {
             ui->labelMainWindowText->setFont(font);
-            ui->labelMainWindowFont->setText(QString("%1,%2").arg(font.family()).arg(font.pointSize()));
+            ui->labelMainWindowFont->setText(QString("%1,%2")
+                                             .arg(font.family())
+                                             .arg(font.pointSize()));
         }
     });
     connect(ui->btnDialog, &QPushButton::clicked, this, [=](){
         bool ok;
-        QFont font = QFontDialog::getFont(&ok, ui->labelDialogText->font(), this);
+        QFont font = QFontDialog::getFont(&ok,
+                                          ui->labelDialogText->font(),
+                                          this);
         if (ok)
         {
             ui->labelDialogText->setFont(font);
-            ui->labelDialogFont->setText(QString("%1,%2").arg(font.family()).arg(font.pointSize()));
+            ui->labelDialogFont->setText(QString("%1,%2")
+                                         .arg(font.family())
+                                         .arg(font.pointSize()));
         }
     });
-    connect(ui->tbFontColor, &ColorToolButton::selectedColor, this, [=](QColor const& color){
+    connect(ui->tbFontColor, &ColorToolButton::selectedColor,
+            this, [=](QColor const& color)
+    {
         colorOption.fontColor = color.name();
         updateColorOptionToUI(colorOption);
     });
 
-    connect(ui->tbBackgroud1, &ColorToolButton::selectedColor, this, [=](QColor const& color){
+    connect(ui->tbBackgroud1, &ColorToolButton::selectedColor,
+            this, [=](QColor const& color)
+    {
         colorOption.background1Color = color.name();
         updateColorOptionToUI(colorOption);
     });
-    connect(ui->tbBackgroud2, &ColorToolButton::selectedColor, this, [=](QColor const& color){
+    connect(ui->tbBackgroud2, &ColorToolButton::selectedColor,
+            this, [=](QColor const& color)
+    {
         colorOption.background2Color = color.name();
         updateColorOptionToUI(colorOption);
     });
-    connect(ui->tbMarkColor, &ColorToolButton::selectedColor, this, [=](QColor const& color){
+    connect(ui->tbMarkColor, &ColorToolButton::selectedColor,
+            this, [=](QColor const& color)
+    {
         colorOption.markColor = color.name();
         updateColorOptionToUI(colorOption);
     });
-    connect(ui->tbCursorColor, &ColorToolButton::selectedColor, this, [=](QColor const& color){
+    connect(ui->tbCursorColor, &ColorToolButton::selectedColor,
+            this, [=](QColor const& color)
+    {
         colorOption.cursorColor = color.name();
         updateColorOptionToUI(colorOption);
     });
@@ -168,13 +195,15 @@ void OptionsDialog::createConnects()
 void OptionsDialog::setFileIconSize(int index)
 {
     int size = ui->cbbFileIconSize->itemData(index).toInt();
-    ui->labelFileIcon->setPixmap(Utils::dirIcon().pixmap(QSize(size, size)));
+    ui->labelFileIcon->setPixmap(Utils::dirIcon()
+                                 .pixmap(QSize(size, size)));
 }
 
 void OptionsDialog::setToolBarIconSize(int index)
 {
     int size = ui->cbbToolBarIconSize->itemData(index).toInt();
-    ui->labelToolBarIcon->setPixmap(QIcon(":/image/control.png").pixmap(QSize(size, size)));
+    ui->labelToolBarIcon->setPixmap(QIcon(":/image/control.png")
+                                    .pixmap(QSize(size, size)));
 }
 
 void OptionsDialog::updateOptionToUI()
@@ -376,18 +405,32 @@ void OptionsDialog::updateUIToColorOption()
 void OptionsDialog::updateLanguageOptionToUI()
 {
     LanguageOption const& option = theOptionManager.languageOption();
-    ui->lwLanguage->addItem(option.language);
+    LanguageManager manager;
+    Languages const& languages = manager.languages();
+    foreach(auto lang, languages)
+    {
+        QListWidgetItem* item = new QListWidgetItem(lang.showText(), ui->lwLanguage);
+
+        item->setData(Qt::UserRole, lang.name);
+        if(lang.name == option.language)
+            item->setSelected(true);
+        ui->lwLanguage->addItem(item);
+    }
 }
 
 void OptionsDialog::updateUIToLanguageOption()
 {
     LanguageOption option;
-    QListWidgetItem *item = ui->lwLanguage->currentItem();\
+    QListWidgetItem *item = ui->lwLanguage->currentItem();
     if(item)
     {
-        option.language = item->text();
+        option.language = item->data(Qt::UserRole).toString();
         if(option != theOptionManager.languageOption())
-        emit langOptionChanged(option);
+        {
+            emit langOptionChanged(option);
+            ui->retranslateUi(this);
+            updateUI();
+        }
     }
 }
 
@@ -419,6 +462,7 @@ QIcon OptionsDialog::createFontIcon(ColorOption const& option, QString const& te
 {
     QPixmap pixmap(colorSize);
     QPainter painter(&pixmap);
+
     painter.setPen(Qt::NoPen);
     painter.fillRect(0, 0, colorSize.width(), colorSize.height(), QColor(QString("#FFFFFF")));
     painter.setPen(QColor(option.fontColor));
@@ -431,6 +475,7 @@ QIcon OptionsDialog::createBack1Icon(ColorOption const& option, QString const& t
 {
     QPixmap pixmap(colorSize);
     QPainter painter(&pixmap);
+
     painter.setPen(Qt::NoPen);
     painter.fillRect(QRect(QPoint(0, 0), colorSize), QColor(option.background1Color));
     painter.setPen(QColor(option.fontColor));
@@ -443,6 +488,7 @@ QIcon OptionsDialog::createBack2Icon(ColorOption const& option, QString const& t
 {
     QPixmap pixmap(colorSize);
     QPainter painter(&pixmap);
+
     painter.setPen(Qt::NoPen);
     painter.fillRect(QRect(QPoint(0, 0), colorSize), QColor(option.background2Color));
     painter.setPen(QColor(option.fontColor));
@@ -455,6 +501,7 @@ QIcon OptionsDialog::createMarkIcon(ColorOption const& option, QString const& te
 {
     QPixmap pixmap(colorSize);
     QPainter painter(&pixmap);
+
     painter.setPen(Qt::NoPen);
     painter.fillRect(QRect(QPoint(0, 0), colorSize), QColor(option.markColor));
     painter.setPen(QColor(option.fontColor));
@@ -467,6 +514,7 @@ QIcon OptionsDialog::createCursorIcon(ColorOption const& option, QString const& 
 {
     QPixmap pixmap(colorSize);
     QPainter painter(&pixmap);
+
     painter.setPen(Qt::NoPen);
     painter.fillRect(QRect(QPoint(0, 0), colorSize), QColor(option.markColor));
     painter.setPen(QColor(option.cursorColor));
@@ -482,6 +530,7 @@ QPixmap OptionsDialog::createExample(ColorOption const& option)
     QSize size(200, 161);
     QPixmap pixmap(size);
     QPainter painter(&pixmap);
+
     painter.setPen(Qt::NoPen);
     painter.fillRect(QRect(QPoint(0, 0), size), QColor(option.background1Color));
 
@@ -561,4 +610,15 @@ void OptionsDialog::loadSettings()
     ui->stackedWidget->setCurrentIndex(index);
     setCurrntTreeItem(index);
     settings.endGroup();
+}
+
+void OptionsDialog::updateUI()
+{
+    layout->setText(0, tr("Layout"));
+    display->setText(0, tr("Display"));
+    icons->setText(0, tr("Icons"));
+    font->setText(0, tr("Font"));
+    color->setText(0, tr("Color"));
+    language->setText(0, tr("Language"));
+    operation->setText(0, tr("Operation"));
 }

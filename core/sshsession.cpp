@@ -4,7 +4,6 @@ SSHSession::SSHSession(QObject *parent)
     : QObject(parent)
     , sessioin_(new ssh::Session())
 {
-
 }
 
 void SSHSession::start(SSHSettings const& settings)

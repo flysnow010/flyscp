@@ -1,6 +1,7 @@
 #ifndef TREE_MODEL_H
 #define TREE_MODEL_H
 #include "treeitem.h"
+
 #include <QAbstractItemModel>
 #include <QModelIndex>
 #include <QVariant>
@@ -16,12 +17,15 @@ public:
     virtual ~TreeModel();
 
     void reset();
-    QVariant data(const QModelIndex &index, int role) const;
+    QVariant data(const QModelIndex &index,
+                  int role) const;
     Qt::ItemFlags flags(const QModelIndex &index) const;
-    QVariant headerData(int section, Qt::Orientation orientation,
+    QVariant headerData(int section,
+                        Qt::Orientation orientation,
                         int role = Qt::DisplayRole) const;
     TreeItem* index(QModelIndex const& index) const;
-    QModelIndex index(int row, int column,
+    QModelIndex index(int row,
+                      int column,
                       const QModelIndex &parent = QModelIndex()) const;
     QModelIndex parent(const QModelIndex &index) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;

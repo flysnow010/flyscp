@@ -8,8 +8,9 @@ FileOperateConfirmDialog::FileOperateConfirmDialog(QWidget *parent) :
 {
     ui->setupUi(this);
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
-    connect(ui->btnBrowsePath, &QToolButton::clicked, [=]{
-        QString path = Utils::getPath("Select a path", ui->lineEditPath->text());
+
+    connect(ui->btnBrowsePath, &QToolButton::clicked, this, [=]{
+        QString path = Utils::getPath(tr("Select a path"), ui->lineEditPath->text());
         if(!path.isEmpty())
             ui->lineEditPath->setText(path);
     });

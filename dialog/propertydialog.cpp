@@ -24,12 +24,14 @@ void PropertyDialog::setFileInfo(ssh::FileInfoPtr const& fileInfo)
 
     if(fileInfo->is_dir())
     {
-        ui->labelName->setText(QString("Folder name: %1").arg(QString::fromStdString(fileInfo->name())));
+        ui->labelName->setText(QString(tr("Folder name: %1"))
+                               .arg(QString::fromStdString(fileInfo->name())));
         ui->labelFileSize->hide();
     }
     else
     {
-        ui->labelName->setText(QString("File name: %1").arg(QString::fromStdString(fileInfo->name())));
+        ui->labelName->setText(QString(tr("File name: %1"))
+                               .arg(QString::fromStdString(fileInfo->name())));
         ui->labelFileSize->setText(QString("%1 %2")
                                .arg(ui->labelFileSize->text(),
                                     Utils::formatFileSize(fileInfo->size())));
@@ -45,7 +47,8 @@ void PropertyDialog::setFileInfo(ssh::FileInfoPtr const& fileInfo)
                                  QString::fromStdString(fileInfo->group())));
     ui->labelPermissions->setText(QString("%1 %2")
                                   .arg(ui->labelPermissions->text(),
-                                       Utils::permissionsText(fileInfo->permissions(), fileInfo->is_dir())));
+                                       Utils::permissionsText(fileInfo->permissions(),
+                                                              fileInfo->is_dir())));
     adjustSize();
 }
 
@@ -57,14 +60,16 @@ void PropertyDialog::setFileInfo(CompressFileInfo::Ptr const& fileInfo)
 
     if(fileInfo->isDir())
     {
-        ui->labelName->setText(QString("Folder name: %1").arg(fileInfo->filePath()));
+        ui->labelName->setText(QString(tr("Folder name: %1"))
+                               .arg(fileInfo->filePath()));
         ui->labelFileSize->hide();
         ui->labelPacketedSize->hide();
         ui->labelCompressionRatio->hide();
     }
     else
     {
-        ui->labelName->setText(QString("File name: %1").arg(fileInfo->filePath()));
+        ui->labelName->setText(QString(tr("File name: %1"))
+                               .arg(fileInfo->filePath()));
         ui->labelFileSize->setText(QString("%1 %2")
                                .arg(ui->labelFileSize->text(),
                                     Utils::formatFileSize(fileInfo->size())));

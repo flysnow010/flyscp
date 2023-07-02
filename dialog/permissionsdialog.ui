@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>278</width>
-    <height>214</height>
+    <width>308</width>
+    <height>246</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Chaging permissions...</string>
+   <string>Changing permissions...</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,1,1,1,1">
    <item>

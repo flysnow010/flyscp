@@ -53,7 +53,7 @@ QVariant LocalDirModel::icon(const QModelIndex &index) const
 
     if(fileInfos_[index.row()].isRoot())
     {
-        if(iconShowType() == IconShowType::Standard)if(iconShowType() == IconShowType::Standard)
+        if(iconShowType() == IconShowType::Standard)
             QFileIconProvider().icon(QFileIconProvider::Drive);
         return QFileIconProvider().icon(fileInfos_[index.row()]);
     }
@@ -61,6 +61,7 @@ QVariant LocalDirModel::icon(const QModelIndex &index) const
     {
         if(iconShowType() == IconShowType::ALLWithExeAndLink)
             return QFileIconProvider().icon(fileInfos_[index.row()]);
+
         QString suffix = fileInfos_[index.row()].suffix().toLower();
         if(!iconMap.contains(suffix))
         {
@@ -80,7 +81,8 @@ QVariant LocalDirModel::icon(const QModelIndex &index) const
             return QFileIconProvider().icon(QFileIconProvider::File);
 
         QString suffix = fileInfos_[index.row()].suffix().toLower();
-        if(suffix == ExeSuffix && iconShowType() == IconShowType::ALLWithExeAndLink)
+        if(suffix == ExeSuffix
+                && iconShowType() == IconShowType::ALLWithExeAndLink)
         {
             QIcon icon = Utils::GetIcon(fileInfos_[index.row()].filePath());
             if(!icon.isNull())
@@ -97,7 +99,9 @@ QVariant LocalDirModel::icon(const QModelIndex &index) const
     return QVariant();
 }
 
-bool LocalDirModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool LocalDirModel::setData(const QModelIndex &index,
+                            const QVariant &value,
+                            int role)
 {
     if(index.column() == 0 && role == Qt::EditRole)
     {
@@ -170,7 +174,8 @@ QVariant LocalDirModel::editText(const QModelIndex &index) const
 {
     if(index.column() == 0)
     {
-        if(!isRenameBaseName() || fileInfos_[index.row()].completeBaseName().isEmpty())
+        if(!isRenameBaseName()
+                || fileInfos_[index.row()].completeBaseName().isEmpty())
             return fileInfos_[index.row()].fileName();
         else
             return fileInfos_[index.row()].completeBaseName();
@@ -201,7 +206,8 @@ void LocalDirModel::refresh()
         defaultRefresh();
 }
 
-void LocalDirModel::sortItems(int index, bool isDescendingOrder)
+void LocalDirModel::sortItems(int index,
+                              bool isDescendingOrder)
 {
     QDir::SortFlags sortFlag = QDir::DirsFirst;
 
@@ -220,6 +226,7 @@ void LocalDirModel::sortItems(int index, bool isDescendingOrder)
         sortFlag |= QDir::SortFlag::Type;
     if(!isDescendingOrder)
         sortFlag |=  QDir::SortFlag::Reversed;
+
     fileInfos_ = dir_.entryInfoList(getFilters(), sortFlag);
     sortIndex = index;
     isDescending = isDescendingOrder;
@@ -237,7 +244,8 @@ bool LocalDirModel::mkdirs(QString const& dir)
     return dir_.mkpath(dir);
 }
 
-bool LocalDirModel::rename(QString const& original, QString const& newname)
+bool LocalDirModel::rename(QString const& original,
+                           QString const& newname)
 {
     return dir_.rename(original, newname);
 }

@@ -22,6 +22,7 @@ SOURCES += \
     core/filename.cpp \
     core/filetransfer.cpp \
     core/fileuncompresser.cpp \
+    core/languagemanager.cpp \
     core/optionsmanager.cpp \
     core/remotefilemanager.cpp \
     core/remotefiletransfer.cpp \
@@ -84,6 +85,7 @@ HEADERS += \
     core/filename.h \
     core/filetransfer.h \
     core/fileuncompresser.h \
+    core/languagemanager.h \
     core/optionsmanager.h \
     core/remotefilemanager.h \
     core/remotefiletransfer.h \
@@ -159,6 +161,6 @@ RC_ICONS = FlyScp.ico
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
-
+TRANSLATIONS += en.ts zh_CN.ts
 RESOURCES += \
     FlyScp.qrc

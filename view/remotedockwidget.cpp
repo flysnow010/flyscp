@@ -57,13 +57,18 @@ RemoteDockWidget::RemoteDockWidget(QWidget *parent)
                     this, SLOT(dragMove(QDragMoveEvent*)));
     connect(ui->treeView, SIGNAL(drop(QDropEvent*)),
                     this, SLOT(drop(QDropEvent*)));
-    connect(ui->treeView->selectionModel(), &QItemSelectionModel::selectionChanged, this, [=](){
+    connect(ui->treeView->selectionModel(), &QItemSelectionModel::selectionChanged,
+            this, [=]()
+    {
             emit statusTextChanged(getStatusText());
     });
 
-    connect(sftp, &SFtpSession::connected, this, &RemoteDockWidget::connected);
-    connect(sftp, &SFtpSession::unconnected, this, &RemoteDockWidget::unconnected);
-    connect(sftp, &SFtpSession::connectionError, this, &RemoteDockWidget::connectionError);
+    connect(sftp, &SFtpSession::connected,
+            this, &RemoteDockWidget::connected);
+    connect(sftp, &SFtpSession::unconnected,
+            this, &RemoteDockWidget::unconnected);
+    connect(sftp, &SFtpSession::connectionError,
+            this, &RemoteDockWidget::connectionError);
 
     connect(titleBarWidget, SIGNAL(libDirButtonClicked()),
                     this, SLOT(libDirContextMenu()));
@@ -71,7 +76,8 @@ RemoteDockWidget::RemoteDockWidget(QWidget *parent)
                     this, SLOT(favoritesDirContextMenu()));
     connect(titleBarWidget, SIGNAL(historyDirButtonClicked()),
                     this, SLOT(historyDirContextMenu()));
-    connect(titleBarWidget, &TitleBarWidget::dirSelected, this, [&](QString const& dir)
+    connect(titleBarWidget, &TitleBarWidget::dirSelected,
+            this, [&](QString const& dir)
     {
         setDir(dir);
     });
@@ -88,7 +94,9 @@ RemoteDockWidget::~RemoteDockWidget()
     delete ui;
 }
 
-void RemoteDockWidget::setDir(QString const& dir, QString const& caption, bool  isNavigation)
+void RemoteDockWidget::setDir(QString const& dir,
+                              QString const& caption,
+                              bool  isNavigation)
 {
     model_->setDir(sftp->dir(dir.toStdString()));
     updateCurrentDir(model_->dirName(), caption, isNavigation);
@@ -164,7 +172,6 @@ void RemoteDockWidget::showHistoryButton(bool isShow)
 
 void RemoteDockWidget::libDirContextMenu()
 {
-
 }
 
 void RemoteDockWidget::showHiddenAndSystem(bool isShow)
@@ -237,8 +244,8 @@ void RemoteDockWidget::setItemColor(QString const& fore,
 }
 
 void RemoteDockWidget::setItemSelectedColor(QString const& back,
-                  QString const& mark,
-                  QString const&cursor)
+                                            QString const& mark,
+                                            QString const&cursor)
 {
     ui->treeView->setStyleSheet(QString("QTreeView{ background: %1;}"
                                         "QTreeView::item:selected:active:first{"
@@ -281,10 +288,10 @@ void RemoteDockWidget::showParentInRoot(bool isShow)
 
 void RemoteDockWidget::favoritesDirContextMenu()
 {
-    QMenu menu;
-
     QString currentFileName = this->dir();
     QList<FavoriteItem> items = dirFavorite->favoriteItems();
+    QMenu menu;
+
     bool isCurrent = false;
     foreach(auto const& item, items)
     {
@@ -306,25 +313,25 @@ void RemoteDockWidget::favoritesDirContextMenu()
     item.fileName = currentFileName;
 
     if(isCurrent)
-        menu.addAction("Remove current folder", this, [&](bool){
+        menu.addAction(tr("Remove current folder"), this, [&](bool){
             dirFavorite->removeItem(item);
         });
     else
-        menu.addAction("Add current folder", this, [&](bool){
-            QString caption = Utils::getText("Cation of new menu", item.caption);
+        menu.addAction(tr("Add current folder"), this, [&](bool){
+            QString caption = Utils::getText(tr("Caption of new menu"), item.caption);
             if(!caption.isEmpty())
                 item.caption = caption;
             dirFavorite->addItem(item);
     });
-    menu.addAction("Settings");
+    menu.addAction(tr("Settings"));
     menu.exec(QCursor::pos());
 }
 
 void RemoteDockWidget::historyDirContextMenu()
 {
     QStringList const& dirNames = dirHistory->dirs();
-    QMenu menu;
     QString currentDir = this->dir();
+    QMenu menu;
 
     foreach(auto const& dirName, dirNames)
     {
@@ -358,14 +365,21 @@ bool RemoteDockWidget::isActived() const
     return titleBarWidget->isActived();
 }
 
+void RemoteDockWidget::retranslateUi()
+{
+    ui->retranslateUi(this);
+    emit statusTextChanged(getStatusText());
+}
 
 void RemoteDockWidget::saveSettings()
 {
     QSettings settings(QCoreApplication::applicationName(),
                        QCoreApplication::applicationVersion());
+
     settings.beginGroup(name_);
-    QHeaderView *headerView = ui->treeView->header();
     settings.setValue("DirName", windowTitle());
+
+    QHeaderView *headerView = ui->treeView->header();
     settings.beginWriteArray("sectionSizes", headerView->count());
     for(int i = 0; i < headerView->count(); i++)
     {
@@ -373,6 +387,7 @@ void RemoteDockWidget::saveSettings()
         settings.setValue("sectionSize", headerView->sectionSize(i));
     }
     settings.endArray();
+
     settings.endGroup();
 }
 
@@ -380,7 +395,9 @@ void RemoteDockWidget::loadSettings()
 {
     QSettings settings(QCoreApplication::applicationName(),
                        QCoreApplication::applicationVersion());
+
     settings.beginGroup(name_);
+
     QHeaderView *headerView = ui->treeView->header();
     int size = settings.beginReadArray("sectionSizes");
     for(int i = 0; i < size && i < headerView->count(); i++)
@@ -390,6 +407,7 @@ void RemoteDockWidget::loadSettings()
         headerView->resizeSection(i, settings.value("sectionSize").toInt());
     }
     settings.endArray();
+
     settings.endGroup();
 }
 
@@ -413,7 +431,8 @@ void RemoteDockWidget::customContextMenuRequested(const QPoint &pos)
     QMenu menu;
     if(!index.isValid())
     {
-        menu.addAction(QIcon(":/image/back.png"), tr("Parent directory"), this, SLOT(parentDirectory()));
+        menu.addAction(QIcon(":/image/back.png"), tr("Parent directory"),
+                       this, SLOT(parentDirectory()));
         menu.addSeparator();
         menu.addAction(tr("New directory"), this, SLOT(makeDirectory()));
         menu.addAction(tr("New file"), this, SLOT(newFile()));
@@ -442,7 +461,8 @@ void RemoteDockWidget::customContextMenuRequested(const QPoint &pos)
     menu.exec(QCursor::pos());
 }
 
-void RemoteDockWidget::sortIndicatorChanged(int logicalIndex, Qt::SortOrder order)
+void RemoteDockWidget::sortIndicatorChanged(int logicalIndex,
+                                            Qt::SortOrder order)
 {
     if(order == Qt::SortOrder::AscendingOrder)
         model_->sortItems(logicalIndex, false);
@@ -511,8 +531,10 @@ void RemoteDockWidget::drop(QDropEvent * event)
     QMimeData const* mimeData = event->mimeData();
     if(!mimeData)
         return;
+
     QStringList fileNames = ClipBoard::fileNames(mimeData);
     fileTransfer(fileNames, QString(), filePath, Upload);
+
     model_->refresh();
 }
 
@@ -523,8 +545,8 @@ void RemoteDockWidget::connected()
         model_->setDir(sftp->home());
     else
         model_->setDir(sftp->dir(homeDir));
-    QString dir = model_->dirName();
-    updateCurrentDir(dir);
+
+    updateCurrentDir(model_->dirName());
 }
 
 void RemoteDockWidget::unconnected()
@@ -569,7 +591,8 @@ void RemoteDockWidget::newFile()
 
 void RemoteDockWidget::upload()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, QApplication::applicationName());
+    QString fileName = QFileDialog::getOpenFileName(this,
+                                                    QApplication::applicationName());
     if(!fileName.isEmpty() && upload(fileName))
         model_->refresh();
 }
@@ -608,7 +631,8 @@ void RemoteDockWidget::download()
     if(fileNames.isEmpty())
         return;
 
-    QString filePath = QFileDialog::getExistingDirectory(this, QApplication::applicationName());
+    QString filePath = QFileDialog::getExistingDirectory(this,
+                                                         QApplication::applicationName());
     if(filePath.isEmpty())
         return;
 
@@ -690,7 +714,7 @@ void RemoteDockWidget::openDir(ssh::FileInfoPtr const& fileInfo)
     if(std::string(fileInfo->owner()) != sftp->userName()
             && !fileInfo->other_is_only_read())
     {
-        QMessageBox::warning(this, QApplication::applicationName(), "Permission denied");
+        QMessageBox::warning(this, QApplication::applicationName(), tr("Permission denied"));
         return;
     }
 
@@ -704,7 +728,8 @@ void RemoteDockWidget::openDir(ssh::FileInfoPtr const& fileInfo)
     updateCurrentDir(dir);
 }
 
-QString RemoteDockWidget::download(ssh::FileInfoPtr const& fileInfo, QDir const& dstDir)
+QString RemoteDockWidget::download(ssh::FileInfoPtr const& fileInfo,
+                                   QDir const& dstDir)
 {
     ssh::File::Ptr remotefile = sftp->openForRead(model_->filePath(fileInfo->name()).c_str());
     if(!remotefile)
@@ -753,17 +778,17 @@ void RemoteDockWidget::fileTransfer(QStringList const& srcFileNames,
     dialog.show();
     if(type == Download)
     {
-        dialog.setWindowTitle("DownloadFiles");
+        dialog.setWindowTitle(tr("DownloadFiles"));
         transfer.downloadFiles(srcFileNames, srcFilePath, dstFilePath);
     }
     else if(type == Upload)
     {
-        dialog.setWindowTitle("UploadFiles");
+        dialog.setWindowTitle(tr("UploadFiles"));
         transfer.uploadFiles(srcFileNames, dstFilePath);
     }
     else if(type == Delete)
     {
-        dialog.setWindowTitle("DeleteFiles");
+        dialog.setWindowTitle(tr("DeleteFiles"));
         transfer.deleteFiles(srcFileNames, srcFilePath, false);
     }
     while(!dialog.isFinished())
@@ -805,7 +830,9 @@ QString RemoteDockWidget::getStatusText()
             .arg(dirs).arg(model_->dirCount());
 }
 
-void RemoteDockWidget::updateCurrentDir(QString const& dir, QString const& caption, bool  isNavigation)
+void RemoteDockWidget::updateCurrentDir(QString const& dir,
+                                        QString const& caption,
+                                        bool  isNavigation)
 {
     if(caption.isEmpty())
         titleBarWidget->setTitle(dir);

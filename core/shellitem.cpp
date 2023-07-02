@@ -33,6 +33,7 @@ LPITEMIDLIST ShellItem::clone(LPCITEMIDLIST pidl)
 {
     if(!pidl)
         return 0;
+
     UINT size = getSize(pidl);
     LPITEMIDLIST   pidlTarget = (LPITEMIDLIST)theMemManager.alloc(size);
     if(!pidlTarget)
@@ -48,6 +49,7 @@ LPITEMIDLIST ShellItem::concat(LPCITEMIDLIST pidl1, LPCITEMIDLIST pidl2)
     UINT  cb1 = 0;
     if(pidl1)
         cb1 = getSize(pidl1) - 2 * sizeof(BYTE);
+
     UINT cb2 = getSize(pidl2);
     pidlNew = createItem(cb1 + cb2);
     if(pidlNew)
@@ -56,6 +58,7 @@ LPITEMIDLIST ShellItem::concat(LPCITEMIDLIST pidl1, LPCITEMIDLIST pidl2)
             CopyMemory(pidlNew, pidl1, cb1);
         CopyMemory(((LPBYTE)pidlNew) + cb1, pidl2, cb2);
     }
+
     return pidlNew;
 }
 
@@ -96,7 +99,11 @@ void ShellItem::exec() const
         HMENU hPopup = CreatePopupMenu();
         if(hPopup)
         {
-            hr = pcm->QueryContextMenu(hPopup, 0, 1, 0x7fff, CMF_DEFAULTONLY | CMF_EXPLORE);
+            hr = pcm->QueryContextMenu(hPopup,
+                                       0,
+                                       1,
+                                       0x7fff,
+                                       CMF_DEFAULTONLY | CMF_EXPLORE);
 
             if(SUCCEEDED(hr))
             {
@@ -104,66 +111,6 @@ void ShellItem::exec() const
 
                 idCmd = GetMenuItemID(hPopup, 0);
 
-                if(idCmd && (idCmd != (UINT)-1))
-                {
-                    CMINVOKECOMMANDINFO  cmi;
-                    cmi.cbSize = sizeof(CMINVOKECOMMANDINFO);
-                    cmi.fMask = 0;
-                    cmi.hwnd = 0;
-                    cmi.lpVerb = (LPCSTR)(INT_PTR)(idCmd - 1);
-                    cmi.lpParameters = NULL;
-                    cmi.lpDirectory = NULL;
-                    cmi.nShow = SW_SHOWNORMAL;
-                    cmi.dwHotKey = 0;
-                    cmi.hIcon = NULL;
-                    pcm->InvokeCommand(&cmi);
-                }
-            }
-            DestroyMenu(hPopup);
-        }
-    }
-    pParentFolder->Release();
-}
-
-void ShellItem::contextMenu(void* handle, int x, int y) const
-{
-    if(!pParentFolder)
-        return;
-
-    IContextMenu   *pcm;
-    pParentFolder->AddRef();
-    HRESULT  hr = pParentFolder->GetUIObjectOf(0,
-                                 1,
-                                 (LPCITEMIDLIST*)&pidlRel,
-                                 IID_IContextMenu,
-                                 0,
-                                 (LPVOID*)&pcm);
-    if(SUCCEEDED(hr))
-    {
-        HMENU hPopup = CreatePopupMenu();
-        if(hPopup)
-        {
-            hr = pcm->QueryContextMenu(hPopup, 0, 1, 0x7fff, CMF_NORMAL | CMF_EXPLORE);
-
-            if(SUCCEEDED(hr))
-            {
-                IContextMenu2  *pcm2;
-                pcm->QueryInterface(IID_IContextMenu2, (LPVOID*)&pcm2);
-                UINT  idCmd;
-
-                idCmd = TrackPopupMenu( hPopup,
-                                        TPM_LEFTALIGN | TPM_RETURNCMD | TPM_RIGHTBUTTON,
-                                        x,
-                                        y,
-                                        0,
-                                        (HWND)handle,
-                                        0);
-
-                if(pcm2)
-                {
-                    pcm2->Release();
-                    pcm2 = NULL;
-                }
                 if(idCmd && (idCmd != (UINT)-1))
                 {
                     CMINVOKECOMMANDINFO  cmi;

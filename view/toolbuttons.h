@@ -16,6 +16,7 @@ public:
     ~ToolButtons();
 
     void setButtonFont(QFont const& font);
+    void retranslateUi();
 signals:
     void viewClicked();
     void editClicked();

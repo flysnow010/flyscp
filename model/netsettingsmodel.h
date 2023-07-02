@@ -6,13 +6,15 @@
 class SSHSettingsManager;
 class NetSettingsModel : public TreeModel
 {
+    Q_OBJECT
 public:
     explicit NetSettingsModel(QObject *parent = nullptr);
 
     void setSettingsManager(SSHSettingsManager* manager);
     void refresh();
 
-    bool setData(const QModelIndex &index, const QVariant &value, int role);
+    bool setData(const QModelIndex &index,
+                 const QVariant &value, int role);
 protected:
     virtual TreeItem *createRootItem();
     virtual void setupModelData(TreeItem *parent);

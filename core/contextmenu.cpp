@@ -225,6 +225,7 @@ struct ContextMenuHelper
                 {
                      pParentFolder->GetDisplayNameOf(pidl, SHGDN_FORPARSING, &str);
                      childPath = strToString(pidl, &str);
+
                      int index = filePath.indexOf(childPath);
                      if(index >= 0)
                      {
@@ -263,6 +264,7 @@ struct ContextMenuHelper
                 while(pEnum->Next(1, &pidl, 0) == S_OK)
                 {
                     ContextMenuItem item;
+
                     psf->GetDisplayNameOf(pidl, SHGDN_NORMAL, &str);
                     item.name = strToString(pidl, &str);
                     psf->GetDisplayNameOf(pidl, SHGDN_FORPARSING, &str);
@@ -339,7 +341,7 @@ struct ContextMenuHelper
         LPITEMIDLIST pidl;
         LPSHELLFOLDER psf = NULL;
 
-        HRESULT hr = SHGetSpecialFolderLocation(0, idFolder, &pidl);//SHGetFolderLocation
+        HRESULT hr = SHGetSpecialFolderLocation(0, idFolder, &pidl);
         if (SUCCEEDED(hr))
         {
             pDesktop->BindToObject(pidl, NULL, IID_IShellFolder, (LPVOID *)&psf);
@@ -350,10 +352,10 @@ struct ContextMenuHelper
 
 private:
     ContextMenuHelper()
-        : pDesktop(0)
-        , pidlDrives(0)
-        , pDataObject(0)
-        , size(0)
+    : pDesktop(0)
+    , pidlDrives(0)
+    , pDataObject(0)
+    , size(0)
     {
         SHGetDesktopFolder(&pDesktop);
     }
@@ -378,7 +380,6 @@ private:
 
 ContextMenu::ContextMenu()
 {
-
 }
 
 ContextMenuItems ContextMenu::FileCommands()
@@ -416,13 +417,15 @@ void ContextMenu::GetShellContextItems(QString const& fileName,
                                        bool isSort)
 {
     QSettings reg(fileName, QSettings::NativeFormat);
-
     QStringList groups = reg.childGroups();
+
     if(isSort)
         std::sort(groups.begin(), groups.end(), std::greater<QString>());
+
     foreach(auto const& group, groups)
     {
         reg.beginGroup(group);
+
         QStringList keys = reg.childKeys();
         ContextMenuItem item;
         foreach(auto const& key, keys)
@@ -439,6 +442,7 @@ void ContextMenu::GetShellContextItems(QString const& fileName,
                 item.icon = GetIcon(item.iconName);
             }
         }
+
         QStringList childGroups = reg.childGroups();
         foreach(auto const& childGroup, childGroups)
         {
@@ -450,16 +454,19 @@ void ContextMenu::GetShellContextItems(QString const& fileName,
             }
             reg.endGroup();
         }
+
         if(!item.command.isEmpty() && !item.name.isEmpty())
         {
             if(items.indexOf(item) < 0)
                 items << item;
         }
+
         reg.endGroup();
     }
 }
 
-void ContextMenu::GetShellExContextItems(QString const& fileName,ContextMenuItems & items)
+void ContextMenu::GetShellExContextItems(QString const& fileName,
+                                         ContextMenuItems & items)
 {
     QSettings reg(fileName, QSettings::NativeFormat);
 
@@ -474,11 +481,8 @@ void ContextMenu::GetShellExContextItems(QString const& fileName,ContextMenuItem
             if(key == ".")
             {
                 QString value = reg.value(key).toString();
-                //qDebug() << group;
                 GetShellExContextItem(
                             QString("HKEY_CLASSES_ROOT\\CLSID\\%1\\Settings").arg(value), item);
-//                GetShellExContextMenu(QString("HKEY_CLASSES_ROOT\\CLSID\\%1\\InprocServer32").arg(value),
-//                                      value, group);
             }
         }
         if(!item.command.isEmpty() && !item.name.isEmpty())
@@ -516,7 +520,6 @@ void ContextMenu::GetShellExContextMenu(QString const& fileName, QString const& 
     {
         if(key == ".")
         {
-            QString dllName = reg.value(key).toString();
             QAxObject *mpAxObj =  new QAxObject();
             mpAxObj->setControl(glsid);
             QString doc = mpAxObj->generateDocumentation();
@@ -594,14 +597,17 @@ void ContextMenuItem::exec(QString const& fileName) const
         ContextMenuHelper::Instatnce()->execSendToCmd(QStringList() << fileName, name);
         return;
     }
+
     QString params = parameters;
     QString newFileName = QString("\"%1\"").arg(fileName);
+
     params.replace("\"%1\"", newFileName)
             .replace("\"%L\"", newFileName)
             .replace("\"%V\"", newFileName)
             .replace("%L", newFileName)
             .replace("%V", newFileName)
             .replace("%1", newFileName);
+
     ShellExecute(0, L"open", command.toStdWString().c_str(),
                  params.toStdWString().c_str(), 0, SW_SHOWNORMAL);
 }
@@ -622,14 +628,17 @@ void ContextMenuItem::exec(QStringList const& fileNames) const
     {
         newFileNames << QString("\"%1\"").arg(fileName);
     }
+
     QString newFileName = newFileNames.join(" ");
     QString params = parameters;
+
     params.replace("\"%1\"", newFileName)
             .replace("\"%L\"", newFileName)
             .replace("\"%V\"", newFileName)
             .replace("%L", newFileName)
             .replace("%V", newFileName)
             .replace("%1", newFileName);
+
     ShellExecute(0, L"open", command.toStdWString().c_str(),
                  params.toStdWString().c_str(), 0, SW_SHOWNORMAL);
 }

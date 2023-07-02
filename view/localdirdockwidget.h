@@ -25,7 +25,9 @@ public:
     ~LocalDirDockWidget();
 
     bool isRemote() const override { return false; }
-    void setDir(QString const& dir, QString const& caption = QString(), bool isNavigation  = false) override;
+    void setDir(QString const& dir,
+                QString const& caption = QString(),
+                bool isNavigation  = false) override;
     QString dir() const override;
     void cd(QString const& dir) override;
     QString home() const override;
@@ -58,6 +60,7 @@ public:
                       QString const&cursor) override;
     void setActived(bool isActived) override;
     bool isActived() const override;
+    void retranslateUi() override;
 
     QString currentFileName() const { return selectedFileName(); }
     void resizeSection(int logicalIndex, int size);
@@ -83,8 +86,11 @@ public slots:
     void newTxtFile();
 
 signals:
-    void sectionResized(int logicalIndex, int oldSize, int newSize);
-    void dirChanged(QString const& dir, bool isNavigation);
+    void sectionResized(int logicalIndex,
+                        int oldSize,
+                        int newSize);
+    void dirChanged(QString const& dir,
+                    bool isNavigation);
     void statusTextChanged(QString const& text);
     void libDirContextMenuRequested();
     void favoritesDirContextMenuRequested();
@@ -103,7 +109,8 @@ private slots:
     void normalDoubleClick(QModelIndex const& index);
     void compressDoubleClick(QModelIndex const& index);
     void directoryChanged(const QString &path);
-    void sortIndicatorChanged(int logicalIndex, Qt::SortOrder order);
+    void sortIndicatorChanged(int logicalIndex,
+                              Qt::SortOrder order);
     void customNormalContextMenu(const QPoint &pos);
     void customCompressContextMenu(const QPoint &pos);
 
@@ -126,22 +133,28 @@ private slots:
 private:
     bool isMultiSelected();
     bool isCompressFiles(QString const& suffix);
-    QStringList selectedFileNames(bool isOnlyFilename = false, bool isParent = false);
+    QStringList selectedFileNames(bool isOnlyFilename = false,
+                                  bool isParent = false);
     QStringList selectedCompressedFileNames();
     QString selectedFileName(bool isOnlyFilename = false) const;
     CompressFileInfo::Ptr selectedCompressedFileName();
 
-    void copyFilels(QStringList const& fileNames, QString const& dstFilePath);
-    void cutFiles(QStringList const& fileNames, QString const& dstFilePath);
-    void fileTransfer(FileNames const& fileNames, bool isMove);
+    void copyFilels(QStringList const& fileNames,
+                    QString const& dstFilePath);
+    void cutFiles(QStringList const& fileNames,
+                  QString const& dstFilePath);
+    void fileTransfer(FileNames const& fileNames,
+                      bool isMove);
     void extractFiles(QStringList const& fileNames,
                       QString const& targetPath,
                       bool isMove);
-    void compressFiles(QStringList const& fileNames, QString const& filePath);
+    void compressFiles(QStringList const& fileNames,
+                       QString const& filePath);
     void goToFile(QString const& fileName);
 
     QString getStatusText();
-    QString getStatusText(QItemSelectionModel* selectMode, DirModel* model);
+    QString getStatusText(QItemSelectionModel* selectMode,
+                          DirModel* model);
     void updateCurrentDir(QString const& dir,
                           QString const& caption = QString(),
                           bool isNavigation = false);

@@ -65,6 +65,7 @@ public:
                       QString const&cursor) override;
     void setActived(bool isActived) override;
     bool isActived() const override;
+    void retranslateUi() override;
 
     void start(SSHSettings const& settings);
     QString const& name() const { return name_; }
@@ -84,7 +85,8 @@ public slots:
 private slots:
     void viewClick(QModelIndex const& index);
     void customContextMenuRequested(const QPoint &pos);
-    void sortIndicatorChanged(int logicalIndex, Qt::SortOrder order);
+    void sortIndicatorChanged(int logicalIndex,
+                              Qt::SortOrder order);
     void beginDragFile(QPoint const& point);
     void dragEnter(QDragEnterEvent * event);
     void dragMove(QDragMoveEvent * event);
@@ -113,7 +115,8 @@ private:
     QStringList selectedileNames();
 
     void openDir(ssh::FileInfoPtr const& fileInfo);
-    QString download(ssh::FileInfoPtr const& fileInfo, QDir const& dstDir);
+    QString download(ssh::FileInfoPtr const& fileInfo,
+                     QDir const& dstDir);
     bool upload(QString const& fileName);
     void fileTransfer(QStringList const& srcFileNames,
                       QString const& srcFilePath,
@@ -122,7 +125,7 @@ private:
     QString getStatusText();
     void updateCurrentDir(QString const& dir,
                           QString const& caption = QString(),
-                          bool  isNavigation = false);
+                          bool isNavigation = false);
     void applyOptions();
 private:
     Ui::RemoteDockWidget *ui;

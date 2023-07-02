@@ -42,12 +42,14 @@ void LayoutOption::load(QSettings & settings)
 void DisplayOption::save(QSettings & settings)
 {
     settings.beginGroup("Dialay");
+
     settings.setValue("isShowHideAndSystemFile", isShowHideAndSystemFile);
     settings.setValue("isShowParentDirInRootDrive", isShowParentDirInRootDrive);
     settings.setValue("isDirSortByName", isDirSortByName);
     settings.setValue("isShowToolbarTooltips", isShowToolbarTooltips);
     settings.setValue("isShowDriveTooltips", isShowDriveTooltips);
     settings.setValue("isShowFilenameTooltips", isShowFilenameTooltips);
+
     settings.endGroup();
 }
 
@@ -106,38 +108,46 @@ void IconsOption::load(QSettings & settings)
 void FontInfo::save(QSettings & settings, QString const& type)
 {
     settings.beginGroup(type);
+
     settings.setValue("name", name);
     settings.setValue("size", size);
     settings.setValue("isBold", isBold);
     settings.setValue("isItalic", isItalic);
+
     settings.endGroup();
 }
 
 void FontInfo::load(QSettings & settings, QString const& type)
 {
     settings.beginGroup(type);
+
     name = settings.value("name", "SimSun").toString();
     size = settings.value("size", 9).toInt();
     isBold = settings.value("isBold", false).toBool();
     isItalic = settings.value("isItalic", false).toBool();
+
     settings.endGroup();
 }
 
 void FontOption::save(QSettings & settings)
 {
     settings.beginGroup("Font");
+
     fileList.save(settings, "fileList");
     mainWindow.save(settings, "mainWindow");
     dialog.save(settings, "dialog");
+
     settings.endGroup();
 }
 
 void FontOption::load(QSettings & settings)
 {
     settings.beginGroup("Font");
+
     fileList.load(settings, "fileList");
     mainWindow.load(settings, "mainWindow");
     dialog.load(settings, "dialog");
+
     settings.endGroup();
 }
 
@@ -220,7 +230,9 @@ void OptionsManager::load(QString const& name)
 {
     QSettings settings(QCoreApplication::applicationName(),
                        QCoreApplication::applicationVersion());
+
     settings.beginGroup(name);
+
     layoutOption_.load(settings);
     displayOption_.load(settings);
     iconOption_.load(settings);
@@ -228,6 +240,7 @@ void OptionsManager::load(QString const& name)
     colorOption_.load(settings);
     languageOption_.load(settings);
     operationOption_.load(settings);
+
     settings.endGroup();
 }
 

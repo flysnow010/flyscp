@@ -14,6 +14,8 @@
 #include "util/utils.h"
 #include "core/winshell.h"
 #include "core/sshsettings.h"
+#include "core/languagemanager.h"
+
 #include <QSplitter>
 #include <QTabWidget>
 #include <QSettings>
@@ -23,8 +25,35 @@
 #include <QScreen>
 #include <QStyleFactory>
 
+
 #include <windows.h>
 #include <dbt.h>
+
+QTranslator MainWindow::appTranslator;
+QTranslator MainWindow::sysTranslator;
+
+void MainWindow::InstallTranstoirs(bool isInited)
+{
+    if(!isInited)
+        theOptionManager.load("Options");
+
+    Language lang;
+    LanguageManager().find(theOptionManager.languageOption().language, lang);
+
+    if(isInited)
+    {
+        qApp->removeTranslator(&appTranslator);
+        qApp->removeTranslator(&sysTranslator);
+    }
+
+    if(!lang.isDefault())
+    {
+        appTranslator.load(QString("%1/%2.qm").arg(Utils::languagePath(), lang.file));
+        sysTranslator.load(QString("%1/qt_%2.qm").arg(Utils::languagePath(), lang.file));
+        qApp->installTranslator(&appTranslator);
+        qApp->installTranslator(&sysTranslator);
+    }
+}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -40,6 +69,7 @@ MainWindow::MainWindow(QWidget *parent)
     , isShowTips_(true)
 {
     ui->setupUi(this);
+
     QWidget* centerWidget = new QWidget(this);
     QVBoxLayout* layout = new QVBoxLayout();
     QSplitter *spliter = new QSplitter(this);
@@ -61,8 +91,8 @@ MainWindow::MainWindow(QWidget *parent)
        statusBar->setLeftWidth(pos);
     });
 
-    leftPanelWidget->addDirTab(leftDirView, Utils::driverIcon(), "Local of left");
-    rightPanelWidget->addDirTab(rightDirView, Utils::driverIcon(), "Local of right");
+    leftPanelWidget->addDirTab(leftDirView, Utils::driverIcon(), tr("Local of left"));
+    rightPanelWidget->addDirTab(rightDirView, Utils::driverIcon(), tr("Local of right"));
     setCentralWidget(centerWidget);
 
     createHelpMenu();
@@ -106,13 +136,15 @@ void MainWindow::createToolButtons()
     connectMenu->setIcon(QIcon(":/image/connect.png"));
     QAction* diffAction = diffMenu->menuAction();
     QAction* connectAction = connectMenu->menuAction();
-    diffAction->setToolTip("Diff folders");
-    connectAction->setToolTip("Connect");
-    diffAction->setStatusTip("Diff tow folders");
-    connectAction->setStatusTip("Connect a stfp");
+    diffAction->setToolTip(tr("Diff folders"));
+    connectAction->setToolTip(tr("Connect"));
+    diffAction->setStatusTip(tr("Diff two folders"));
+    connectAction->setStatusTip(tr("Connect a stfp"));
 
-    connect(diffAction, SIGNAL(triggered(bool)), this, SLOT(diffFolders()));
-    connect(connectAction, SIGNAL(triggered(bool)), this, SLOT(connectSftp()));
+    connect(diffAction, SIGNAL(triggered(bool)),
+            this, SLOT(diffFolders()));
+    connect(connectAction, SIGNAL(triggered(bool)),
+            this, SLOT(connectSftp()));
     ui->toolBar->addAction(diffAction);
     ui->toolBar->addSeparator();
     ui->toolBar->addAction(ui->actionControlPanel);
@@ -128,7 +160,8 @@ void MainWindow::updateConnectMenu()
     {
         SSHSettings::Ptr settings = sshSettingsMangaer_->settings(i);
         connectMenu->addAction(settings->name, this, [=](){
-                settings->passWord = Utils::getPassword(QString("Password for %1").arg(settings->name));
+                settings->passWord = Utils::getPassword(QString(tr("Password for %1"))
+                                                        .arg(settings->name));
                 if(settings->passWord.isEmpty())
                     return;
                 createRemoteDirWidget(*settings);
@@ -136,7 +169,7 @@ void MainWindow::updateConnectMenu()
     }
     if(sshSettingsMangaer_->size() > 0)
         connectMenu->addSeparator();
-    connectMenu->addAction("Settings", this, SLOT(netsettings()));
+    connectMenu->addAction(tr("Settings"), this, SLOT(netsettings()));
 }
 
 bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, long *result)
@@ -204,24 +237,29 @@ void MainWindow::createMenuConnect()
     connect(ui->actionSearch, SIGNAL(triggered(bool)), this, SLOT(searchFiles()));
     connect(ui->actionOption, SIGNAL(triggered(bool)), this, SLOT(options()));
     connect(ui->actionSettings, SIGNAL(triggered(bool)), this, SLOT(netsettings()));
+
     connect(ui->actionControlPanel, &QAction::triggered, this, [&](){
         WinShell::Exec("control");
     });
+
     connect(ui->actionCalc, &QAction::triggered, this, [&](){
         WinShell::Exec("calc");
     });
+
     connect(ui->actionRefresh, &QAction::triggered, this, [&](){
         if(leftDirView->isActived())
             leftDirView->refresh();
         else
             rightDirView->refresh();
     });
+
     connect(ui->actionPrevious, &QAction::triggered, this, [&](){
         if(leftDirView->isActived())
             leftPanelWidget->preDir();
         else
             rightPanelWidget->preDir();
     });
+
     connect(ui->actionNext, &QAction::triggered, this, [&](){
         if(leftDirView->isActived())
             leftPanelWidget->nextDir();
@@ -235,18 +273,21 @@ void MainWindow::createMenuConnect()
         ui->toolBar->setVisible(on);
         theOptionManager.setLayoutOption(option);
     });
+
     connect(ui->actionStatusBar,  &QAction::triggered, this, [&](bool on){
         LayoutOption option = theOptionManager.layoutOption();
         option.isShowStatusBar = on;
         statusBar->setVisible(on);
         theOptionManager.setLayoutOption(option);
     });
+
     connect(ui->actionCommandBar,  &QAction::triggered, this, [&](bool on){
         LayoutOption option = theOptionManager.layoutOption();
         option.isShowCommandLine = on;
         commandBar->setVisible(on);
         theOptionManager.setLayoutOption(option);
     });
+
     connect(ui->actionButtonsBar,  &QAction::triggered, this, [&](bool on){
         LayoutOption option = theOptionManager.layoutOption();
         option.isShowFunctionKeyButtons = on;
@@ -254,63 +295,105 @@ void MainWindow::createMenuConnect()
         theOptionManager.setLayoutOption(option);
     });
 
-    connect(ui->actionAbout,  &QAction::triggered, this, [](bool){ AboutDialog().exec(); });
+    connect(ui->actionAbout,  &QAction::triggered,
+            this, [](bool){ AboutDialog().exec(); });
 }
 
 void MainWindow::createViewConnect()
 {
-    connect(leftDirView, &LocalDirDockWidget::sectionResized, this, [&](int index, int, int newSize){
+    connect(leftDirView, &LocalDirDockWidget::sectionResized,
+            this, [&](int index, int, int newSize){
         rightDirView->resizeSection(index, newSize);
     });
-    connect(rightDirView, &LocalDirDockWidget::sectionResized, this, [&](int index, int, int newSize){
+
+    connect(rightDirView, &LocalDirDockWidget::sectionResized,
+            this, [&](int index, int, int newSize){
         leftDirView->resizeSection(index, newSize);
     });
-    connect(leftPanelWidget, &PanelWidget::tabCountChanged, this, [&](int count){
+
+    connect(leftPanelWidget, &PanelWidget::tabCountChanged,
+            this, [&](int count){
         rightPanelWidget->setTabBarAutoHide(count);
     });
-    connect(rightPanelWidget, &PanelWidget::tabCountChanged, this, [&](int count){
+
+    connect(rightPanelWidget, &PanelWidget::tabCountChanged,
+            this, [&](int count){
         leftPanelWidget->setTabBarAutoHide(count);
     });
-    connect(leftDirView, &LocalDirDockWidget::dirChanged, this, [&](QString const& dir, bool isNavigation){
+
+    connect(leftDirView, &LocalDirDockWidget::dirChanged,
+            this, [&](QString const& dir, bool isNavigation){
         leftPanelWidget->addDirToHistory(dir, isNavigation);
     });
-    connect(rightDirView, &LocalDirDockWidget::dirChanged, this, [&](QString const& dir, bool isNavigation){
+
+    connect(rightDirView, &LocalDirDockWidget::dirChanged,
+            this, [&](QString const& dir, bool isNavigation){
         rightPanelWidget->addDirToHistory(dir, isNavigation);
     });
 
-    connect(leftDirView, &LocalDirDockWidget::libDirContextMenuRequested, this, [&](){
+    connect(leftDirView, &LocalDirDockWidget::libDirContextMenuRequested,
+            this, [&]()
+    {
         leftPanelWidget->libDirContextMenu();
     });
-    connect(leftDirView, &LocalDirDockWidget::favoritesDirContextMenuRequested, this, [&](){
+
+    connect(leftDirView, &LocalDirDockWidget::favoritesDirContextMenuRequested,
+            this, [&]()
+    {
         leftPanelWidget->favoritesDirContextMenu();
     });
-    connect(leftDirView, &LocalDirDockWidget::historyDirContextMenuRequested, this, [&](){
+
+    connect(leftDirView, &LocalDirDockWidget::historyDirContextMenuRequested,
+            this, [&]()
+    {
         leftPanelWidget->historyDirContextMenu();
     });
-    connect(leftDirView, &LocalDirDockWidget::copyRequested, this, [&](){
+
+    connect(leftDirView, &LocalDirDockWidget::copyRequested,
+            this, [&]()
+    {
         leftDirView->copyFiles(rightDirView->dir());
     });
-    connect(leftDirView, &LocalDirDockWidget::moveRequested, this, [&](){
+
+    connect(leftDirView, &LocalDirDockWidget::moveRequested,
+            this, [&]()
+    {
         leftDirView->moveFiles(rightDirView->dir());
     });
 
-    connect(rightDirView, &LocalDirDockWidget::libDirContextMenuRequested, this, [&](){
+    connect(rightDirView, &LocalDirDockWidget::libDirContextMenuRequested,
+            this, [&]()
+    {
         rightPanelWidget->libDirContextMenu();
     });
-    connect(rightDirView, &LocalDirDockWidget::favoritesDirContextMenuRequested, this, [&](){
+
+    connect(rightDirView, &LocalDirDockWidget::favoritesDirContextMenuRequested,
+            this, [&]()
+    {
         rightPanelWidget->favoritesDirContextMenu();
     });
-    connect(rightDirView, &LocalDirDockWidget::historyDirContextMenuRequested, this, [&](){
+
+    connect(rightDirView, &LocalDirDockWidget::historyDirContextMenuRequested,
+            this, [&]()
+    {
         rightPanelWidget->historyDirContextMenu();
     });
-    connect(rightDirView, &LocalDirDockWidget::copyRequested, this, [&](){
+
+    connect(rightDirView, &LocalDirDockWidget::copyRequested,
+            this, [&]()
+    {
         rightDirView->copyFiles(leftDirView->dir());
     });
-    connect(rightDirView, &LocalDirDockWidget::moveRequested, this, [&](){
+
+    connect(rightDirView, &LocalDirDockWidget::moveRequested,
+            this, [&]()
+    {
         rightDirView->moveFiles(leftDirView->dir());
     });
 
-    connect(rightDirView, &LocalDirDockWidget::actived, this, [&](){
+    connect(rightDirView, &LocalDirDockWidget::actived,
+            this, [&]()
+    {
         leftDirView->setActived(false);
         commandBar->setDir(rightDirView->dir());
     });
@@ -318,27 +401,47 @@ void MainWindow::createViewConnect()
         rightDirView->setActived(false);
         commandBar->setDir(leftDirView->dir());
     });
-    connect(leftDirView, &LocalDirDockWidget::statusTextChanged, this, [&](QString const& text){
+
+    connect(leftDirView, &LocalDirDockWidget::statusTextChanged,
+            this, [&](QString const& text)
+    {
         statusBar->setLeftStatusText(text);
     });
-    connect(rightDirView, &LocalDirDockWidget::statusTextChanged, this, [&](QString const& text){
+    connect(rightDirView, &LocalDirDockWidget::statusTextChanged,
+            this, [&](QString const& text)
+    {
         statusBar->setRightStatusText(text);
     });
-    connect(leftDirView, &LocalDirDockWidget::dirChanged, this, [&](QString const& dir, bool){
+
+    connect(leftDirView, &LocalDirDockWidget::dirChanged,
+            this, [&](QString const& dir, bool)
+    {
         commandBar->setDir(dir);
     });
-    connect(rightDirView, &LocalDirDockWidget::dirChanged, this, [&](QString const& dir, bool){
+
+    connect(rightDirView, &LocalDirDockWidget::dirChanged,
+            this, [&](QString const& dir, bool)
+    {
         commandBar->setDir(dir);
     });
-    connect(leftDirView, &LocalDirDockWidget::compressFileExtract, this, [&](QStringList const& fileNames){
+
+    connect(leftDirView, &LocalDirDockWidget::compressFileExtract,
+            this, [&](QStringList const& fileNames)
+    {
         rightDirView->extractFiles(fileNames, leftDirView->dir());
         rightDirView->refresh();
     });
-    connect(rightDirView, &LocalDirDockWidget::compressFileExtract, this, [&](QStringList const& fileNames){
+
+    connect(rightDirView, &LocalDirDockWidget::compressFileExtract,
+            this, [&](QStringList const& fileNames)
+    {
         leftDirView->extractFiles(fileNames, rightDirView->dir());
         leftDirView->refresh();
     });
-    connect(commandBar, &CommandBar::commanded, this, [&](QString const& commnad){
+
+    connect(commandBar, &CommandBar::commanded,
+            this, [&](QString const& commnad)
+    {
         if(leftDirView->isActived())
             leftDirView->execCommand(commnad);
         else
@@ -365,7 +468,8 @@ void MainWindow::save()
     rightDirView->saveSettings("RightDirView");
     leftPanelWidget->saveSettings("LeftPanel");
     rightPanelWidget->saveSettings("RightPane");
-    sshSettingsMangaer_->save(QString("%1/settings.json").arg(Utils::sshSettingsPath()));
+    sshSettingsMangaer_->save(QString("%1/settings.json")
+                              .arg(Utils::sshSettingsPath()));
     theOptionManager.save("Options");
 }
 
@@ -378,7 +482,8 @@ void MainWindow::load()
     rightPanelWidget->loadSettings("RightPane");
     leftPanelWidget->updateTexts(leftDirView);
     rightPanelWidget->updateTexts(rightDirView);
-    sshSettingsMangaer_->load(QString("%1/settings.json").arg(Utils::sshSettingsPath()));
+    sshSettingsMangaer_->load(QString("%1/settings.json")
+                              .arg(Utils::sshSettingsPath()));
     if(leftDirViewIsActived)
     {
         emit leftDirView->actived();
@@ -395,7 +500,6 @@ void MainWindow::load()
     updateIcons(theOptionManager.iconOption());
     updateFonts(theOptionManager.fontOption());
     updateColors(theOptionManager.colorOption());
-    updateLang(theOptionManager.languageOption());
     updateOperation(theOptionManager.operationOption());
 
     leftPanelWidget->refresh();
@@ -579,7 +683,8 @@ void MainWindow::connectSftp()
         SSHSettings::Ptr settings = dialog.sshSettings();
         sshSettingsMangaer_->addSettings(settings);
         updateConnectMenu();
-        settings->passWord = Utils::getPassword(QString("Password for %1").arg(settings->name));
+        settings->passWord = Utils::getPassword(QString(tr("Password for %1"))
+                                                .arg(settings->name));
         if(settings->passWord.isEmpty())
             return;
         createRemoteDirWidget(*settings);
@@ -589,34 +694,60 @@ void MainWindow::connectSftp()
 void MainWindow::options()
 {
     OptionsDialog dialog;
-    connect(&dialog, &OptionsDialog::layoutOptionChanged, this, [=](LayoutOption const& option){
+    connect(&dialog, &OptionsDialog::layoutOptionChanged,
+            this, [=](LayoutOption const& option)
+    {
         updateLayout(option);
         theOptionManager.setLayoutOption(option);
     });
-    connect(&dialog, &OptionsDialog::displayOptionChanged, this, [=](DisplayOption const& option){
+
+    connect(&dialog, &OptionsDialog::displayOptionChanged,
+            this, [=](DisplayOption const& option)
+    {
         updateDisplay(option);
         theOptionManager.setDialayOption(option);
     });
-    connect(&dialog, &OptionsDialog::iconsOptionChanged, this, [=](IconsOption const& option){
+
+    connect(&dialog, &OptionsDialog::iconsOptionChanged,
+            this, [=](IconsOption const& option)
+    {
         updateIcons(option);
         theOptionManager.setIconsOption(option);
     });
-    connect(&dialog, &OptionsDialog::fontOptionChanged, this, [=](FontOption const& option){
+
+    connect(&dialog, &OptionsDialog::fontOptionChanged,
+            this, [=](FontOption const& option)
+    {
         updateFonts(option);
         theOptionManager.setFontOption(option);
     });
-    connect(&dialog, &OptionsDialog::colorOptionChanged, this, [=](ColorOption const& option){
+
+    connect(&dialog, &OptionsDialog::colorOptionChanged,
+            this, [=](ColorOption const& option)
+    {
         updateColors(option);
         theOptionManager.setColorOption(option);
     });
-    connect(&dialog, &OptionsDialog::langOptionChanged, this, [=](LanguageOption const& option){
-        updateLang(option);
+
+    connect(&dialog, &OptionsDialog::langOptionChanged,
+            this, [=](LanguageOption const& option)
+    {
         theOptionManager.setLanguageOption(option);
+        InstallTranstoirs(true);
+
+        ui->retranslateUi(this);
+        toolButtons->retranslateUi();
+        leftPanelWidget->retranslateUi();
+        rightPanelWidget->retranslateUi();
     });
-    connect(&dialog, &OptionsDialog::operationOptionChanged, this, [=](OperationOption const& option){
+
+    connect(&dialog, &OptionsDialog::operationOptionChanged,
+            this, [=](OperationOption const& option)
+    {
         updateOperation(option);
         theOptionManager.setOperationOption(option);
     });
+
     if(dialog.exec() == QDialog::Accepted)
         dialog.updateUIToOption();
 }
@@ -631,7 +762,8 @@ void MainWindow::netsettings()
         SSHSettings::Ptr settings = sshSettingsMangaer_->settings(index);
         if(settings)
         {
-            settings->passWord = Utils::getPassword(QString("Password for %1").arg(settings->name));
+            settings->passWord = Utils::getPassword(QString(tr("Password for %1"))
+                                                    .arg(settings->name));
             if(settings->passWord.isEmpty())
                 return;
             createRemoteDirWidget(*settings);
@@ -647,28 +779,44 @@ void MainWindow::createRemoteDirWidget(SSHSettings const& settings)
 
     if(rightPanelWidget->tabCount() <= leftPanelWidget->tabCount())
     {
-        rightPanelWidget->addDirTab(remoteDockWidget, Utils::networkIcon(), remoteDockWidget->name());
-        connect(remoteDockWidget, &RemoteDockWidget::closeRequest, rightPanelWidget, &PanelWidget::closeTab);
-        connect(remoteDockWidget, &RemoteDockWidget::statusTextChanged, this, [&](QString const& text){
+        rightPanelWidget->addDirTab(remoteDockWidget,
+                                    Utils::networkIcon(),
+                                    remoteDockWidget->name());
+        connect(remoteDockWidget, &RemoteDockWidget::closeRequest,
+                rightPanelWidget, &PanelWidget::closeTab);
+
+        connect(remoteDockWidget, &RemoteDockWidget::statusTextChanged,
+                this, [&](QString const& text)
+        {
             statusBar->setRightStatusText(text);
         });
+
         connect(leftDirView, &LocalDirDockWidget::remoteDownload, this, [=](
                 QString const& remoteSrc, QStringList const& fileNames,
-                QString const& targetFilePath) {
+                QString const& targetFilePath)
+        {
             remoteDockWidget->downloadFiles(remoteSrc, fileNames, targetFilePath);
             leftDirView->refresh();
         });
     }
     else
     {
-        leftPanelWidget->addDirTab(remoteDockWidget, Utils::networkIcon(), remoteDockWidget->name());
-        connect(remoteDockWidget, &RemoteDockWidget::closeRequest, leftPanelWidget, &PanelWidget::closeTab);
-        connect(remoteDockWidget, &RemoteDockWidget::statusTextChanged, this, [&](QString const& text){
+        leftPanelWidget->addDirTab(remoteDockWidget,
+                                   Utils::networkIcon(),
+                                   remoteDockWidget->name());
+        connect(remoteDockWidget, &RemoteDockWidget::closeRequest,
+                leftPanelWidget, &PanelWidget::closeTab);
+
+        connect(remoteDockWidget, &RemoteDockWidget::statusTextChanged,
+                this, [&](QString const& text)
+        {
             statusBar->setLeftStatusText(text);
         });
+
         connect(rightDirView, &LocalDirDockWidget::remoteDownload, this, [=](
                 QString const& remoteSrc, QStringList const& fileNames,
-                QString const& targetFilePath) {
+                QString const& targetFilePath)
+        {
             remoteDockWidget->downloadFiles(remoteSrc, fileNames, targetFilePath);
             rightDirView->refresh();
         });
@@ -699,6 +847,7 @@ void MainWindow::updateLayout(LayoutOption const& o)
     rightPanelWidget->showDeskNavigationButton(o.isShowDeskNavigationButton);
     rightPanelWidget->showFavoriteButton(o.isShowFavoriteButton);
     rightPanelWidget->showHistoryButton(o.isShowHistoryButton);
+
     QApplication::setStyle(QStyleFactory::create(o.showStyle));
 
 }
@@ -734,7 +883,9 @@ void MainWindow::updateIcons(IconsOption const& o, bool isRefresh)
     leftPanelWidget->showIconForFyleSystem(o.isShowIconForFilesystem);
     leftPanelWidget->showIconForVirtualFolder(o.isShowOverlayIcon);
     leftPanelWidget->fileIconSize(o.fileIconSize);
+
     ui->toolBar->setIconSize(QSize(o.toolbarIconSize, o.toolbarIconSize));
+
     rightPanelWidget->showAllIconWithExeAndLink(o.isShowAllIconIncludeExeAndLink);
     rightPanelWidget->showAllIcon(o.isShowAllIcon);
     rightPanelWidget->showStandardIcon(o.isShowStandardIcon);
@@ -753,35 +904,36 @@ void MainWindow::updateIcons(IconsOption const& o, bool isRefresh)
 void MainWindow::updateFonts(FontOption const& o)
 {
     QFont font = o.mainWindow.font();
+
     toolButtons->setButtonFont(font);
     commandBar->setDirFont(font);
+
     leftPanelWidget->setDriveFont(font);
-    rightPanelWidget->setDriveFont(font);
     leftPanelWidget->fileFont(o.fileList.font());
+    rightPanelWidget->setDriveFont(font);
     rightPanelWidget->fileFont(o.fileList.font());
 }
 
 void MainWindow::updateColors(ColorOption const& o, bool isRefresh)
 {
     leftPanelWidget->setItemColor(o.fontColor,
-                                  o.background1Color, o.background2Color);
+                                  o.background1Color,
+                                  o.background2Color);
     leftPanelWidget->setItemSelectedColor(o.background1Color,
-                                  o.markColor, o.cursorColor);
+                                          o.markColor,
+                                          o.cursorColor);
 
-    rightPanelWidget->setItemColor(o.fontColor,
-                                  o.background1Color, o.background2Color);
+    rightPanelWidget->setItemColor(o.fontColor,                                
+                                   o.background1Color,
+                                   o.background2Color);
     rightPanelWidget->setItemSelectedColor(o.background1Color,
-                                   o.markColor, o.cursorColor);
+                                           o.markColor,
+                                           o.cursorColor);
     if(isRefresh)
     {
         leftPanelWidget->refresh();
         rightPanelWidget->refresh();
     }
-}
-
-void MainWindow::updateLang(LanguageOption const& option)
-{
-    Q_UNUSED(option)
 }
 
 void MainWindow::updateOperation(OperationOption const& o)

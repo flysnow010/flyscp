@@ -21,7 +21,9 @@ public:
     explicit PanelWidget(QWidget *parent = nullptr);
     ~PanelWidget();
 
-    void addDirTab(QWidget* widget, QIcon const& icon, QString const& text);
+    void addDirTab(QWidget* widget,
+                   QIcon const& icon,
+                   QString const& text);
     void updateTexts(QWidget* widget);
 
     void saveSettings(QString const& name);
@@ -62,17 +64,20 @@ public:
                       QString const&cursor);
     void setGoToRoot(bool isOn) { isGotRoot_ = isOn; }
     void refresh();
+    void retranslateUi();
 signals:
     void tabCountChanged(int count);
 public slots:
     void setTabBarAutoHide(int count);
-    void addDirToHistory(QString const& dir, bool isNavigation);
+    void addDirToHistory(QString const& dir,
+                         bool isNavigation);
     void libDirContextMenu();
     void favoritesDirContextMenu();
     void historyDirContextMenu();
     void closeTab(QWidget *w);
 protected:
-    bool eventFilter(QObject *obj, QEvent *event) override;
+    bool eventFilter(QObject *obj,
+                     QEvent *event) override;
 private slots:
     void buttonClicked(QAbstractButton* button);
     void backToHome();

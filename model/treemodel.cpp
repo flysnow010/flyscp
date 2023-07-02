@@ -34,7 +34,8 @@ int TreeModel::columnCount(const QModelIndex &parent) const
         return rootItem->columnCount();
 }
 
-QVariant TreeModel::data(const QModelIndex &index, int role) const
+QVariant TreeModel::data(const QModelIndex &index,
+                         int role) const
 {
     if (!index.isValid())
         return QVariant();
@@ -70,7 +71,8 @@ Qt::ItemFlags TreeModel::flags(const QModelIndex &index) const
         return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable;
 }
 
-QVariant TreeModel::headerData(int section, Qt::Orientation orientation,
+QVariant TreeModel::headerData(int section,
+                               Qt::Orientation orientation,
                                int role) const
 {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
@@ -85,8 +87,9 @@ TreeItem* TreeModel::index(QModelIndex const& index) const
     return static_cast<TreeItem*>(index.internalPointer());
 }
 
-QModelIndex TreeModel::index(int row, int column, const QModelIndex &parent)
-            const
+QModelIndex TreeModel::index(int row,
+                             int column,
+                             const QModelIndex &parent) const
 {
     if (!hasIndex(row, column, parent))
         return QModelIndex();

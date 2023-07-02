@@ -56,15 +56,18 @@ public:
     static void Open(QString const& fileName);
     static void OpenWith(QString const& fileName);
     static void OpenByExplorer(QString const& fileName);
-    static void Exec(QString const& appName, QStringList const& params);
-    static void Exec(QString const& appName, QString const& params = QString());
+    static void Exec(QString const& appName,
+                     QStringList const& params);
+    static void Exec(QString const& appName,
+                     QString const& params = QString());
     static bool CreateShortcut(QString const& linkFilePath,
                                QString const& targetFilePath);
     static QList<WinLibDir> winLibDirs();
     static ShellMenuItems computerShellItems();
     static ShellMenuItems shellMenuItems();
     static void shellSubMenuItems(ShellMenuItem const& item,
-                                  ShellMenuItems & menuItems, bool isOnlyDir = true);
+                                  ShellMenuItems & menuItems,
+                                  bool isOnlyDir = true);
 };
 
 #endif // WINSHELL_H

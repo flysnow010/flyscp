@@ -1,4 +1,5 @@
 #include "colortoolbutton.h"
+
 #include <QMenu>
 #include <QPainter>
 #include <QListWidget>
