@@ -8,6 +8,9 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     QApplication::setApplicationName("FlyScp");
     QApplication::setApplicationVersion("V1.0.0");
+    if(!MainWindow::IsRunSingle())
+        return 1;
+
     MainWindow::InstallTranstoirs();
     MainWindow w;
     w.show();

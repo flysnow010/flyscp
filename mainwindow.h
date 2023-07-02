@@ -22,6 +22,7 @@ class ColorOption;
 class LanguageOption;
 class OperationOption;
 class QTranslator;
+class QLockFile;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -31,6 +32,7 @@ public:
     ~MainWindow();
 
     static void InstallTranstoirs(bool isInited = false);
+    static bool IsRunSingle();
 protected:
     bool nativeEvent(const QByteArray &eventType,
                      void *message,

@@ -43,6 +43,11 @@ QString Utils::languagePath()
     return QString("%1/languages").arg(QApplication::applicationDirPath());
 }
 
+QString Utils::lockFileName()
+{
+    return QString("%1/FlyScp.lock").arg(currentPath());
+}
+
 QString Utils::compressApp()
 {
     return QString("%1/7z.exe").arg(QApplication::applicationDirPath());

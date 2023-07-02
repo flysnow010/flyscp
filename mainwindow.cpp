@@ -24,6 +24,7 @@
 #include <QDebug>
 #include <QScreen>
 #include <QStyleFactory>
+#include <QLockFile>
 
 
 #include <windows.h>
@@ -34,9 +35,6 @@ QTranslator MainWindow::sysTranslator;
 
 void MainWindow::InstallTranstoirs(bool isInited)
 {
-    if(!isInited)
-        theOptionManager.load("Options");
-
     Language lang;
     LanguageManager().find(theOptionManager.languageOption().language, lang);
 
@@ -53,6 +51,21 @@ void MainWindow::InstallTranstoirs(bool isInited)
         qApp->installTranslator(&appTranslator);
         qApp->installTranslator(&sysTranslator);
     }
+}
+
+bool MainWindow::IsRunSingle()
+{
+    static QLockFile fileLock(Utils::lockFileName());
+    theOptionManager.load("Options");
+    if(theOptionManager.operationOption().isOnlyOneMainProgramRun)
+    {
+        if(!fileLock.tryLock(1000))
+        {
+            Utils::warring(tr("Only one FlyScp can run simultaneously!"));
+            return false;
+        }
+    }
+    return true;
 }
 
 MainWindow::MainWindow(QWidget *parent)

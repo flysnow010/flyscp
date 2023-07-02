@@ -12,6 +12,7 @@ public:
     static QDir tempDir();
     static QString sshSettingsPath();
     static QString languagePath();
+    static QString lockFileName();
     static QString compressApp();
     static QString viewApp();
     static QString editApp();
