@@ -862,7 +862,6 @@ void MainWindow::updateLayout(LayoutOption const& o)
     rightPanelWidget->showHistoryButton(o.isShowHistoryButton);
 
     QApplication::setStyle(QStyleFactory::create(o.showStyle));
-
 }
 
 void MainWindow::updateDisplay(DisplayOption const& o, bool isRefresh)
