@@ -483,7 +483,13 @@ void LocalDirDockWidget::compressDoubleClick(QModelIndex const& index)
     }
     else
     {
-        ;
+        QDir targetDir = Utils::tempDir();
+        if(compressModel_->extract(targetDir.path(), QStringList() << fileInfo->filePath(), false))
+        {
+            QString fileName = targetDir.filePath(fileInfo->fileName());
+            FileNames::MakeFileNameAsParams(fileName);
+            WinShell::Open(fileName);
+        }
     }
 }
 
