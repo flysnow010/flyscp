@@ -629,7 +629,7 @@
     </message>
     <message>
         <location filename="mainwindow.ui" line="122"/>
-        <location filename="mainwindow.cpp" line="152"/>
+        <location filename="mainwindow.cpp" line="153"/>
         <source>Connect</source>
         <translation type="unfinished">连接</translation>
     </message>
@@ -690,12 +690,14 @@
     </message>
     <message>
         <location filename="mainwindow.ui" line="200"/>
-        <source>Tool bar</source>
+        <source>Tool Bar</source>
+        <oldsource>Tool bar</oldsource>
         <translation type="unfinished">工具条</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="211"/>
-        <source>Status bar</source>
+        <source>Status Bar</source>
+        <oldsource>Status bar</oldsource>
         <translation type="unfinished">状态条</translation>
     </message>
     <message>
@@ -740,7 +742,8 @@
     </message>
     <message>
         <location filename="mainwindow.ui" line="248"/>
-        <source>Select all</source>
+        <source>Select All</source>
+        <oldsource>Select all</oldsource>
         <translation type="unfinished">全部选定</translation>
     </message>
     <message>
@@ -816,7 +819,8 @@
     </message>
     <message>
         <location filename="mainwindow.ui" line="340"/>
-        <source>Control panel</source>
+        <source>Control Panel</source>
+        <oldsource>Control panel</oldsource>
         <translation type="unfinished">控制面板</translation>
     </message>
     <message>
@@ -841,12 +845,14 @@
     </message>
     <message>
         <location filename="mainwindow.ui" line="371"/>
-        <source>Command bar</source>
+        <source>Command Bar</source>
+        <oldsource>Command bar</oldsource>
         <translation type="unfinished">命令条</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="382"/>
-        <source>Buttons bar</source>
+        <source>Buttons Bar</source>
+        <oldsource>Buttons bar</oldsource>
         <translation type="unfinished">按钮条</translation>
     </message>
     <message>
@@ -855,45 +861,45 @@
         <translation type="unfinished">网络配置...</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="63"/>
+        <location filename="mainwindow.cpp" line="64"/>
         <source>Only one FlyScp can run simultaneously!</source>
         <oldsource>Only one Flyscp can run simultaneously</oldsource>
         <translation type="unfinished">同时只能有一个FlyScp运行!</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="106"/>
+        <location filename="mainwindow.cpp" line="107"/>
         <source>Local of left</source>
         <translation type="unfinished">本地文件(左)</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="107"/>
+        <location filename="mainwindow.cpp" line="108"/>
         <source>Local of right</source>
         <translation type="unfinished">本地文件(右)</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="151"/>
+        <location filename="mainwindow.cpp" line="152"/>
         <source>Diff folders</source>
         <translation type="unfinished">比较文件夹</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="153"/>
+        <location filename="mainwindow.cpp" line="154"/>
         <source>Diff two folders</source>
         <translation type="unfinished">比较两个文件夹</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="154"/>
+        <location filename="mainwindow.cpp" line="155"/>
         <source>Connect a stfp</source>
         <translation type="unfinished">连接SFTP</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="175"/>
-        <location filename="mainwindow.cpp" line="698"/>
-        <location filename="mainwindow.cpp" line="777"/>
+        <location filename="mainwindow.cpp" line="176"/>
+        <location filename="mainwindow.cpp" line="699"/>
+        <location filename="mainwindow.cpp" line="778"/>
         <source>Password for %1</source>
         <translation type="unfinished">%1的密码</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="184"/>
+        <location filename="mainwindow.cpp" line="185"/>
         <source>Settings</source>
         <translation type="unfinished">网络配置</translation>
     </message>
@@ -1351,17 +1357,20 @@ abcdefghijklmnopqrstuvwxyz</source>
     </message>
     <message>
         <location filename="view/panelwidget.cpp" line="249"/>
-        <source>Remove current folder</source>
+        <source>Remove Current Folder</source>
+        <oldsource>Remove current folder</oldsource>
         <translation type="unfinished">移除当前文件夹</translation>
     </message>
     <message>
         <location filename="view/panelwidget.cpp" line="253"/>
-        <source>Add current folder</source>
+        <source>Add Current Folder</source>
+        <oldsource>Add current folder</oldsource>
         <translation type="unfinished">增加当前文件夹</translation>
     </message>
     <message>
         <location filename="view/panelwidget.cpp" line="254"/>
-        <source>Caption of new menu</source>
+        <source>Caption of New Menu</source>
+        <oldsource>Caption of new menu</oldsource>
         <translation type="unfinished">新菜单标题</translation>
     </message>
     <message>

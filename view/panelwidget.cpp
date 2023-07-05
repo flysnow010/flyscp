@@ -246,12 +246,12 @@ void PanelWidget::favoritesDirContextMenu()
     item.fileName = currentFileName;
 
     if(isCurrent)
-        menu.addAction(tr("Remove current folder"), this, [&](bool){
+        menu.addAction(tr("Remove Current Folder"), this, [&](bool){
             dirFavorite->removeItem(item);
         });
     else
-        menu.addAction(tr("Add current folder"), this, [&](bool){
-            QString caption = Utils::getText(tr("Caption of new menu"), item.caption);
+        menu.addAction(tr("Add Current Folder"), this, [&](bool){
+            QString caption = Utils::getText(tr("Caption of New Menu"), item.caption);
             if(!caption.isEmpty())
                 item.caption = caption;
             dirFavorite->addItem(item);

@@ -197,7 +197,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Tool bar</string>
+    <string>Tool Bar</string>
    </property>
   </action>
   <action name="actionStatusBar">
@@ -208,7 +208,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Status bar</string>
+    <string>Status Bar</string>
    </property>
   </action>
   <action name="actionFileFolder">
@@ -245,7 +245,7 @@
   </action>
   <action name="actionSelectAll">
    <property name="text">
-    <string>Select all</string>
+    <string>Select All</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+A</string>
@@ -337,7 +337,7 @@
      <normaloff>:/image/control.png</normaloff>:/image/control.png</iconset>
    </property>
    <property name="text">
-    <string>Control panel</string>
+    <string>Control Panel</string>
    </property>
    <property name="statusTip">
     <string>Run control panel</string>
@@ -368,7 +368,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Command bar</string>
+    <string>Command Bar</string>
    </property>
   </action>
   <action name="actionButtonsBar">
@@ -379,7 +379,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Buttons bar</string>
+    <string>Buttons Bar</string>
    </property>
   </action>
   <action name="actionSettings">
