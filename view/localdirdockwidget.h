@@ -22,7 +22,7 @@ class LocalDirDockWidget : public QDockWidget, public BaseDir
     Q_OBJECT
 
 public:
-    enum ViewMode { Normal, Compress };
+    enum ShowMode { Normal, Compress };
     explicit LocalDirDockWidget(QWidget *parent = nullptr);
     ~LocalDirDockWidget();
 
@@ -163,6 +163,8 @@ private:
     void updateCurrentDir(QString const& dir,
                           QString const& caption = QString(),
                           bool isNavigation = false);
+    ShowMode showMode() const { return showMode_ ; }
+    void setShowMode(ShowMode const& mode);
 private:
     Ui::LocalDirDockWidget *ui;
     LocalDirModel* model_;
@@ -172,7 +174,7 @@ private:
     DirFavorite* dirFavorite;
     DirHistory* dirHistory;
     QFileSystemWatcher* fileSystemWatcher;
-    ViewMode viewMode_ = Normal;
+    ShowMode showMode_ = Normal;
 };
 
 #endif // LOCALDIRDOCKWIDGET_H

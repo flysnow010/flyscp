@@ -119,12 +119,11 @@ void LocalDirDockWidget::setDir(QString const& dir,
                                 bool isNavigation)
 {
     QDir dirInfo(dir);
-    if(ui->tvNormal->isVisible())
+    if(showMode() == Normal)
     {
         if(!dirInfo.exists())
         {
-            ui->tvNormal->hide();
-            ui->tvCompress->show();
+            setShowMode(Compress);
             compressModel_->setDir(dir);
         }
         else
@@ -136,14 +135,13 @@ void LocalDirDockWidget::setDir(QString const& dir,
         updateCurrentDir(dir, caption, isNavigation);
 
     }
-    else if(ui->tvCompress->isVisible())
+    else if(showMode() == Compress)
     {
         if(!dirInfo.exists())
             compressModel_->setDir(dir);
         else
         {
-            ui->tvCompress->hide();
-            ui->tvNormal->show();
+            setShowMode(Normal);
             fileSystemWatcher->removePath(model_->dir());
             model_->setDir(dir);
             fileSystemWatcher->addPath(dir);
@@ -524,8 +522,7 @@ void LocalDirDockWidget::normalDoubleClick(QModelIndex const& index)
         else
         {
             compressModel_->setCompressFileName(fileInfo.filePath());
-            ui->tvCompress->show();
-            ui->tvNormal->hide();
+            setShowMode(Compress);
             updateCurrentDir(compressModel_->dir());
         }
     }
@@ -551,8 +548,7 @@ void LocalDirDockWidget::compressDoubleClick(QModelIndex const& index)
             updateCurrentDir(compressModel_->dir());
         else
         {
-            ui->tvCompress->hide();
-            ui->tvNormal->show();
+            setShowMode(Normal);
             updateCurrentDir(model_->dir());
         }
     }
@@ -848,8 +844,7 @@ void LocalDirDockWidget::customCompressContextMenu(const QPoint &pos)
                     updateCurrentDir(compressModel_->dir());
                 else
                 {
-                    ui->tvCompress->hide();
-                    ui->tvNormal->show();
+                    setShowMode(Normal);
                     updateCurrentDir(model_->dir());
                 }
             });
@@ -1253,7 +1248,7 @@ void LocalDirDockWidget::editFile()
 void LocalDirDockWidget::copyFiles(QString const& dstFilePath)
 {
     QStringList fileNames;
-    if(ui->tvCompress->isVisible())
+    if(showMode() == Compress)
         fileNames = selectedCompressedFileNames();
     else
         fileNames = selectedFileNames(true);
@@ -1282,7 +1277,7 @@ void LocalDirDockWidget::copyFiles(QString const& dstFilePath)
     dialog.setPath(dstFilePath);
     if(dialog.exec() == QDialog::Accepted)
     {
-        if(ui->tvCompress->isVisible())
+        if(showMode() == Compress)
             extractFiles(fileNames, dialog.path(), false);
         else
             copyFilels(selectedFileNames(), dialog.path());
@@ -1292,7 +1287,7 @@ void LocalDirDockWidget::copyFiles(QString const& dstFilePath)
 void LocalDirDockWidget::moveFiles(QString const& dstFilePath)
 {
     QStringList fileNames;
-    if(ui->tvCompress->isVisible())
+    if(showMode() == Compress)
         fileNames = selectedCompressedFileNames();
     else
         fileNames = selectedFileNames(true);
@@ -1320,13 +1315,12 @@ void LocalDirDockWidget::moveFiles(QString const& dstFilePath)
     dialog.setPath(dstFilePath);
     if(dialog.exec() == QDialog::Accepted)
     {
-        if(ui->tvCompress->isVisible())
+        if(showMode() == Compress)
         {
             extractFiles(fileNames, dialog.path(), true);
             compressModel_->refresh();
         }
-        else
-        if(ui->tvNormal->isVisible())
+        else if(showMode() == Normal)
         {
             cutFiles(selectedFileNames(), dialog.path());
             model_->refresh();
@@ -1336,20 +1330,31 @@ void LocalDirDockWidget::moveFiles(QString const& dstFilePath)
 
 void LocalDirDockWidget::refresh()
 {
-    if(ui->tvNormal->isVisible())
+    if(showMode() == Normal)
         model_->refresh();
-    else if(ui->tvCompress->isVisible())
+    else if(showMode() == Compress)
         compressModel_->refresh();
 }
 
 void LocalDirDockWidget::selectAll()
 {
-    ui->tvNormal->selectAll();
-    if(model_->isParent(0))
+    if(showMode() == Normal)
     {
-        QModelIndexList indexList = ui->tvNormal->selectionModel()->selectedColumns(0);
+        ui->tvNormal->selectAll();
+        if(model_->isParent(0))
+        {
+            QModelIndexList indexList = ui->tvNormal->selectionModel()->selectedColumns(0);
+            foreach(auto const& index, indexList)
+                ui->tvNormal->selectionModel()->select(index,
+                                                       QItemSelectionModel::Deselect);
+        }
+    }
+    else if(showMode() == Compress)
+    {
+        ui->tvCompress->selectAll();
+        QModelIndexList indexList = ui->tvCompress->selectionModel()->selectedColumns(0);
         foreach(auto const& index, indexList)
-            ui->tvNormal->selectionModel()->select(index,
+            ui->tvCompress->selectionModel()->select(index,
                                                    QItemSelectionModel::Deselect);
     }
 }
@@ -1791,4 +1796,11 @@ void LocalDirDockWidget::updateCurrentDir(QString const& dir,
         dirHistory->add(dir);
     emit dirChanged(dir);
     emit statusTextChanged(getStatusText());
+}
+
+void LocalDirDockWidget::setShowMode(ShowMode const& mode)
+{
+    showMode_ = mode;
+    ui->tvNormal->setVisible(showMode_ == Normal);
+    ui->tvCompress->setVisible(showMode_ == Compress);
 }
