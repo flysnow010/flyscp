@@ -19,7 +19,10 @@ CommandBar::~CommandBar()
 
 void CommandBar::setDir(QString const& dir)
 {
-    ui->labelDir->setText(Utils::toWindowsPath(dir));
+    if(dir.startsWith("/"))
+        ui->labelDir->setText(dir);
+    else
+        ui->labelDir->setText(Utils::toWindowsPath(dir));
 }
 
 void CommandBar::setDirFont(QFont const& font)
