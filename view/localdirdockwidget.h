@@ -63,6 +63,12 @@ public:
     void setItemSelectedColor(QString const& back,
                       QString const& mark,
                       QString const&cursor) override;
+    void execCommand(QString const& command) override;
+    void viewFile() override;
+    void newFolder() override;
+    void newTxtFile() override;
+    void deleteFiles() override;
+
     void setActived(bool isActived) override;
     bool isActived() const override;
     void retranslateUi() override;
@@ -72,23 +78,16 @@ public:
     void saveSettings(QString const& name);
     void loadSettings(QString const& name);
 
-
-    void viewFile();
     void editFile();
     void copyFiles(QString const& dstFilePath);
     void moveFiles(QString const& dstFilePath);
 
-    void delFilesWithConfirm();
     void selectAll();
     void compressFiles(QString const& dstFilePath);
     void uncompressFiles(QString const& dstFilePath);
     void extractFiles(QStringList const& fileNames,
                       QString const& targetPath);
     void searchFiles(QString const& dstFilePath);
-    void execCommand(QString const& command);
-public slots:
-    void newFolder();
-    void newTxtFile();
 
 signals:
     void sectionResized(int logicalIndex,
@@ -105,7 +104,7 @@ signals:
                         QStringList const& fileNames,
                         QString const& targetFilePath);
     void compressFileExtract(QStringList const& fileNames);
-    void actived();
+    void actived(QString const& dir);
 
 protected:
      bool eventFilter(QObject *obj, QEvent *event) override;

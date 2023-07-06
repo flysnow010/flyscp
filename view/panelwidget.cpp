@@ -93,7 +93,8 @@ void PanelWidget::libDirContextMenu()
             menu.addAction(menuItem.icon, menuItem.caption,
                            this, [=](bool)
             {
-                dir->setDir(menuItem.filePath, menuItem.showPath());
+                dir->setDir(Utils::toLinuxPath(menuItem.filePath),
+                            menuItem.showPath());
             });
         else
         {
@@ -117,7 +118,8 @@ void PanelWidget::libDirContextMenu()
                         if(childMenuItem.isDir())
                             subMenu->addAction(childMenuItem.icon, childMenuItem.caption,
                                                this, [=](bool){
-                                dir->setDir(childMenuItem.filePath, childMenuItem.showPath());
+                                dir->setDir(Utils::toLinuxPath(childMenuItem.filePath),
+                                            childMenuItem.showPath());
                             });
                         else
                             subMenu->addAction(childMenuItem.icon, childMenuItem.caption,
@@ -399,6 +401,19 @@ void PanelWidget::setItemSelectedColor(QString const& back,
     }
 }
 
+void PanelWidget::setUnActived()
+{
+    for(int i = 0; i < ui->tabWidget->count(); i++)
+    {
+        BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->widget(i));
+        if(dir)
+        {
+            if(dir->isActived())
+                dir->setActived(false);
+        }
+    }
+}
+
 void PanelWidget::refresh()
 {
     for(int i = 0; i < ui->tabWidget->count(); i++)
@@ -409,9 +424,60 @@ void PanelWidget::refresh()
     }
 }
 
-void PanelWidget::retranslateUi()
+void PanelWidget::execCommand(QString const& command)
+{
+    BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
+    if(dir)
+        dir->execCommand(command);
+}
+
+void PanelWidget::viewFile()
+{
+    BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
+    if(dir)
+        dir->viewFile();
+}
+
+void PanelWidget::newFolder()
+{
+    BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
+    if(dir)
+        dir->newFolder();
+}
+
+void PanelWidget::newTxtFile()
+{
+    BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
+    if(dir)
+        dir->newTxtFile();
+}
+
+void PanelWidget::deleteFiles()
+{
+    BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
+    if(dir)
+        dir->deleteFiles();
+}
+
+bool PanelWidget::isActived() const
+{
+    BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
+    if(dir)
+        return dir->isActived();
+    return false;
+}
+
+void PanelWidget::refreshCurrent()
+{
+    BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
+    if(dir)
+        dir->refresh();
+}
+
+void PanelWidget::retranslateUi(QString const& tabText)
 {
     ui->retranslateUi(this);
+    ui->tabWidget->setTabText(0, tabText);
     updateTexts(ui->tabWidget->currentWidget());
     for(int i = 0; i < ui->tabWidget->count(); i++)
     {
@@ -465,6 +531,8 @@ void PanelWidget::currentChanged(int index)
     if(!dir)
         return;
      QList<QAbstractButton*> buttons = buttonGroup->buttons();
+     emit tabActived(dir->dir());
+     dir->setActived(true);
      foreach(auto button, buttons)
      {
          button->setEnabled(!dir->isRemote());

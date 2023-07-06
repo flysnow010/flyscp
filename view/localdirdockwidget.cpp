@@ -43,6 +43,7 @@ LocalDirDockWidget::LocalDirDockWidget(QWidget *parent)
     ui->tvCompress->setModel(compressModel_);
     ui->tvCompress->hide();
     ui->tvNormal->installEventFilter(this);
+    ui->tvCompress->installEventFilter(this);
     titleBarWidget->installEventFilter(this);
     setTitleBarWidget(titleBarWidget);
 
@@ -96,11 +97,11 @@ LocalDirDockWidget::LocalDirDockWidget(QWidget *parent)
     connect(titleBarWidget, SIGNAL(historyDirButtonClicked()),
                     this, SLOT(historyDirContextMenu()));
     connect(titleBarWidget, &TitleBarWidget::actived, this, [=](){
+        emit actived(dir());
         setActived(true);
-        emit actived();
     });
     connect(titleBarWidget, &TitleBarWidget::dirSelected,
-            this, [&](QString const& dir) { setDir(dir); });
+            this, [&](QString const& dir) { setDir(Utils::toLinuxPath(dir)); });
     connect(fileSystemWatcher, SIGNAL(directoryChanged(QString)),
         this, SLOT(directoryChanged(QString)));
 }
@@ -151,8 +152,8 @@ void LocalDirDockWidget::setDir(QString const& dir,
     }
     if(!isActived())
     {
+        emit actived(this->dir());
         setActived(true);
-        emit actived();
     }
 }
 
@@ -351,6 +352,8 @@ bool LocalDirDockWidget::isActived() const
 void LocalDirDockWidget::retranslateUi()
 {
     ui->retranslateUi(this);
+    model_->reset();
+    compressModel_->reset();
     emit statusTextChanged(getStatusText());
 }
 
@@ -481,31 +484,31 @@ bool LocalDirDockWidget::eventFilter(QObject *obj, QEvent *event)
     if (event->type() == QEvent::KeyPress)
     {
          QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-         if(keyEvent->matches(QKeySequence::Copy))
+         if(keyEvent->matches(QKeySequence::Copy) && obj == ui->tvNormal)
          {
              copy();
              return true;
          }
-         else if(keyEvent->matches(QKeySequence::Cut))
+         else if(keyEvent->matches(QKeySequence::Cut) && obj == ui->tvNormal)
          {
             cut();
             return true;
          }
-         else if(keyEvent->matches(QKeySequence::Paste))
+         else if(keyEvent->matches(QKeySequence::Paste) && obj == ui->tvNormal)
          {
              paste();
              return true;
          }
-         else if(keyEvent->matches(QKeySequence::Delete))
+         else if(keyEvent->matches(QKeySequence::Delete) && obj == ui->tvNormal)
          {
-             delFilesWithConfirm();
+             deleteFiles();
              return true;
          }
     }
     else if(event->type() == QEvent::FocusIn)
     {
+        emit actived(dir());
         setActived(true);
-        emit actived();
     }
     return QDockWidget::eventFilter(obj, event);
 }
@@ -1095,7 +1098,7 @@ void LocalDirDockWidget::paste()
     model_->refresh();
 }
 
-void LocalDirDockWidget::delFilesWithConfirm()
+void LocalDirDockWidget::deleteFiles()
 {
     QStringList fileNames;
     if(ui->tvNormal->isVisible())
@@ -1173,7 +1176,7 @@ void LocalDirDockWidget::createShortcut()
 
 void LocalDirDockWidget::newFolder()
 {
-    QString path = Utils::getText(tr("New folder"));
+    QString path = Utils::getText(tr("Folder Name"));
     if(path.isEmpty())
         return;
     if(ui->tvNormal->isVisible())
@@ -1510,7 +1513,7 @@ void LocalDirDockWidget::execCommand(QString const& command)
 
 void LocalDirDockWidget::newTxtFile()
 {
-    QString fileName = Utils::getText(tr("New File", "*.txt"));
+    QString fileName = Utils::getText(tr("File Name", "*.txt"));
     if(fileName.isEmpty())
         return;
     if(ui->tvNormal->isVisible())

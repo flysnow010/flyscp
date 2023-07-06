@@ -41,6 +41,7 @@ RemoteDockWidget::RemoteDockWidget(QWidget *parent)
 {
     ui->setupUi(this);
     ui->treeView->setModel(model_);
+    ui->treeView->installEventFilter(this);
 
     setTitleBarWidget(titleBarWidget);
     connect(ui->treeView, SIGNAL(doubleClicked(QModelIndex)),
@@ -76,6 +77,10 @@ RemoteDockWidget::RemoteDockWidget(QWidget *parent)
                     this, SLOT(favoritesDirContextMenu()));
     connect(titleBarWidget, SIGNAL(historyDirButtonClicked()),
                     this, SLOT(historyDirContextMenu()));
+    connect(titleBarWidget, &TitleBarWidget::actived, this, [=](){
+        emit actived(dir());
+        setActived(true);
+    });
     connect(titleBarWidget, &TitleBarWidget::dirSelected,
             this, [&](QString const& dir)
     {
@@ -100,6 +105,11 @@ void RemoteDockWidget::setDir(QString const& dir,
 {
     model_->setDir(sftp->dir(dir.toStdString()));
     updateCurrentDir(model_->dirName(), caption, isNavigation);
+    if(!isActived())
+    {
+        emit actived(this->dir());
+        setActived(true);
+    }
 }
 
 QString RemoteDockWidget::dir() const
@@ -375,6 +385,59 @@ void RemoteDockWidget::start(SSHSettings const& settings)
     loadSettings();
 }
 
+void RemoteDockWidget::execCommand(QString const& command)
+{
+    QStringList args = command.split(" ");
+    if(args.size() < 2)
+    {
+        ;
+    }
+    else
+    {
+        if(args[0] == "cd")
+            cd(args[1]);
+    }
+}
+
+void RemoteDockWidget::viewFile()
+{
+    QModelIndex index = ui->treeView->currentIndex();
+    ssh::FileInfoPtr fileInfo = model_->fileInfo(index.row());
+    if(!fileInfo || fileInfo->is_dir())
+        return;
+    QString fileName = download(fileInfo, Utils::tempDir());
+    if(fileName.isEmpty())
+        return;
+
+    FileNames::MakeFileNameAsParams(fileName);
+    WinShell::Exec(Utils::viewApp(), fileName);
+}
+
+void RemoteDockWidget::deleteFiles()
+{
+    QStringList fileNames = selectedileNames();
+    QString tipText;
+    if(fileNames.size() > 1)
+        tipText = QString(tr("Are you sure you want to delete %1 files or folders?\n\n%2"))
+                .arg(fileNames.size())
+                .arg(fileNames.join("\n"));
+    else
+    {
+        QModelIndex index = ui->treeView->currentIndex();
+        QString type = model_->isDir(index.row()) ? tr("folder") : tr("file");
+        tipText = QString(tr("Are you sure you want to delete the %1 %2?"))
+                .arg(type, fileNames.first());
+    }
+    if(tipText.isEmpty())
+    {
+        Utils::warring(tr("No files or folders selected!"));
+        return;
+    }
+
+    if(Utils::question(tipText))
+        delFiles();
+}
+
 void RemoteDockWidget::setActived(bool isActived)
 {
     titleBarWidget->setActived(isActived);
@@ -388,6 +451,7 @@ bool RemoteDockWidget::isActived() const
 void RemoteDockWidget::retranslateUi()
 {
     ui->retranslateUi(this);
+    model_->reset();
     emit statusTextChanged(getStatusText());
 }
 
@@ -431,6 +495,15 @@ void RemoteDockWidget::loadSettings()
     settings.endGroup();
 }
 
+bool RemoteDockWidget::eventFilter(QObject *obj, QEvent *event)
+{
+    if(event->type() == QEvent::FocusIn)
+    {
+        emit actived(dir());
+        setActived(true);
+    }
+    return QDockWidget::eventFilter(obj, event);
+}
 
 void RemoteDockWidget::viewClick(QModelIndex const& index)
 {
@@ -451,14 +524,14 @@ void RemoteDockWidget::customContextMenuRequested(const QPoint &pos)
     QMenu menu;
     if(!index.isValid())
     {
-        menu.addAction(QIcon(":/image/back.png"), tr("Parent directory"),
+        menu.addAction(QIcon(":/image/back.png"), tr("Parent Directory"),
                        this, SLOT(parentDirectory()));
         menu.addSeparator();
-        menu.addAction(tr("New directory"), this, SLOT(makeDirectory()));
-        menu.addAction(tr("New file"), this, SLOT(newFile()));
+        menu.addAction(tr("New Folder"), this, [=](){ newFolder(); });
+        menu.addAction(tr("New Txt File"), this, [=](){ newTxtFile(); });
         menu.addSeparator();
-        menu.addAction(tr("Refresh current folder"), this, [=](){ refresh(); });
-        menu.addAction(tr("Upload to current folder"), this, SLOT(upload()));
+        menu.addAction(tr("Refresh Current Folder"), this, [=](){ refresh(); });
+        menu.addAction(tr("Upload To Current Folder"), this, SLOT(upload()));
     }
     else
     {
@@ -468,13 +541,13 @@ void RemoteDockWidget::customContextMenuRequested(const QPoint &pos)
 
         menu.addAction(tr("Open"), this, SLOT(open()));
         if(fileInfo->is_file())
-            menu.addAction(tr("Open with..."), this, SLOT(openWith()));
+            menu.addAction(tr("Open With..."), this, SLOT(openWith()));
         menu.addAction(tr("Download"), this, SLOT(download()));
         menu.addSeparator();
-        menu.addAction(tr("Delete"), this, SLOT(deleteFiles()));
+        menu.addAction(tr("Delete"), this, SLOT(delFiles()));
         menu.addAction(tr("Rename"), this, SLOT(rename()));
         menu.addSeparator();
-        menu.addAction(tr("Copy file path"), this, SLOT(copyFilepath()));
+        menu.addAction(tr("Copy File Path"), this, SLOT(copyFilepath()));
         menu.addAction(tr("Permissions"), this, SLOT(permissions()));
         menu.addAction(tr("Properties"), this, SLOT(properties()));
     }
@@ -591,18 +664,18 @@ void RemoteDockWidget::parentDirectory()
     updateCurrentDir(model_->dirName());
 }
 
-void RemoteDockWidget::makeDirectory()
+void RemoteDockWidget::newFolder()
 {
-    QString path = Utils::getText(tr("New folder"));
+    QString path = Utils::getText(tr("Folder Name"));
     if(path.isEmpty())
         return;
     if(model_->mkdir(path.toStdString()))
         model_->refresh();
 }
 
-void RemoteDockWidget::newFile()
+void RemoteDockWidget::newTxtFile()
 {
-    QString fileName = Utils::getText(tr("New file"));
+    QString fileName = Utils::getText(tr("File Name"));
     if(fileName.isEmpty())
         return;
     if(model_->mkFile(fileName.toStdString()))
@@ -667,7 +740,7 @@ void RemoteDockWidget::downloadFiles(QString const& remoteSrc,
         fileTransfer(fileNames, model_->dirName(), targetFilePath, Download);
 }
 
-void RemoteDockWidget::deleteFiles()
+void RemoteDockWidget::delFiles()
 {
     fileTransfer(selectedileNames(), model_->dirName(), QString(), Delete);
     model_->refresh();
@@ -860,6 +933,7 @@ void RemoteDockWidget::updateCurrentDir(QString const& dir,
         titleBarWidget->setTitle(caption);
     if(!isNavigation)
         dirHistory->add(dir);
+    emit dirChanged(dir);
     emit statusTextChanged(getStatusText());
 }
 

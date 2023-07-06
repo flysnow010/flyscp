@@ -59,10 +59,22 @@ public:
                       QString const& mark,
                       QString const&cursor);
     void setGoToRoot(bool isOn) { isGotRoot_ = isOn; }
+
+    void execCommand(QString const& command);
+    void viewFile();
+    void newFolder();
+    void newTxtFile();
+    void deleteFiles();
+
+    bool isActived() const;
+    void setUnActived();
+    void refreshCurrent();
+
     void refresh();
-    void retranslateUi();
+    void retranslateUi(QString const& tabText);
 signals:
     void tabCountChanged(int count);
+    void tabActived(QString const& dir);
 public slots:
     void setTabBarAutoHide(int count);
     void upddateDrive();

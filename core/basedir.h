@@ -45,6 +45,11 @@ public:
     virtual void setItemSelectedColor(QString const& back,
                                       QString const& mark,
                                       QString const&cursor) = 0;
+    virtual void execCommand(QString const& command) = 0;
+    virtual void viewFile() = 0;
+    virtual void newFolder() = 0;
+    virtual void newTxtFile() = 0;
+    virtual void deleteFiles() = 0;
     virtual void setActived(bool isActived) = 0;
     virtual bool isActived() const = 0;
     virtual void retranslateUi() = 0;

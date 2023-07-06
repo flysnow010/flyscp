@@ -66,6 +66,11 @@ public:
     void setItemSelectedColor(QString const& back,
                       QString const& mark,
                       QString const&cursor) override;
+    void execCommand(QString const& command) override;
+    void viewFile() override;
+    void newFolder() override;
+    void newTxtFile() override;
+    void deleteFiles() override;
     void setActived(bool isActived) override;
     bool isActived() const override;
     void retranslateUi() override;
@@ -76,6 +81,8 @@ public:
 signals:
     void closeRequest(QWidget* widget);
     void statusTextChanged(QString const& text);
+    void dirChanged(QString const& dir);
+    void actived(QString const& dir);
 
 public slots:
     void libDirContextMenu();
@@ -85,6 +92,8 @@ public slots:
                        QStringList const& fileNames,
                        QString const& targetFilePath);
 
+protected:
+     bool eventFilter(QObject *obj, QEvent *event) override;
 private slots:
     void viewClick(QModelIndex const& index);
     void customContextMenuRequested(const QPoint &pos);
@@ -99,14 +108,12 @@ private slots:
     void connectionError(QString const& error);
 
     void parentDirectory();
-    void makeDirectory();
-    void newFile();
     void upload();
 
     void open();
     void openWith();
     void download();
-    void deleteFiles();
+    void delFiles();
     void rename();
     void copyFilepath();
     void properties();
