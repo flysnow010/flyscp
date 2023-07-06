@@ -23,6 +23,7 @@ class LanguageOption;
 class OperationOption;
 class QTranslator;
 class QLockFile;
+class QAction;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -84,6 +85,8 @@ private:
     SSHSettingsManager *sshSettingsMangaer_;
     QMenu* connectMenu;
     QMenu* diffMenu;
+    QAction* diffFilesAction = 0;
+    QAction* netsettingsAction = 0;
     PanelWidget* leftPanelWidget;
     PanelWidget* rightPanelWidget;
     LocalDirDockWidget* leftDirView;

@@ -104,8 +104,8 @@ MainWindow::MainWindow(QWidget *parent)
        statusBar->setLeftWidth(pos);
     });
 
-    leftPanelWidget->addDirTab(leftDirView, Utils::driverIcon(), tr("Local of left"));
-    rightPanelWidget->addDirTab(rightDirView, Utils::driverIcon(), tr("Local of right"));
+    leftPanelWidget->addDirTab(leftDirView, Utils::driverIcon(), tr("Local File(Left)"));
+    rightPanelWidget->addDirTab(rightDirView, Utils::driverIcon(), tr("Local File(Right)"));
     setCentralWidget(centerWidget);
 
     createHelpMenu();
@@ -138,7 +138,7 @@ void MainWindow::createHelpMenu()
 
 void MainWindow::createDiffMenu()
 {
-    diffMenu->addAction("Diff files", this, [=](){
+    diffFilesAction = diffMenu->addAction(tr("Diff Files"), this, [=](){
         diffFiles();
     });
 }
@@ -182,7 +182,7 @@ void MainWindow::updateConnectMenu()
     }
     if(sshSettingsMangaer_->size() > 0)
         connectMenu->addSeparator();
-    connectMenu->addAction(tr("Settings"), this, SLOT(netsettings()));
+    netsettingsAction = connectMenu->addAction(tr("Settings"), this, SLOT(netsettings()));
 }
 
 bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, long *result)
@@ -260,21 +260,21 @@ void MainWindow::createMenuConnect()
     });
 
     connect(ui->actionRefresh, &QAction::triggered, this, [&](){
-        if(leftDirView->isActived())
-            leftDirView->refresh();
+        if(leftPanelWidget->isActived())
+            leftPanelWidget->refreshCurrent();
         else
-            rightDirView->refresh();
+            rightPanelWidget->refreshCurrent();
     });
 
     connect(ui->actionPrevious, &QAction::triggered, this, [&](){
-        if(leftDirView->isActived())
+        if(leftPanelWidget->isActived())
             leftPanelWidget->preDir();
         else
             rightPanelWidget->preDir();
     });
 
     connect(ui->actionNext, &QAction::triggered, this, [&](){
-        if(leftDirView->isActived())
+        if(leftPanelWidget->isActived())
             leftPanelWidget->nextDir();
         else
             rightPanelWidget->nextDir();
@@ -381,14 +381,24 @@ void MainWindow::createViewConnect()
     });
 
     connect(rightDirView, &LocalDirDockWidget::actived,
-            this, [&]()
+            rightPanelWidget,&PanelWidget::tabActived);
+    connect(leftDirView, &LocalDirDockWidget::actived,
+            leftPanelWidget, &PanelWidget::tabActived);
+
+    connect(leftPanelWidget, &PanelWidget::tabActived,
+            this, [=](QString const& dir)
     {
-        leftDirView->setActived(false);
-        commandBar->setDir(rightDirView->dir());
+        leftPanelWidget->setUnActived();
+        rightPanelWidget->setUnActived();
+        commandBar->setDir(dir);
     });
-    connect(leftDirView, &LocalDirDockWidget::actived, this, [&](){
-        rightDirView->setActived(false);
-        commandBar->setDir(leftDirView->dir());
+
+    connect(rightPanelWidget, &PanelWidget::tabActived,
+            this, [=](QString const& dir)
+    {
+        leftPanelWidget->setUnActived();
+        rightPanelWidget->setUnActived();
+        commandBar->setDir(dir);
     });
 
     connect(leftDirView, &LocalDirDockWidget::statusTextChanged,
@@ -431,10 +441,10 @@ void MainWindow::createViewConnect()
     connect(commandBar, &CommandBar::commanded,
             this, [&](QString const& commnad)
     {
-        if(leftDirView->isActived())
-            leftDirView->execCommand(commnad);
+        if(leftPanelWidget->isActived())
+            leftPanelWidget->execCommand(commnad);
         else
-            rightDirView->execCommand(commnad);
+            rightPanelWidget->execCommand(commnad);
     });
 }
 
@@ -471,12 +481,12 @@ void MainWindow::load()
                               .arg(Utils::sshSettingsPath()));
     if(leftDirViewIsActived)
     {
-        emit leftDirView->actived();
+        emit leftDirView->actived(leftDirView->dir());
         leftDirView->setActived(true);
     }
     else
     {
-        emit rightDirView->actived();
+        emit rightDirView->actived(rightDirView->dir());
         rightDirView->setActived(true);
     }
     theOptionManager.load("Options");
@@ -530,26 +540,26 @@ void MainWindow::loadStyleSheet()
 
 void MainWindow::newFolder()
 {
-    if(leftDirView->isActived())
-        leftDirView->newFolder();
+    if(leftPanelWidget->isActived())
+        leftPanelWidget->newFolder();
     else
-        rightDirView->newFolder();
+        rightPanelWidget->newFolder();
 }
 
 void MainWindow::newFile()
 {
-    if(leftDirView->isActived())
-        leftDirView->newTxtFile();
+    if(leftPanelWidget->isActived())
+        leftPanelWidget->newTxtFile();
     else
-        rightDirView->newTxtFile();
+        rightPanelWidget->newTxtFile();
 }
 
 void MainWindow::viewFile()
 {
-    if(leftDirView->isActived())
-        leftDirView->viewFile();
+    if(leftPanelWidget->isActived())
+        leftPanelWidget->viewFile();
     else
-        rightDirView->viewFile();
+        rightPanelWidget->viewFile();
 }
 
 void MainWindow::editFile()
@@ -590,10 +600,10 @@ void MainWindow::moveFiles()
 
 void MainWindow::delFiles()
 {
-    if(leftDirView->isActived())
-        leftDirView->delFilesWithConfirm();
+    if(leftPanelWidget->isActived())
+        leftPanelWidget->deleteFiles();
     else
-        rightDirView->delFilesWithConfirm();
+        rightPanelWidget->deleteFiles();
 }
 
 void MainWindow::selectAll()
@@ -718,12 +728,15 @@ void MainWindow::options()
             this, [=](LanguageOption const& option)
     {
         theOptionManager.setLanguageOption(option);
-        InstallTranstoirs(true);
 
+        InstallTranstoirs(true);
+        diffFilesAction->setText(tr("Diff Files"));
+        netsettingsAction->setText(tr("Settings"));
         ui->retranslateUi(this);
+
         toolButtons->retranslateUi();
-        leftPanelWidget->retranslateUi();
-        rightPanelWidget->retranslateUi();
+        leftPanelWidget->retranslateUi(tr("Local File(Left)"));
+        rightPanelWidget->retranslateUi(tr("Local File(Right)"));
     });
 
     connect(&dialog, &OptionsDialog::operationOptionChanged,
@@ -769,6 +782,13 @@ void MainWindow::createRemoteDirWidget(SSHSettings const& settings)
                                     remoteDockWidget->name());
         connect(remoteDockWidget, &RemoteDockWidget::closeRequest,
                 rightPanelWidget, &PanelWidget::closeTab);
+        connect(remoteDockWidget, &RemoteDockWidget::actived,
+                rightPanelWidget, &PanelWidget::tabActived);
+        connect(remoteDockWidget, &RemoteDockWidget::dirChanged,
+                this, [=](QString const& dir)
+        {
+            commandBar->setDir(dir);
+        });
 
         connect(remoteDockWidget, &RemoteDockWidget::statusTextChanged,
                 this, [&](QString const& text)
@@ -791,6 +811,13 @@ void MainWindow::createRemoteDirWidget(SSHSettings const& settings)
                                    remoteDockWidget->name());
         connect(remoteDockWidget, &RemoteDockWidget::closeRequest,
                 leftPanelWidget, &PanelWidget::closeTab);
+        connect(remoteDockWidget, &RemoteDockWidget::actived,
+                leftPanelWidget, &PanelWidget::tabActived);
+        connect(remoteDockWidget, &RemoteDockWidget::dirChanged,
+                this, [=](QString const& dir)
+        {
+            commandBar->setDir(dir);
+        });
 
         connect(remoteDockWidget, &RemoteDockWidget::statusTextChanged,
                 this, [&](QString const& text)
