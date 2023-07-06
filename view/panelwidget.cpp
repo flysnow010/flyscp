@@ -2,8 +2,6 @@
 #include "ui_panelwidget.h"
 #include "view/localdirdockwidget.h"
 #include "util/utils.h"
-#include "core/dirhistory.h"
-#include "core/dirfavorite.h"
 #include "core/winshell.h"
 
 #include <QDir>
@@ -23,11 +21,8 @@ PanelWidget::PanelWidget(QWidget *parent)
     , ui(new Ui::PanelWidget)
     , buttonGroup(new QButtonGroup(this))
     , labelDiskInfo(new QLabel(this))
-    , dirFavorite(new DirFavorite())
-    , dirHistory(new DirHistory())
     , isShowTips_(true)
     , isGotRoot_(false)
-
 {
     ui->setupUi(this);
     ui->tabWidget->setTabBarAutoHide(true);
@@ -42,8 +37,6 @@ PanelWidget::PanelWidget(QWidget *parent)
 
 PanelWidget::~PanelWidget()
 {
-    delete dirFavorite;
-    delete dirHistory;
     delete ui;
 }
 
@@ -61,82 +54,13 @@ void PanelWidget::setTabBarAutoHide(int count)
     ui->tabWidget->setTabBarAutoHide(count > 1 ? false : true);
 }
 
-void PanelWidget::saveSettings(QString const& name)
-{
-    QSettings settings(QCoreApplication::applicationName(),
-                       QCoreApplication::applicationVersion());
-
-    settings.beginGroup(name);
-
-    QStringList const& dirNames = dirHistory->dirs();
-
-    settings.beginWriteArray("historyDirNames", dirNames.size());
-    for(int i = 0; i < dirNames.size(); i++)
-    {
-        settings.setArrayIndex(i);
-        settings.setValue("dirName", dirNames[i]);
-    }
-    settings.endArray();
-
-    QList<FavoriteItem> items = dirFavorite->favoriteItems();
-
-    settings.beginWriteArray("favoriteItems", items.size());
-    for(int i = 0; i < items.size(); i++)
-    {
-        settings.setArrayIndex(i);
-        settings.setValue("caption", items[i].caption);
-        settings.setValue("command", items[i].command);
-        settings.setValue("fileName", items[i].fileName);
-    }
-    settings.endArray();
-
-    settings.endGroup();
-}
-
-void PanelWidget::loadSettings(QString const& name)
-{
-    QSettings settings(QCoreApplication::applicationName(),
-                       QCoreApplication::applicationVersion());
-
-    settings.beginGroup(name);
-
-    QStringList dirNames;
-    int size = settings.beginReadArray("historyDirNames");
-    for(int i = 0; i < size; i++)
-    {
-        settings.setArrayIndex(i);
-        dirNames << settings.value("dirName").toString();
-    }
-    settings.endArray();
-
-    size = settings.beginReadArray("favoriteItems");
-    QList<FavoriteItem> items;
-    for(int i = 0; i < size; i++)
-    {
-        settings.setArrayIndex(i);
-        FavoriteItem item;
-        item.caption = settings.value("caption").toString();
-        item.command = settings.value("command").toString();
-        item.fileName = settings.value("fileName").toString();
-        items << item;
-    }
-    dirFavorite->setFavoriteItems(items);
-    settings.endArray();
-
-    settings.endGroup();
-
-    dirHistory->setDirs(dirNames);
-}
-
 void PanelWidget::preDir()
 {
     BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
     if(!dir)
         return;
 
-    QString newDir = dirHistory->pre(dir->dir());
-    if(!newDir.isEmpty())
-        dir->setDir(newDir, QString(), true);
+    dir->preDir();
 }
 
 void PanelWidget::nextDir()
@@ -145,16 +69,11 @@ void PanelWidget::nextDir()
     if(!dir)
         return;
 
-    QString newDir = dirHistory->next(dir->dir());
-    if(!newDir.isEmpty())
-        dir->setDir(newDir, QString(), true);
+    dir->nextDir();
 }
 
-void PanelWidget::addDirToHistory(QString const& dir, bool isNavigation)
+void PanelWidget::upddateDrive()
 {
-    if(!isNavigation)
-        dirHistory->add(dir);
-
     updateTexts(ui->tabWidget->currentWidget());
 }
 
@@ -213,75 +132,6 @@ void PanelWidget::libDirContextMenu()
     }
 
     QApplication::restoreOverrideCursor();
-    menu.exec(QCursor::pos());
-}
-
-void PanelWidget::favoritesDirContextMenu()
-{
-    BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
-    if(!dir)
-        return;
-
-    QMenu menu;
-    QString currentFileName = dir->dir();
-    QList<FavoriteItem> items = dirFavorite->favoriteItems();
-    bool isCurrent = false;
-    foreach(auto const& item, items)
-    {
-        QAction* action = menu.addAction(item.caption, this, [&](bool)
-        {
-            dir->setDir(item.fileName);
-        }
-        );
-        if(currentFileName == item.fileName)
-        {
-            action->setCheckable(true);
-            action->setChecked(true);
-            isCurrent = true;
-        }
-    }
-    menu.addSeparator();
-    FavoriteItem item;
-    item.caption = QFileInfo(currentFileName).fileName();
-    item.fileName = currentFileName;
-
-    if(isCurrent)
-        menu.addAction(tr("Remove Current Folder"), this, [&](bool){
-            dirFavorite->removeItem(item);
-        });
-    else
-        menu.addAction(tr("Add Current Folder"), this, [&](bool){
-            QString caption = Utils::getText(tr("Caption of New Menu"), item.caption);
-            if(!caption.isEmpty())
-                item.caption = caption;
-            dirFavorite->addItem(item);
-    });
-    menu.addAction(tr("Settings"));
-    menu.exec(QCursor::pos());
-}
-
-void PanelWidget::historyDirContextMenu()
-{
-    BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
-    QStringList const& dirNames = dirHistory->dirs();
-    if(!dir || dirNames.isEmpty())
-        return;
-
-    QMenu menu;
-    QString currentDir = dir->dir();
-
-    foreach(auto const& dirName, dirNames)
-    {
-        QAction* action = menu.addAction(dirName, this, [&](bool){
-            dir->setDir(dirName);
-        });
-
-        if(dirName == currentDir)
-        {
-            action->setCheckable(true);
-            action->setChecked(true);
-        }
-    }
     menu.exec(QCursor::pos());
 }
 
@@ -605,7 +455,7 @@ void PanelWidget::updateDir(QString const& driver)
         if(isGotRoot_)
             dir->setDir(QString("%1:/").arg(driver));
         else
-            dir->setDir(dirHistory->find(driver));
+            dir->setDir(dir->findDir(driver));
     }
 }
 

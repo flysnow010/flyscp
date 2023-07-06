@@ -10,8 +10,6 @@ class PanelWidget;
 class QButtonGroup;
 class QAbstractButton;
 class QIcon;
-class DirFavorite;
-class DirHistory;
 class QLabel;
 class PanelWidget : public QWidget
 {
@@ -26,8 +24,6 @@ public:
                    QString const& text);
     void updateTexts(QWidget* widget);
 
-    void saveSettings(QString const& name);
-    void loadSettings(QString const& name);
     void preDir();
     void nextDir();
 
@@ -69,11 +65,8 @@ signals:
     void tabCountChanged(int count);
 public slots:
     void setTabBarAutoHide(int count);
-    void addDirToHistory(QString const& dir,
-                         bool isNavigation);
+    void upddateDrive();
     void libDirContextMenu();
-    void favoritesDirContextMenu();
-    void historyDirContextMenu();
     void closeTab(QWidget *w);
 protected:
     bool eventFilter(QObject *obj,
@@ -92,8 +85,6 @@ private:
     Ui::PanelWidget *ui;
     QButtonGroup* buttonGroup;
     QLabel* labelDiskInfo;
-    DirFavorite* dirFavorite;
-    DirHistory* dirHistory;
     bool isShowTips_;
     bool isGotRoot_;
 };

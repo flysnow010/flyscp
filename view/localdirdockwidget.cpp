@@ -6,6 +6,8 @@
 #include "core/filemanager.h"
 #include "core/filetransfer.h"
 #include "core/winshell.h"
+#include "core/dirhistory.h"
+#include "core/dirfavorite.h"
 #include "core/clipboard.h"
 #include "core/contextmenu.h"
 #include "core/filecompresser.h"
@@ -32,6 +34,8 @@ LocalDirDockWidget::LocalDirDockWidget(QWidget *parent)
     , compressModel_(new CompressDirModel(this))
     , titleBarWidget(new TitleBarWidget())
     , hideBarWidget(new QWidget(this))
+    , dirFavorite(new DirFavorite())
+    , dirHistory(new DirHistory())
     , fileSystemWatcher(new QFileSystemWatcher(this))
 {
     ui->setupUi(this);
@@ -88,9 +92,9 @@ LocalDirDockWidget::LocalDirDockWidget(QWidget *parent)
     connect(titleBarWidget, SIGNAL(libDirButtonClicked()),
                     this, SIGNAL(libDirContextMenuRequested()));
     connect(titleBarWidget, SIGNAL(favoritesDirButtonCLicked()),
-                    this, SIGNAL(favoritesDirContextMenuRequested()));
+                    this, SLOT(favoritesDirContextMenu()));
     connect(titleBarWidget, SIGNAL(historyDirButtonClicked()),
-                    this, SIGNAL(historyDirContextMenuRequested()));
+                    this, SLOT(historyDirContextMenu()));
     connect(titleBarWidget, &TitleBarWidget::actived, this, [=](){
         setActived(true);
         emit actived();
@@ -104,6 +108,8 @@ LocalDirDockWidget::LocalDirDockWidget(QWidget *parent)
 LocalDirDockWidget::~LocalDirDockWidget()
 {
     delete titleBarWidget;
+    delete dirFavorite;
+    delete dirHistory;
     delete ui;
 }
 
@@ -153,6 +159,11 @@ void LocalDirDockWidget::setDir(QString const& dir,
 QString LocalDirDockWidget::dir() const
 {
     return model_->dir();
+}
+
+QString LocalDirDockWidget::findDir(QString const& prefix) const
+{
+    return dirHistory->find(prefix);
 }
 
 QString LocalDirDockWidget::home() const
@@ -355,6 +366,20 @@ void LocalDirDockWidget::cd(QString const& dir)
     }
 }
 
+void LocalDirDockWidget::preDir()
+{
+    QString newDir = dirHistory->pre(dir());
+    if(!newDir.isEmpty())
+        setDir(newDir, QString(), true);
+}
+
+void LocalDirDockWidget::nextDir()
+{
+    QString newDir = dirHistory->next(dir());
+    if(!newDir.isEmpty())
+        setDir(newDir, QString(), true);
+}
+
 void LocalDirDockWidget::resizeSection(int logicalIndex,
                                        int size)
 {
@@ -379,6 +404,29 @@ void LocalDirDockWidget::saveSettings(QString const& name)
     }
     settings.endArray();
 
+    QStringList const& dirNames = dirHistory->dirs();
+
+    settings.beginWriteArray("historyDirNames", dirNames.size());
+    for(int i = 0; i < dirNames.size(); i++)
+    {
+        settings.setArrayIndex(i);
+        settings.setValue("dirName", dirNames[i]);
+    }
+    settings.endArray();
+
+    QList<FavoriteItem> items = dirFavorite->favoriteItems();
+
+    settings.beginWriteArray("favoriteItems", items.size());
+    for(int i = 0; i < items.size(); i++)
+    {
+        settings.setArrayIndex(i);
+        settings.setValue("caption", items[i].caption);
+        settings.setValue("command", items[i].command);
+        settings.setValue("fileName", items[i].fileName);
+    }
+
+    settings.endArray();
+
     settings.endGroup();
 }
 
@@ -399,6 +447,30 @@ void LocalDirDockWidget::loadSettings(QString const& name)
         headerView->resizeSection(i, settings.value("sectionSize").toInt());
         compresSheaderView->resizeSection(i, settings.value("sectionSize").toInt());
     }
+    settings.endArray();
+
+    QStringList dirNames;
+    size = settings.beginReadArray("historyDirNames");
+    for(int i = 0; i < size; i++)
+    {
+        settings.setArrayIndex(i);
+        dirNames << settings.value("dirName").toString();
+    }
+    dirHistory->setDirs(dirNames);
+    settings.endArray();
+
+    size = settings.beginReadArray("favoriteItems");
+    QList<FavoriteItem> items;
+    for(int i = 0; i < size; i++)
+    {
+        settings.setArrayIndex(i);
+        FavoriteItem item;
+        item.caption = settings.value("caption").toString();
+        item.command = settings.value("command").toString();
+        item.fileName = settings.value("fileName").toString();
+        items << item;
+    }
+    dirFavorite->setFavoriteItems(items);
     settings.endArray();
 
     settings.endGroup();
@@ -517,6 +589,71 @@ void LocalDirDockWidget::sortIndicatorChanged(int logicalIndex,
             compressModel_->sortItems(logicalIndex, true);
     }
 }
+
+void LocalDirDockWidget::favoritesDirContextMenu()
+{
+    QMenu menu;
+    QString currentFileName = dir();
+    QList<FavoriteItem> items = dirFavorite->favoriteItems();
+    bool isCurrent = false;
+    foreach(auto const& item, items)
+    {
+        QAction* action = menu.addAction(item.caption, this, [&](bool)
+        {
+            setDir(item.fileName);
+        }
+        );
+        if(currentFileName == item.fileName)
+        {
+            action->setCheckable(true);
+            action->setChecked(true);
+            isCurrent = true;
+        }
+    }
+    menu.addSeparator();
+    FavoriteItem item;
+    item.caption = QFileInfo(currentFileName).fileName();
+    item.fileName = currentFileName;
+
+    if(isCurrent)
+        menu.addAction(tr("Remove Current Folder"), this, [&](bool){
+            dirFavorite->removeItem(item);
+        });
+    else
+        menu.addAction(tr("Add Current Folder"), this, [&](bool){
+            QString caption = Utils::getText(tr("Caption of New Menu"), item.caption);
+            if(!caption.isEmpty())
+                item.caption = caption;
+            dirFavorite->addItem(item);
+    });
+    menu.addAction(tr("Settings"));
+    menu.exec(QCursor::pos());
+}
+
+void LocalDirDockWidget::historyDirContextMenu()
+{
+    QStringList const& dirNames = dirHistory->dirs();
+    if(dirNames.isEmpty())
+        return;
+
+    QMenu menu;
+    QString currentDir = dir();
+
+    foreach(auto const& dirName, dirNames)
+    {
+        QAction* action = menu.addAction(dirName, this, [&](bool){
+            setDir(dirName);
+        });
+
+        if(dirName == currentDir)
+        {
+            action->setCheckable(true);
+            action->setChecked(true);
+        }
+    }
+    menu.exec(QCursor::pos());
+}
+
 
 void LocalDirDockWidget::customNormalContextMenu(const QPoint & pos)
 {
@@ -1647,6 +1784,8 @@ void LocalDirDockWidget::updateCurrentDir(QString const& dir,
         titleBarWidget->setTitle(dir);
     else
         titleBarWidget->setTitle(caption);
-    emit dirChanged(dir, isNavigation);
+    if(!isNavigation)
+        dirHistory->add(dir);
+    emit dirChanged(dir);
     emit statusTextChanged(getStatusText());
 }

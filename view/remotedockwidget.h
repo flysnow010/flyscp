@@ -34,7 +34,10 @@ public:
                 QString const& caption = QString(),
                 bool  isNavigation = false) override;
     QString dir() const override;
+    QString findDir(QString const& prefix) const override;
     void cd(QString const& dir) override;
+    void preDir() override;
+    void nextDir() override;
     QString home() const override;
     QString root() const override;
     void refresh() override;

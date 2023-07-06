@@ -107,6 +107,12 @@ QString RemoteDockWidget::dir() const
     return model_->dirName();
 }
 
+QString RemoteDockWidget::findDir(QString const& prefix) const
+{
+    return dirHistory->find(prefix);
+}
+
+
 void RemoteDockWidget::cd(QString const& dir)
 {
     if(dir == "..")
@@ -121,6 +127,20 @@ void RemoteDockWidget::cd(QString const& dir)
         if(fileInfo->is_dir())
             openDir(fileInfo);
     }
+}
+
+void RemoteDockWidget::preDir()
+{
+    QString newDir = dirHistory->pre(dir());
+    if(!newDir.isEmpty())
+        setDir(newDir, QString(), true);
+}
+
+void RemoteDockWidget::nextDir()
+{
+    QString newDir = dirHistory->next(dir());
+    if(!newDir.isEmpty())
+        setDir(newDir, QString(), true);
 }
 
 QString RemoteDockWidget::home() const

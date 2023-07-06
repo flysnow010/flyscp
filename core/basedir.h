@@ -13,7 +13,10 @@ public:
                         QString const& caption = QString(),
                         bool isNavigation = false) = 0;
     virtual QString dir() const = 0;
+    virtual QString findDir(QString const& prefix) const = 0;
     virtual void cd(QString const& dir) = 0;
+    virtual void preDir() = 0;
+    virtual void nextDir() = 0;
     virtual QString home() const = 0;
     virtual QString root() const = 0;
     virtual void refresh() = 0;

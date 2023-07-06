@@ -14,6 +14,8 @@ class QMimeData;
 class TitleBarWidget;
 class QItemSelectionModel;
 class DirModel;
+class DirFavorite;
+class DirHistory;
 class QFileSystemWatcher;
 class LocalDirDockWidget : public QDockWidget, public BaseDir
 {
@@ -29,7 +31,10 @@ public:
                 QString const& caption = QString(),
                 bool isNavigation  = false) override;
     QString dir() const override;
+    QString findDir(QString const& prefix) const override;
     void cd(QString const& dir) override;
+    void preDir() override;
+    void nextDir() override;
     QString home() const override;
     QString root() const override;
     void refresh() override;
@@ -89,8 +94,7 @@ signals:
     void sectionResized(int logicalIndex,
                         int oldSize,
                         int newSize);
-    void dirChanged(QString const& dir,
-                    bool isNavigation);
+    void dirChanged(QString const& dir);
     void statusTextChanged(QString const& text);
     void libDirContextMenuRequested();
     void favoritesDirContextMenuRequested();
@@ -111,6 +115,8 @@ private slots:
     void directoryChanged(const QString &path);
     void sortIndicatorChanged(int logicalIndex,
                               Qt::SortOrder order);
+    void favoritesDirContextMenu();
+    void historyDirContextMenu();
     void customNormalContextMenu(const QPoint &pos);
     void customCompressContextMenu(const QPoint &pos);
 
@@ -164,6 +170,8 @@ private:
     CompressDirModel* compressModel_;
     TitleBarWidget* titleBarWidget;
     QWidget*        hideBarWidget;
+    DirFavorite* dirFavorite;
+    DirHistory* dirHistory;
     QFileSystemWatcher* fileSystemWatcher;
     ViewMode viewMode_ = Normal;
 };

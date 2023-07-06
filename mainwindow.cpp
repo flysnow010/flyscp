@@ -335,31 +335,19 @@ void MainWindow::createViewConnect()
     });
 
     connect(leftDirView, &LocalDirDockWidget::dirChanged,
-            this, [&](QString const& dir, bool isNavigation){
-        leftPanelWidget->addDirToHistory(dir, isNavigation);
+            this, [&](QString const&){
+        leftPanelWidget->upddateDrive();
     });
 
     connect(rightDirView, &LocalDirDockWidget::dirChanged,
-            this, [&](QString const& dir, bool isNavigation){
-        rightPanelWidget->addDirToHistory(dir, isNavigation);
+            this, [&](QString const&){
+        rightPanelWidget->upddateDrive();
     });
 
     connect(leftDirView, &LocalDirDockWidget::libDirContextMenuRequested,
             this, [&]()
     {
         leftPanelWidget->libDirContextMenu();
-    });
-
-    connect(leftDirView, &LocalDirDockWidget::favoritesDirContextMenuRequested,
-            this, [&]()
-    {
-        leftPanelWidget->favoritesDirContextMenu();
-    });
-
-    connect(leftDirView, &LocalDirDockWidget::historyDirContextMenuRequested,
-            this, [&]()
-    {
-        leftPanelWidget->historyDirContextMenu();
     });
 
     connect(leftDirView, &LocalDirDockWidget::copyRequested,
@@ -378,18 +366,6 @@ void MainWindow::createViewConnect()
             this, [&]()
     {
         rightPanelWidget->libDirContextMenu();
-    });
-
-    connect(rightDirView, &LocalDirDockWidget::favoritesDirContextMenuRequested,
-            this, [&]()
-    {
-        rightPanelWidget->favoritesDirContextMenu();
-    });
-
-    connect(rightDirView, &LocalDirDockWidget::historyDirContextMenuRequested,
-            this, [&]()
-    {
-        rightPanelWidget->historyDirContextMenu();
     });
 
     connect(rightDirView, &LocalDirDockWidget::copyRequested,
@@ -427,13 +403,13 @@ void MainWindow::createViewConnect()
     });
 
     connect(leftDirView, &LocalDirDockWidget::dirChanged,
-            this, [&](QString const& dir, bool)
+            this, [&](QString const& dir)
     {
         commandBar->setDir(dir);
     });
 
     connect(rightDirView, &LocalDirDockWidget::dirChanged,
-            this, [&](QString const& dir, bool)
+            this, [&](QString const& dir)
     {
         commandBar->setDir(dir);
     });
@@ -479,8 +455,6 @@ void MainWindow::save()
     saveSettings();
     leftDirView->saveSettings("LeftDirView");
     rightDirView->saveSettings("RightDirView");
-    leftPanelWidget->saveSettings("LeftPanel");
-    rightPanelWidget->saveSettings("RightPane");
     sshSettingsMangaer_->save(QString("%1/settings.json")
                               .arg(Utils::sshSettingsPath()));
     theOptionManager.save("Options");
@@ -491,8 +465,6 @@ void MainWindow::load()
     bool leftDirViewIsActived = loadSettings();
     leftDirView->loadSettings("LeftDirView");
     rightDirView->loadSettings("RightDirView");
-    leftPanelWidget->loadSettings("LeftPanel");
-    rightPanelWidget->loadSettings("RightPane");
     leftPanelWidget->updateTexts(leftDirView);
     rightPanelWidget->updateTexts(rightDirView);
     sshSettingsMangaer_->load(QString("%1/settings.json")
