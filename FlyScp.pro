@@ -39,6 +39,7 @@ SOURCES += \
     dialog/fileprogressdialog.cpp \
     dialog/networksettingsdialog.cpp \
     dialog/optionsdialog.cpp \
+    dialog/passworddialog.cpp \
     dialog/permissionsdialog.cpp \
     dialog/propertydialog.cpp \
     dialog/searchfiledialog.cpp \
@@ -102,6 +103,7 @@ HEADERS += \
     dialog/fileprogressdialog.h \
     dialog/networksettingsdialog.h \
     dialog/optionsdialog.h \
+    dialog/passworddialog.h \
     dialog/permissionsdialog.h \
     dialog/propertydialog.h \
     dialog/searchfiledialog.h \
@@ -143,6 +145,7 @@ FORMS += \
     dialog/fileprogressdialog.ui \
     dialog/networksettingsdialog.ui \
     dialog/optionsdialog.ui \
+    dialog/passworddialog.ui \
     dialog/permissionsdialog.ui \
     dialog/propertydialog.ui \
     dialog/searchfiledialog.ui \
