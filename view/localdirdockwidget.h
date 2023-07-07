@@ -68,7 +68,8 @@ public:
     void newFolder() override;
     void newTxtFile() override;
     void deleteFiles() override;
-
+    void selectAll() override;
+    void searchFiles(QString const& dstFilePath) override;
     void setActived(bool isActived) override;
     bool isActived() const override;
     void retranslateUi() override;
@@ -82,12 +83,12 @@ public:
     void copyFiles(QString const& dstFilePath);
     void moveFiles(QString const& dstFilePath);
 
-    void selectAll();
+
     void compressFiles(QString const& dstFilePath);
     void uncompressFiles(QString const& dstFilePath);
     void extractFiles(QStringList const& fileNames,
                       QString const& targetPath);
-    void searchFiles(QString const& dstFilePath);
+
 
 signals:
     void sectionResized(int logicalIndex,

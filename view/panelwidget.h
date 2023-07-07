@@ -65,7 +65,8 @@ public:
     void newFolder();
     void newTxtFile();
     void deleteFiles();
-
+    void selectAll();
+    void searchFiles(QString const& dstFilePath);
     bool isActived() const;
     void setUnActived();
     void refreshCurrent();

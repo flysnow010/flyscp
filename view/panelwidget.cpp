@@ -459,6 +459,20 @@ void PanelWidget::deleteFiles()
         dir->deleteFiles();
 }
 
+void PanelWidget::selectAll()
+{
+    BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
+    if(dir)
+        dir->selectAll();
+}
+
+void PanelWidget::searchFiles(QString const& dstFilePath)
+{
+    BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
+    if(dir)
+        dir->searchFiles(dstFilePath);
+}
+
 bool PanelWidget::isActived() const
 {
     BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());

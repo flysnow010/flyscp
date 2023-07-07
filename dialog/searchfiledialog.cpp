@@ -1,5 +1,5 @@
-#include "serchfiledialog.h"
-#include "ui_serchfiledialog.h"
+#include "searchfiledialog.h"
+#include "ui_searchfiledialog.h"
 #include "util/utils.h"
 
 #include "core/filetransfer.h"
@@ -11,19 +11,29 @@
 #include <QSettings>
 #include <QDebug>
 
-SerchFileDialog::SerchFileDialog(QWidget *parent)
+SearchFileDialog::SearchFileDialog(Mode mode, QWidget *parent)
     : QDialog(parent)
-    , ui(new Ui::SerchFileDialog)
+    , ui(new Ui::SearchFileDialog)
+    , mode_(mode)
     , dirverMenu(new QMenu(this))
     , model(new StringListModel(this))
     , isSearching(false)
 {
     ui->setupUi(this);
 
-    ui->btnDrivers->setMenu(dirverMenu);
     setWindowFlags(Qt::Widget);
     startSearch(false);
-    createDriverMenu();
+    if(mode_ == Local)
+    {
+        ui->btnDrivers->setMenu(dirverMenu);
+        createDriverMenu();
+    }
+    else
+    {
+        ui->btnBrowseFolder->hide();
+        ui->btnDrivers->hide();
+        ui->gridLayout->setHorizontalSpacing(0);
+    }
 
     connect(ui->lwResult, &QListView::doubleClicked,
             this, [=](QModelIndex const& index)
@@ -85,22 +95,22 @@ SerchFileDialog::SerchFileDialog(QWidget *parent)
     });
 
     connect(ui->btnStartSearch, &QPushButton::clicked,
-            this, &SerchFileDialog::searchFiles);
+            this, &SearchFileDialog::searchFiles);
     loadSettings();
 }
 
-SerchFileDialog::~SerchFileDialog()
+SearchFileDialog::~SearchFileDialog()
 {
     saveSettings();
     delete ui;
 }
 
-void SerchFileDialog::setSearchPath(QString  const& filePath)
+void SearchFileDialog::setSearchPath(QString  const& filePath)
 {
     ui->cbFolder->setCurrentText(filePath);
 }
 
-void SerchFileDialog::searchFiles()
+void SearchFileDialog::searchFiles()
 {
     startSearch(true);
     fileNames.clear();
@@ -177,7 +187,7 @@ void SerchFileDialog::searchFiles()
     }
 }
 
-void SerchFileDialog::setSeearchState(bool isSearching)
+void SearchFileDialog::setSeearchState(bool isSearching)
 {
     ui->btnBrowseFolder->setDisabled(isSearching);
     ui->btnDrivers->setDisabled(isSearching);
@@ -189,7 +199,7 @@ void SerchFileDialog::setSeearchState(bool isSearching)
     ui->btnStartSearch->setDisabled(isSearching);
 }
 
-void SerchFileDialog::startSearch(bool isStart)
+void SearchFileDialog::startSearch(bool isStart)
 {
     ui->widgetResult->setVisible(isStart);
     ui->widgetButtons->setVisible(isStart);
@@ -197,13 +207,13 @@ void SerchFileDialog::startSearch(bool isStart)
     adjustSize();
 }
 
-void SerchFileDialog::insertText(int row, QString const& text)
+void SearchFileDialog::insertText(int row, QString const& text)
 {
     model->insertRows(row, 1);
     model->setData(model->index(row), text);
 }
 
-void SerchFileDialog::createDriverMenu()
+void SearchFileDialog::createDriverMenu()
 {
     QFileInfoList fileInfos = QDir::drives();
     QFileIconProvider iconProvider;
@@ -219,7 +229,7 @@ void SerchFileDialog::createDriverMenu()
 }
 
 #define MAX_ITEM_COUNT 10
-void SerchFileDialog::addCurentItem(QComboBox* cb)
+void SearchFileDialog::addCurentItem(QComboBox* cb)
 {
     QString text = cb->currentText();
     int index = cb->findText(text);
@@ -237,7 +247,7 @@ void SerchFileDialog::addCurentItem(QComboBox* cb)
     cb->setCurrentText(text);
 }
 
-void SerchFileDialog::saveSettings()
+void SearchFileDialog::saveSettings()
 {
     QSettings settings(QCoreApplication::applicationName(),
                        QCoreApplication::applicationVersion());
@@ -265,7 +275,7 @@ void SerchFileDialog::saveSettings()
     settings.endGroup();
 }
 
-void SerchFileDialog::loadSettings()
+void SearchFileDialog::loadSettings()
 {
     QSettings settings(QCoreApplication::applicationName(),
                        QCoreApplication::applicationVersion());

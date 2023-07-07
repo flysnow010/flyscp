@@ -50,6 +50,8 @@ public:
     virtual void newFolder() = 0;
     virtual void newTxtFile() = 0;
     virtual void deleteFiles() = 0;
+    virtual void selectAll() = 0;
+    virtual void searchFiles(QString const& dir) = 0;
     virtual void setActived(bool isActived) = 0;
     virtual bool isActived() const = 0;
     virtual void retranslateUi() = 0;

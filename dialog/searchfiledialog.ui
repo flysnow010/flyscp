@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>SerchFileDialog</class>
- <widget class="QDialog" name="SerchFileDialog">
+ <class>SearchFileDialog</class>
+ <widget class="QDialog" name="SearchFileDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -29,6 +29,9 @@
          <string>Normal</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout" columnstretch="0,1,0,0,0" columnminimumwidth="0,0,0,0,0">
+         <property name="horizontalSpacing">
+          <number>6</number>
+         </property>
          <item row="0" column="0">
           <widget class="QLabel" name="label">
            <property name="text">

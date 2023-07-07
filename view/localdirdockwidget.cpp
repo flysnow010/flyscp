@@ -19,7 +19,7 @@
 #include "dialog/compressconfirmdialog.h"
 #include "dialog/uncompressconfirmdialog.h"
 #include "dialog/propertydialog.h"
-#include "dialog/serchfiledialog.h"
+#include "dialog/searchfiledialog.h"
 
 #include <QMenu>
 #include <QSettings>
@@ -767,8 +767,8 @@ void LocalDirDockWidget::customNormalContextMenu(const QPoint & pos)
     }
     else
     {
-        menu.addAction(tr("New Folder"), this, SLOT(newFolder()));
-        menu.addAction(tr("New Txt File"), this, SLOT(newTxtFile()));
+        menu.addAction(tr("New Folder"), this, [=](){ newFolder(); });
+        menu.addAction(tr("New Txt File"), this, [=](){ newTxtFile(); });
     }
     menu.addSeparator();
     menu.addAction(tr("Properties"), this, [&](bool) {
@@ -1485,16 +1485,16 @@ void LocalDirDockWidget::extractFiles(QStringList const& fileNames,
 
 void LocalDirDockWidget::searchFiles(QString const& dstFilePath)
 {
-    SerchFileDialog dialog;
+    SearchFileDialog dialog;
     dialog.setSearchPath(dstFilePath);
-    connect(&dialog, &SerchFileDialog::viewFile,
+    connect(&dialog, &SearchFileDialog::viewFile,
             this, [=](QString const& fileName)
     {
         QFileInfo fileInfo(fileName);
         if(fileInfo.isFile())
             WinShell::Exec(Utils::viewApp(), fileName);
     });
-    connect(&dialog, &SerchFileDialog::goToFile,
+    connect(&dialog, &SearchFileDialog::goToFile,
             this, [=](QString const& fileName)
     {
         goToFile(fileName);
@@ -1518,7 +1518,7 @@ void LocalDirDockWidget::execCommand(QString const& command)
 
 void LocalDirDockWidget::newTxtFile()
 {
-    QString fileName = Utils::getText(tr("File Name", "*.txt"));
+    QString fileName = Utils::getText(tr("File Name"), "*.txt");
     if(fileName.isEmpty())
         return;
     if(ui->tvNormal->isVisible())

@@ -608,10 +608,10 @@ void MainWindow::delFiles()
 
 void MainWindow::selectAll()
 {
-    if(leftDirView->isActived())
-        leftDirView->selectAll();
+    if(leftPanelWidget->isActived())
+        leftPanelWidget->selectAll();
     else
-        rightDirView->selectAll();
+        rightPanelWidget->selectAll();
 }
 
 void MainWindow::compressFiles()
@@ -644,10 +644,10 @@ void MainWindow::uncompressFiles()
 
 void MainWindow::searchFiles()
 {
-    if(leftDirView->isActived())
-        leftDirView->searchFiles(leftDirView->dir());
+    if(leftPanelWidget->isActived())
+        leftPanelWidget->searchFiles(leftDirView->dir());
     else
-        rightDirView->searchFiles(rightDirView->dir());
+        rightPanelWidget->searchFiles(rightDirView->dir());
 }
 
 void MainWindow::diffFolders()

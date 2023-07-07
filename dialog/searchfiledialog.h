@@ -1,22 +1,23 @@
-#ifndef SERCHFILEDIALOG_H
-#define SERCHFILEDIALOG_H
+#ifndef SEARCHFILEDIALOG_H
+#define SEARCHFILEDIALOG_H
 
 #include <QDialog>
 
 namespace Ui {
-class SerchFileDialog;
+class SearchFileDialog;
 }
 
 class StringListModel;
 class QMenu;
 class QComboBox;
-class SerchFileDialog : public QDialog
+class SearchFileDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit SerchFileDialog(QWidget *parent = nullptr);
-    ~SerchFileDialog();
+    enum Mode { Local, Remote };
+    explicit SearchFileDialog(Mode mode = Mode::Local, QWidget *parent = nullptr);
+    ~SearchFileDialog();
 
     void setSearchPath(QString  const& filePath);
 signals:
@@ -34,11 +35,12 @@ private:
     void loadSettings();
     void addCurentItem(QComboBox* cb);
 private:
-    Ui::SerchFileDialog *ui;
+    Ui::SearchFileDialog *ui;
+    Mode mode_;
     QMenu* dirverMenu;
     StringListModel* model;
     QStringList fileNames;
     bool isSearching;
 };
 
-#endif // SERCHFILEDIALOG_H
+#endif // SEARCHFILEDIALOG_H

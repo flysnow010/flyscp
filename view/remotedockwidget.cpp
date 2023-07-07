@@ -16,6 +16,7 @@
 #include "core/sftpfilemanager.h"
 #include "util/utils.h"
 #include "dialog/fileprogressdialog.h"
+#include "dialog/searchfiledialog.h"
 
 #include <QDebug>
 
@@ -438,10 +439,29 @@ void RemoteDockWidget::deleteFiles()
         delFiles();
 }
 
+void RemoteDockWidget::selectAll()
+{
+    ui->treeView->selectAll();
+    if(model_->isParent(0))
+    {
+        QModelIndexList indexList = ui->treeView->selectionModel()->selectedColumns(0);
+        foreach(auto const& index, indexList)
+            ui->treeView->selectionModel()->select(index,
+                                                   QItemSelectionModel::Deselect);
+    }
+}
+
+void RemoteDockWidget::searchFiles(QString const& dstFilePath)
+{
+    SearchFileDialog dialog(SearchFileDialog::Remote);
+    dialog.exec();
+}
+
 void RemoteDockWidget::setActived(bool isActived)
 {
     titleBarWidget->setActived(isActived);
 }
+
 
 bool RemoteDockWidget::isActived() const
 {
@@ -675,7 +695,7 @@ void RemoteDockWidget::newFolder()
 
 void RemoteDockWidget::newTxtFile()
 {
-    QString fileName = Utils::getText(tr("File Name"));
+    QString fileName = Utils::getText(tr("File Name"), ".txt");
     if(fileName.isEmpty())
         return;
     if(model_->mkFile(fileName.toStdString()))

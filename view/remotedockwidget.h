@@ -71,6 +71,8 @@ public:
     void newFolder() override;
     void newTxtFile() override;
     void deleteFiles() override;
+    void selectAll() override;
+    void searchFiles(QString const& dstFilePath) override;
     void setActived(bool isActived) override;
     bool isActived() const override;
     void retranslateUi() override;
