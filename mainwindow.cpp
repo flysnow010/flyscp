@@ -10,6 +10,7 @@
 #include "dialog/connectdialog.h"
 #include "dialog/optionsdialog.h"
 #include "dialog/networksettingsdialog.h"
+#include "dialog/passworddialog.h"
 #include "dialog/aboutdialog.h"
 #include "util/utils.h"
 #include "core/winshell.h"
@@ -173,11 +174,16 @@ void MainWindow::updateConnectMenu()
     {
         SSHSettings::Ptr settings = sshSettingsMangaer_->settings(i);
         connectMenu->addAction(settings->name, this, [=](){
-                settings->passWord = Utils::getPassword(QString(tr("Password for %1"))
-                                                        .arg(settings->name));
-                if(settings->passWord.isEmpty())
-                    return;
-                createRemoteDirWidget(*settings);
+                PasswordDialog dialog;
+                dialog.setPromptText(QString(tr("Password for %1"))
+                                     .arg(settings->name));
+                if(dialog.exec() == QDialog::Accepted)
+                {
+                    settings->passWord = dialog.password();
+                    if(settings->passWord.isEmpty())
+                        return;
+                    createRemoteDirWidget(*settings);
+                }
         });
     }
     if(sshSettingsMangaer_->size() > 0)
@@ -678,11 +684,16 @@ void MainWindow::connectSftp()
         SSHSettings::Ptr settings = dialog.sshSettings();
         sshSettingsMangaer_->addSettings(settings);
         updateConnectMenu();
-        settings->passWord = Utils::getPassword(QString(tr("Password for %1"))
-                                                .arg(settings->name));
-        if(settings->passWord.isEmpty())
-            return;
-        createRemoteDirWidget(*settings);
+        PasswordDialog dialog;
+        dialog.setPromptText(QString(tr("Password for %1"))
+                             .arg(settings->name));
+        if(dialog.exec() == QDialog::Accepted)
+        {
+            settings->passWord = dialog.password();
+            if(settings->passWord.isEmpty())
+                return;
+            createRemoteDirWidget(*settings);
+        }
     }
 }
 
@@ -760,11 +771,16 @@ void MainWindow::netsettings()
         SSHSettings::Ptr settings = sshSettingsMangaer_->settings(index);
         if(settings)
         {
-            settings->passWord = Utils::getPassword(QString(tr("Password for %1"))
-                                                    .arg(settings->name));
-            if(settings->passWord.isEmpty())
-                return;
-            createRemoteDirWidget(*settings);
+            PasswordDialog dialog;
+            dialog.setPromptText(QString(tr("Password for %1"))
+                                 .arg(settings->name));
+            if(dialog.exec() == QDialog::Accepted)
+            {
+                settings->passWord = dialog.password();
+                if(settings->passWord.isEmpty())
+                    return;
+                createRemoteDirWidget(*settings);
+            }
         }
     }
     updateConnectMenu();
