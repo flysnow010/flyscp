@@ -2,6 +2,12 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 
+
+QString SSHSettings::key() const
+{
+    return QString("%1@%2:%3").arg(userName, hostName).arg(port);
+}
+
 SSHSettingsManager::SSHSettingsManager()
 {}
 

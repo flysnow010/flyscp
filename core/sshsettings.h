@@ -15,6 +15,7 @@ struct SSHSettings
     QString privateKeyFileName;
     int port = 22;
     bool usePrivateKey = false;
+    QString key() const;
 };
 
 class SSHSettingsManager
