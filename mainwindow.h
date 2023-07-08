@@ -12,6 +12,7 @@ class LocalDirDockWidget;
 class ToolButtons;
 class SSHSettings;
 class SSHSettingsManager;
+class UserAuthManager;
 class StatusBar;
 class CommandBar;
 class LayoutOption;
@@ -70,7 +71,8 @@ private:
     void createHelpMenu();
     void createDiffMenu();
     void createToolButtons();
-    void createRemoteDirWidget(SSHSettings const& settings);
+    void connectToSSh(SSHSettings & settings);
+    void createRemoteDirWidget(SSHSettings const& settings, bool isSavePassword);
     void updateConnectMenu();
     void updateLayout(LayoutOption const& option);
     void updateDisplay(DisplayOption const& option, bool isRefresh = true);
@@ -83,6 +85,7 @@ private:
     static QTranslator appTranslator;
     static QTranslator sysTranslator;
     SSHSettingsManager *sshSettingsMangaer_;
+    UserAuthManager* userAuthManager_;
     QMenu* connectMenu;
     QMenu* diffMenu;
     QAction* diffFilesAction = 0;

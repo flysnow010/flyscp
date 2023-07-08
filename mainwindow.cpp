@@ -15,6 +15,7 @@
 #include "util/utils.h"
 #include "core/winshell.h"
 #include "core/sshsettings.h"
+#include "core/userauth.h"
 #include "core/languagemanager.h"
 
 #include <QSplitter>
@@ -73,6 +74,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , sshSettingsMangaer_(new SSHSettingsManager)
+    , userAuthManager_(new UserAuthManager(this))
     , connectMenu(new QMenu(this))
     , diffMenu(new QMenu(this))
     , leftPanelWidget(new PanelWidget(this))
@@ -173,18 +175,7 @@ void MainWindow::updateConnectMenu()
     for(int i = 0; i < sshSettingsMangaer_->size(); i++)
     {
         SSHSettings::Ptr settings = sshSettingsMangaer_->settings(i);
-        connectMenu->addAction(settings->name, this, [=](){
-                PasswordDialog dialog;
-                dialog.setPromptText(QString(tr("Password for %1"))
-                                     .arg(settings->name));
-                if(dialog.exec() == QDialog::Accepted)
-                {
-                    settings->passWord = dialog.password();
-                    if(settings->passWord.isEmpty())
-                        return;
-                    createRemoteDirWidget(*settings);
-                }
-        });
+        connectMenu->addAction(settings->name, this, [=](){ connectToSSh(*settings); });
     }
     if(sshSettingsMangaer_->size() > 0)
         connectMenu->addSeparator();
@@ -474,6 +465,7 @@ void MainWindow::save()
     sshSettingsMangaer_->save(QString("%1/settings.json")
                               .arg(Utils::sshSettingsPath()));
     theOptionManager.save("Options");
+    userAuthManager_->save();
 }
 
 void MainWindow::load()
@@ -505,6 +497,7 @@ void MainWindow::load()
 
     leftPanelWidget->refresh();
     rightPanelWidget->refresh();
+    userAuthManager_->load();
 }
 
 void MainWindow::saveSettings()
@@ -684,16 +677,7 @@ void MainWindow::connectSftp()
         SSHSettings::Ptr settings = dialog.sshSettings();
         sshSettingsMangaer_->addSettings(settings);
         updateConnectMenu();
-        PasswordDialog dialog;
-        dialog.setPromptText(QString(tr("Password for %1"))
-                             .arg(settings->name));
-        if(dialog.exec() == QDialog::Accepted)
-        {
-            settings->passWord = dialog.password();
-            if(settings->passWord.isEmpty())
-                return;
-            createRemoteDirWidget(*settings);
-        }
+        connectToSSh(*settings);
     }
 }
 
@@ -764,31 +748,55 @@ void MainWindow::options()
 void MainWindow::netsettings()
 {
     NetworkSettingsDialog dialog;
-    dialog.setManager(sshSettingsMangaer_);
+    dialog.setSettingsManager(sshSettingsMangaer_);
+    dialog.setAuthManager(userAuthManager_);
     if(dialog.exec() == QDialog::Accepted)
     {
         int index = dialog.connectIndex();
         SSHSettings::Ptr settings = sshSettingsMangaer_->settings(index);
         if(settings)
-        {
-            PasswordDialog dialog;
-            dialog.setPromptText(QString(tr("Password for %1"))
-                                 .arg(settings->name));
-            if(dialog.exec() == QDialog::Accepted)
-            {
-                settings->passWord = dialog.password();
-                if(settings->passWord.isEmpty())
-                    return;
-                createRemoteDirWidget(*settings);
-            }
-        }
+            connectToSSh(*settings);
     }
     updateConnectMenu();
 }
 
-void MainWindow::createRemoteDirWidget(SSHSettings const& settings)
+void MainWindow::connectToSSh(SSHSettings & settings)
+{
+    QString key = UserAuth::hash(settings.key());
+    UserAuth::Ptr userAuth = userAuthManager_->findUserAuth(key);
+
+    if(userAuth)
+    {
+        settings.passWord = userAuth->auth;
+        createRemoteDirWidget(settings, false);
+    }
+    else
+    {
+        PasswordDialog dialog;
+        dialog.setPromptText(QString(tr("Password for %1"))
+                             .arg(settings.name));
+        if(dialog.exec() == QDialog::Accepted)
+        {
+            settings.passWord = dialog.password();
+            if(settings.passWord.isEmpty())
+                return;
+            createRemoteDirWidget(settings, dialog.isSavePassword());
+        }
+    }
+}
+
+void MainWindow::createRemoteDirWidget(SSHSettings const& settings, bool isSavePassword)
 {
     RemoteDockWidget* remoteDockWidget = new RemoteDockWidget(this);
+    connect(remoteDockWidget, &RemoteDockWidget::logined, this, [=](){
+        if(isSavePassword)
+        {
+            UserAuth::Ptr userAuth(new UserAuth());
+            userAuth->key = UserAuth::hash(settings.key());
+            userAuth->auth = settings.passWord;
+            userAuthManager_->addUserAuth(userAuth);
+        }
+    });
     remoteDockWidget->start(settings);
 
     if(rightPanelWidget->tabCount() <= leftPanelWidget->tabCount())
