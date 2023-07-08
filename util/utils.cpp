@@ -38,6 +38,16 @@ QString Utils::sshSettingsPath()
     return path;
 }
 
+
+QString Utils::sshUserAuthPath()
+{
+    QString path = QString("%1/sshUserAuth").arg(currentPath());
+    QDir dir(path);
+    if(!dir.exists(path))
+        dir.mkpath(path);
+    return path;
+}
+
 QString Utils::languagePath()
 {
     return QString("%1/languages").arg(QApplication::applicationDirPath());
