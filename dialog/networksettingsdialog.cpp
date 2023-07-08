@@ -1,14 +1,17 @@
 #include "networksettingsdialog.h"
 #include "ui_networksettingsdialog.h"
 #include "model/netsettingsmodel.h"
+#include "core/userauth.h"
 #include "connectdialog.h"
+
 #include <QSettings>
 
 NetworkSettingsDialog::NetworkSettingsDialog(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::NetworkSettingsDialog)
     , model_(new NetSettingsModel(this))
-    , manager_(0)
+    , sshSettingsManager_(0)
+    , userAuthManager_(0)
     , connectIndex_(-1)
 {
     ui->setupUi(this);
@@ -25,10 +28,15 @@ NetworkSettingsDialog::~NetworkSettingsDialog()
     delete ui;
 }
 
-void NetworkSettingsDialog::setManager(SSHSettingsManager* manager)
+void NetworkSettingsDialog::setSettingsManager(SSHSettingsManager* manager)
 {
-    manager_ = manager;
-    model_->setSettingsManager(manager_);
+    sshSettingsManager_ = manager;
+    model_->setSettingsManager(sshSettingsManager_);
+}
+
+void NetworkSettingsDialog::setAuthManager(UserAuthManager* manager)
+{
+    userAuthManager_ = manager;
 }
 
 void NetworkSettingsDialog::createConnects()
@@ -48,7 +56,7 @@ void NetworkSettingsDialog::createConnects()
         if(dialog.exec() == QDialog::Accepted)
         {
             SSHSettings::Ptr settings = dialog.sshSettings();
-            manager_->addSettings(settings);
+            sshSettingsManager_->addSettings(settings);
             model_->refresh();
         }
     });
@@ -65,7 +73,7 @@ void NetworkSettingsDialog::createConnects()
         {
             ConnectDialog dialog;
             dialog.setType(SSH);
-            dialog.setSshSettings(manager_->settings(index));
+            dialog.setSshSettings(sshSettingsManager_->settings(index));
             if(dialog.exec() == QDialog::Accepted)
             {
                 dialog.sshSettings();
@@ -78,7 +86,9 @@ void NetworkSettingsDialog::createConnects()
         int index = ui->treeView->currentIndex().row();
         if(index >= 0)
         {
-            manager_->removeSettings(manager_->settings(index));
+            SSHSettings::Ptr settings = sshSettingsManager_->settings(index);
+            userAuthManager_->delUserAuth(settings->key());
+            sshSettingsManager_->removeSettings(settings);
             model_->refresh();
         }
     });

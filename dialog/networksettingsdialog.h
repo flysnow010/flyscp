@@ -8,6 +8,7 @@ class NetworkSettingsDialog;
 }
 class NetSettingsModel;
 class SSHSettingsManager;
+class UserAuthManager;
 class NetworkSettingsDialog : public QDialog
 {
     Q_OBJECT
@@ -16,7 +17,8 @@ public:
     explicit NetworkSettingsDialog(QWidget *parent = nullptr);
     ~NetworkSettingsDialog();
 
-    void setManager(SSHSettingsManager* manager);
+    void setSettingsManager(SSHSettingsManager* manager);
+    void setAuthManager(UserAuthManager* manager);
     int connectIndex() const { return connectIndex_; }
 private:
     void createConnects();
@@ -25,7 +27,8 @@ private:
 private:
     Ui::NetworkSettingsDialog *ui;
     NetSettingsModel* model_;
-    SSHSettingsManager* manager_;
+    SSHSettingsManager* sshSettingsManager_;
+    UserAuthManager* userAuthManager_;
     int connectIndex_;
 };
 
