@@ -5,7 +5,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 CONFIG += c++11
 
 INCLUDEPATH += ./include
-LIBS += -L$$(PWD)\lib -lssh.dll -lshlwapi
+LIBS += -L$$(PWD)\lib -lssh.dll -lrsa -lshlwapi
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
@@ -31,6 +31,7 @@ SOURCES += \
     core/shellmemmanager.cpp \
     core/sshsession.cpp \
     core/sshsettings.cpp \
+    core/userauth.cpp \
     core/winshell.cpp \
     dialog/aboutdialog.cpp \
     dialog/compressconfirmdialog.cpp \
@@ -95,6 +96,7 @@ HEADERS += \
     core/shellmemmanager.h \
     core/sshsession.h \
     core/sshsettings.h \
+    core/userauth.h \
     core/winshell.h \
     dialog/aboutdialog.h \
     dialog/compressconfirmdialog.h \
