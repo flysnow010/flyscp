@@ -660,6 +660,7 @@ void RemoteDockWidget::connected()
         model_->setDir(sftp->dir(homeDir));
 
     updateCurrentDir(model_->dirName());
+    emit logined();
 }
 
 void RemoteDockWidget::unconnected()

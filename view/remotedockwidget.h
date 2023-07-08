@@ -81,6 +81,7 @@ public:
     QString const& name() const { return name_; }
 
 signals:
+    void logined();
     void closeRequest(QWidget* widget);
     void statusTextChanged(QString const& text);
     void dirChanged(QString const& dir);
