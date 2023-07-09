@@ -1,6 +1,7 @@
 #ifndef DIRHISTORY_H
 #define DIRHISTORY_H
 #include <QStringList>
+#include <QDir>
 
 class DirHistory
 {
@@ -36,7 +37,14 @@ public:
         int index = dirs_.indexOf(dir);
         if(index < 0 || index  + 1 >= dirs_.size())
             return QString();
-        return dirs_.at(index + 1);
+
+        for(int i = index + 1; i < dirs_.size(); i++)
+        {
+            QString nextDir = dirs_.at(i);
+            if(QDir(nextDir).exists())
+                return nextDir;
+        }
+        return QString();
     }
 
     inline QString pre(QString const& dir) const
@@ -44,7 +52,14 @@ public:
         int index = dirs_.indexOf(dir);
         if(index <= 0)
             return QString();
-        return dirs_.at(index - 1);
+
+        for(int i = index - 1; i >= 0; i--)
+        {
+            QString preDir = dirs_.at(i);
+            if(QDir(preDir).exists())
+                return preDir;
+        }
+        return QString();
     }
 
     inline QStringList const& dirs() const { return dirs_; }

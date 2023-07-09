@@ -455,7 +455,9 @@ void LocalDirDockWidget::loadSettings(QString const& name)
     for(int i = 0; i < size; i++)
     {
         settings.setArrayIndex(i);
-        dirNames << settings.value("dirName").toString();
+        QString dirName = settings.value("dirName").toString();
+        if(QDir(dirName).exists())
+            dirNames << dirName;
     }
     dirHistory->setDirs(dirNames);
     settings.endArray();
