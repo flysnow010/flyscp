@@ -1,0 +1,66 @@
+7-Zip 是一款拥有极高压缩比的开源压缩软件。
+许可协议
+
+7-Zip 是一款开源的免费软件。大多数源代码都基于GNU LGPL许可协议下发布。部分代码基于BSD 3句条款（BSD 3-clause）许可协议发布。并且，部分代码受到了unRAR 许可协议的限制。更多许可信息请查看：7-Zip 许可。
+
+您可以在任何一台计算机上使用7-Zip ，包括用在商业用途的计算机。不对7-Zip进行注册或支付费用并不影响您的使用。
+7-Zip 主要特征
+    使用了 LZMA 与 LZMA2 算法的 7z 格式 拥有极高的压缩比
+    支持格式：
+        压缩 / 解压缩：7z、XZ、BZIP2、GZIP、TAR、ZIP 以及 WIM
+       仅解压缩：AR、ARJ、CAB、CHM、CPIO、CramFS、DMG、EXT、FAT、GPT、HFS、IHEX、ISO、LZH、LZMA、MBR、MSI、NSIS、NTFS、QCOW2、RAR、RPM、SquashFS、UDF、UEFI、VDI、VHD、VMDK、WIM、XAR 以及 Z
+    与 ZIP 及 GZIP 格式相比，7-Zip 能提供比使用 PKZip 及 WinZip 高 2-10% 的压缩比
+    为 7z 与 ZIP 提供更完善的 AES-256 加密算法
+    7z 格式支持创建自释放压缩包
+    Windows 资源管理器集成
+    强大的文件管理器
+    强大的命令行版本
+    支持 FAR Manager 插件
+    支持 87 种语言
+
+7-Zip 适用于 Windows 10 / 8 / 7 / Vista / XP / 2016 / 2012 / 2008 / 2003 / 2000。
+
+使用说明：
+1.压缩文件
+1.1.带路径压缩
+ 7z.exe a E:/test/book.zip -spf1 -r D:/work/rust/book/*"
+1.2.不带路径压缩
+ 7z.exe a E:/test/book.zip -r D:/work/rust/book/*"
+1.3.多卷压缩,分多个文件压缩，每个文件10M
+ 7z.exe a E:/test/book.zip -r D:/work/rust/book/* -v10m
+1.4.创建自解压文件,下面两个命令分别创建命令行和图形自解压文件
+ 7z.exe a E:/test/book.exe -r D:/work/rust/book/* -sfx7zCon.sfx -t7z
+ 7z.exe a E:/test/book1.exe -spf1 -r D:/work/rust/book/* -sfx7z.sfx -t7z
+1.5 创建加密压缩文件,密码admin
+ 7z.exe a E:/test/book.zip -r D:/work/rust/book/* -padmin
+
+2.解压文件
+2.1 解压文件到指定目录
+	7z.exe x E:/test/book.zip -oD:/work/rust/ToData *
+2.2 解压加密压缩文件
+	7z.exe x E:/test/book.zip -oD:/work/rust/ToData * -padmin 
+2.3 解压分卷压缩文件
+	7z.exe x E:/test/book.zip.* -oD:/work/rust/ziptest/book * -y
+	
+3. 重命名
+3.1将压缩包中目录book修改为books
+    7z.exe rn E:\test\book.zip book books
+
+4.删除
+4.1删除压缩包中文件print.css
+  7z.exe d E:\test\book.zip books\css\print.css
+  
+5.新建文件
+5.1在压缩包的css目录下新建文件test.txt
+ 7z.exe	a E:\test\book.zip test.txt
+ 7z rn E:\test\book.zip test.txt books\css\test.tx
+ 
+6.新建目录
+6.1在压缩包的css目录下新建文件夹test
+	mkdir E:\Temp\books\css\test
+	7z.exe a E:\test\book.zip E:\Temp\books\
+
+7.解压指定文件
+	7z	x E:\test\book.zip -oD:\work\rust\ziptest books\css\general.css -y
+
+	
