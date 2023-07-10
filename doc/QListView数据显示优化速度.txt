@@ -1,1 +1,5 @@
-将属性uniformItemSizes设置为true
+最近在做文件搜索，将搜索的文件放入一个QListView控件中，Model使用的是QStringListMode,
+搜索结果有200多万条，全部加入到QListView中后显示很慢，鼠标一直在转圈。QListView显示也就几十行
+不应该显示慢。经过调试发现QListView有一个属性uniformItemSizes的默认值是false,导致QListView内部
+对所有的项计算一遍，200多万条数据就需要计算200多万次，速度当然很慢了。
+将属性uniformItemSizes设置为true后，QListView只计算可显示的几十行，速度很快，达到设计要求。
