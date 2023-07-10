@@ -30,9 +30,10 @@ public:
 
     static bool isCompressFiles(QStringList const& fileNames,
                                 QString &unCompressfileName);
+    static bool isMultiVol(QStringList const& fileNames);
     bool uncompress(QStringList const& fileNames,
                     UncompressParam const& param,
-                    QString const& targetFilePath);
+                    QString const& targetFilePath, bool isMultiVol = false);
 
     bool isEncrypted(QString const& fileName);
     QStringList listFileInfo(QString const& fileName);
@@ -57,6 +58,7 @@ private:
     void onError(QString const& error);
     QString errorToText(int errorCode) const;
     QStringList nextArgs() const;
+    void addArgs(QStringList & args);
 private:
     QProcess* process;
     int currentIndex;

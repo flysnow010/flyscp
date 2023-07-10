@@ -4,6 +4,7 @@
 
 #include <QStringList>
 #include <QProcess>
+#include <QFileInfo>
 #include <QDebug>
 
 QString UncompressParam::overwriteMode() const
@@ -88,24 +89,25 @@ FileUncompresser::FileUncompresser(QObject *parent)
 
 bool FileUncompresser::uncompress(QStringList const& fileNames,
                                   UncompressParam const& param,
-                                  QString const& targetFilePath)
+                                  QString const& targetFilePath, bool isMultiVol)
 {
     mode = Uncompress;
     process->setProgram(Utils::compressApp());
     argsList.clear();
 
-    foreach(auto const& fileName, fileNames)
+    if(isMultiVol)
     {
         QStringList args;
+        QFileInfo fileInfo(fileNames[0]);
         args << (param.isWithPath ? "x" : "e")
-             << fileName;
+             << QString("%1/%2.*").arg(fileInfo.path(), fileInfo.completeBaseName());
 
         if(!param.isCreateDir)
             args << "-o" + targetFilePath;
         else
         {
             QDir dir(targetFilePath);
-            QString pathName = QFileInfo(fileName).baseName();
+            QString pathName = QFileInfo(fileNames[0]).baseName();
             dir.mkdir(pathName);
             args <<  "-o" + dir.filePath(pathName);
         }
@@ -114,7 +116,35 @@ bool FileUncompresser::uncompress(QStringList const& fileNames,
             args << "-p" + param.password;
         if(!param.isWithPath)
             args <<  param.overwriteMode() << "-y";
-        argsList << args;
+        else
+            args << "-y";
+
+        addArgs(args);
+    }
+    else
+    {
+        foreach(auto const& fileName, fileNames)
+        {
+            QStringList args;
+            args << (param.isWithPath ? "x" : "e")
+                 << fileName;
+
+            if(!param.isCreateDir)
+                args << "-o" + targetFilePath;
+            else
+            {
+                QDir dir(targetFilePath);
+                QString pathName = QFileInfo(fileName).baseName();
+                dir.mkdir(pathName);
+                args <<  "-o" + dir.filePath(pathName);
+            }
+            args << param.filter;
+            if(!param.password.isEmpty())
+                args << "-p" + param.password;
+            if(!param.isWithPath)
+                args <<  param.overwriteMode() << "-y";
+            addArgs(args);
+        }
     }
 
     currentIndex = 0;
@@ -129,7 +159,7 @@ bool FileUncompresser::isEncrypted(QString const& fileName)
     QStringList args;
     args << "l"  << "-slt" << fileName;
     argsList.clear();
-    argsList << args;
+    addArgs(args);
     mode = CheckEncrypt;
     isEncrypted_ = false;
 
@@ -147,7 +177,7 @@ QStringList FileUncompresser::listFileInfo(QString const& fileName)
     QStringList args;
     args << "l"  << fileName;
     argsList.clear();
-    argsList << args;
+    addArgs(args);
     mode = List;
 
     currentIndex = 0;
@@ -168,7 +198,7 @@ bool FileUncompresser::remove(QString const& archiveFileName,
     foreach(auto fileName, fileNames)
         args << fileName;
     argsList.clear();
-    argsList << args;
+    addArgs(args);
     mode = Delete;
 
     currentIndex = 0;
@@ -188,7 +218,7 @@ bool FileUncompresser::rename(QString const& archiveFileName,
     QStringList args;
     args << "rn"  << archiveFileName << oldName << newName;
     argsList.clear();
-    argsList << args;
+    addArgs(args);
     mode = Rename;
 
     currentIndex = 0;
@@ -212,7 +242,7 @@ bool FileUncompresser::rename(QString const& archiveFileName,
     foreach(auto fileName, fileNames)
         args << fileName;
     argsList.clear();
-    argsList << args;
+    addArgs(args);
     mode = Rename;
 
     currentIndex = 0;
@@ -241,7 +271,7 @@ bool FileUncompresser::extract(QString const& archiveFileName,
         args << fileName;
     args << "-y";
     argsList.clear();
-    argsList << args;
+    addArgs(args);
     mode = Extract;
 
     currentIndex = 0;
@@ -357,4 +387,25 @@ bool FileUncompresser::isCompressFiles(QStringList const& fileNames,
         }
     }
     return true;
+}
+
+bool FileUncompresser::isMultiVol(QStringList const& fileNames)
+{
+    if(fileNames.isEmpty())
+        return false;
+
+    QString basename = QFileInfo(fileNames[0]).baseName();
+    foreach(auto fileName, fileNames)
+    {
+        QFileInfo fileInfo(fileName);
+        if(fileInfo.baseName() != basename)
+            return false;
+    }
+    return true;
+}
+
+void FileUncompresser::addArgs(QStringList & args)
+{
+    qDebug()<< args.join(" ");
+    argsList << args;
 }
