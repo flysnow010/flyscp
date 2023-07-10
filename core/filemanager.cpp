@@ -1,4 +1,6 @@
 #include "filemanager.h"
+#include "core/winshell.h"
+
 #include <windows.h>
 
 #include <QDebug>
@@ -96,7 +98,13 @@ void FileManager::delereFiles(QStringList const& fileNames)
         if(fileInfo.isDir() && !fileInfo.isSymLink())
             dir.rmdir(newFileNames[i]);
         else
-           dir.remove(newFileNames[i]);
+        {
+           if(!dir.remove(newFileNames[i]))
+           {
+               WinShell::RemoveOnlyReadAtrributes(newFileNames[i]);
+               dir.remove(newFileNames[i]);
+           }
+        }
 
         emit totalProgress(newFileNames[i],
                            QString(),
