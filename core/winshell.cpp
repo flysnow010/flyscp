@@ -257,6 +257,13 @@ void WinShell::Exec(QString const& appName, QString const& params)
     ShellExecuteEx(&shellExecInfo);
 }
 
+void WinShell::RemoveOnlyReadAtrributes(QString const& fileName)
+{
+    std::wstring filename = Utils::toWindowsPath(fileName).toStdWString();
+    DWORD attributes = GetFileAttributes(filename.c_str());
+    SetFileAttributes(filename.c_str(), attributes & (~FILE_ATTRIBUTE_READONLY));
+}
+
 bool WinShell::CreateShortcut(QString const& linkFilePath,
                               QString const& targetFilePath)
 {

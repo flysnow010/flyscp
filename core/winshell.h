@@ -60,6 +60,7 @@ public:
                      QStringList const& params);
     static void Exec(QString const& appName,
                      QString const& params = QString());
+    static void RemoveOnlyReadAtrributes(QString const& fileName);
     static bool CreateShortcut(QString const& linkFilePath,
                                QString const& targetFilePath);
     static QList<WinLibDir> winLibDirs();
