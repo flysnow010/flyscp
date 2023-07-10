@@ -88,8 +88,11 @@ void FileNames::FindFilenames(QString const& fileName,
 {
     QDir dir = QDir(fileName);
 
-    QFileInfoList fileInfoList = dir.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot,
-                                                   QDir::DirsFirst | QDir::Name);
+    QFileInfoList fileInfoList = dir.entryInfoList(QDir::AllEntries
+                                                   | QDir::NoDotAndDotDot
+                                                   | QDir::Hidden,
+                                                   QDir::DirsFirst
+                                                   | QDir::Name);
     for(int i = 0; i < fileInfoList.size(); i++)
     {
         if(fileInfoList[i].isDir())
