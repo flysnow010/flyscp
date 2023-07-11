@@ -13,6 +13,7 @@ public:
                         QString const& caption = QString(),
                         bool isNavigation = false) = 0;
     virtual QString dir() const = 0;
+    virtual QStringList selectedFileNames() const = 0;
     virtual QString findDir(QString const& prefix) const = 0;
     virtual void cd(QString const& dir) = 0;
     virtual void preDir() = 0;
@@ -51,6 +52,9 @@ public:
     virtual void newTxtFile() = 0;
     virtual void deleteFiles() = 0;
     virtual void selectAll() = 0;
+    virtual void uploadFiles(QStringList const& fileNames);
+    virtual void copyFiles(QString const& dstFilePath) = 0;
+    virtual void moveFiles(QString const& dstFilePath) = 0;
     virtual void searchFiles(QString const& dir) = 0;
     virtual void setActived(bool isActived) = 0;
     virtual bool isActived() const = 0;

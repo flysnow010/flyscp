@@ -31,6 +31,7 @@ public:
                 QString const& caption = QString(),
                 bool isNavigation  = false) override;
     QString dir() const override;
+    QStringList selectedFileNames() const override;
     QString findDir(QString const& prefix) const override;
     void cd(QString const& dir) override;
     void preDir() override;
@@ -69,6 +70,8 @@ public:
     void newTxtFile() override;
     void deleteFiles() override;
     void selectAll() override;
+    void copyFiles(QString const& dstFilePath) override;
+    void moveFiles(QString const& dstFilePath) override;
     void searchFiles(QString const& dstFilePath) override;
     void setActived(bool isActived) override;
     bool isActived() const override;
@@ -80,8 +83,7 @@ public:
     void loadSettings(QString const& name);
 
     void editFile();
-    void copyFiles(QString const& dstFilePath);
-    void moveFiles(QString const& dstFilePath);
+
 
 
     void compressFiles(QString const& dstFilePath);
@@ -139,8 +141,8 @@ private slots:
 private:
     bool isMultiSelected();
     bool isCompressFiles(QString const& suffix);
-    QStringList selectedFileNames(bool isOnlyFilename = false,
-                                  bool isParent = false);
+    QStringList getSelectedFileNames(bool isOnlyFilename = false,
+                                  bool isParent = false) const;
     QStringList selectedCompressedFileNames();
     QString selectedFileName(bool isOnlyFilename = false) const;
     CompressFileInfo::Ptr selectedCompressedFileName();

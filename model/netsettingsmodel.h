@@ -14,11 +14,11 @@ public:
     void refresh();
 
     bool setData(const QModelIndex &index,
-                 const QVariant &value, int role);
+                 const QVariant &value, int role) override;
 protected:
-    virtual TreeItem *createRootItem();
-    virtual void setupModelData(TreeItem *parent);
-    virtual bool editable(const QModelIndex &index) const;
+    TreeItem *createRootItem() override;
+    void setupModelData(TreeItem *parent) override;
+    bool editable(const QModelIndex &index) const override;
 private:
     SSHSettingsManager* settingsManager;
 };

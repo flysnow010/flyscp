@@ -416,7 +416,7 @@ void RemoteDockWidget::viewFile()
 
 void RemoteDockWidget::deleteFiles()
 {
-    QStringList fileNames = selectedileNames();
+    QStringList fileNames = selectedFileNames();
     QString tipText;
     if(fileNames.size() > 1)
         tipText = QString(tr("Are you sure you want to delete %1 files or folders?\n\n%2"))
@@ -449,6 +449,19 @@ void RemoteDockWidget::selectAll()
             ui->treeView->selectionModel()->select(index,
                                                    QItemSelectionModel::Deselect);
     }
+}
+
+void RemoteDockWidget::copyFiles(QString const& dstFilePath)
+{
+    fileTransfer(selectedFileNames(), model_->dirName(), dstFilePath, Download);
+}
+
+void RemoteDockWidget::moveFiles(QString const& dstFilePath)
+{
+    QStringList fileNames = selectedFileNames();
+    fileTransfer(fileNames, model_->dirName(), dstFilePath, Download);
+    fileTransfer(fileNames, model_->dirName(), QString(), Delete);
+    model_->refresh();
 }
 
 void RemoteDockWidget::searchFiles(QString const& dstFilePath)
@@ -590,7 +603,7 @@ void RemoteDockWidget::beginDragFile(QPoint const& point)
         return;
 
     QDrag *drag = new QDrag(ui->treeView);
-    QStringList fileNames = selectedileNames();
+    QStringList fileNames = selectedFileNames();
     QMimeData* mimeData = new QMimeData();
 
     mimeData->setText(fileNames.join("\n"));
@@ -741,7 +754,7 @@ void RemoteDockWidget::openWith()
 
 void RemoteDockWidget::download()
 {
-    QStringList fileNames = selectedileNames();
+    QStringList fileNames = selectedFileNames();
     if(fileNames.isEmpty())
         return;
 
@@ -763,11 +776,11 @@ void RemoteDockWidget::downloadFiles(QString const& remoteSrc,
 
 void RemoteDockWidget::delFiles()
 {
-    fileTransfer(selectedileNames(), model_->dirName(), QString(), Delete);
+    fileTransfer(selectedFileNames(), model_->dirName(), QString(), Delete);
     model_->refresh();
 }
 
-QStringList RemoteDockWidget::selectedileNames()
+QStringList RemoteDockWidget::selectedFileNames() const
 {
     QModelIndexList indexs = ui->treeView->selectionModel()->selectedRows(0);
     QStringList names;

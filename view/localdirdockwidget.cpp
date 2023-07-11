@@ -20,6 +20,7 @@
 #include "dialog/uncompressconfirmdialog.h"
 #include "dialog/propertydialog.h"
 #include "dialog/searchfiledialog.h"
+#include "dialog/favoritesettingsdialog.h"
 
 #include <QMenu>
 #include <QSettings>
@@ -158,6 +159,11 @@ void LocalDirDockWidget::setDir(QString const& dir,
 QString LocalDirDockWidget::dir() const
 {
     return model_->dir();
+}
+
+QStringList LocalDirDockWidget::selectedFileNames() const
+{
+    return getSelectedFileNames();
 }
 
 QString LocalDirDockWidget::findDir(QString const& prefix) const
@@ -627,7 +633,11 @@ void LocalDirDockWidget::favoritesDirContextMenu()
                 item.caption = caption;
             dirFavorite->addItem(item);
     });
-    menu.addAction(tr("Settings"));
+    menu.addAction(tr("Settings"), this, [=]{
+        FavoriteSettingsDialog dialog;
+        dialog.setDirFavorite(dirFavorite);
+        dialog.exec();
+    });
     menu.exec(QCursor::pos());
 }
 
@@ -719,12 +729,12 @@ void LocalDirDockWidget::customNormalContextMenu(const QPoint & pos)
     foreach(auto const& item, items)
     {
         menu.addAction(item.icon, item.name, [=](bool) {
-            QStringList fileNames = selectedFileNames(false, true);
+            QStringList fileNames = getSelectedFileNames(false, true);
             item.exec(fileNames);
         });
     }
     menu.addAction(tr("Copy File Path"), this, [=](bool) {
-        QStringList fileNames = selectedFileNames(false, true);
+        QStringList fileNames = getSelectedFileNames(false, true);
         ClipBoard::copy(fileNames.join("\n"));
     });
 
@@ -732,7 +742,7 @@ void LocalDirDockWidget::customNormalContextMenu(const QPoint & pos)
     foreach(auto sendItem, sendtoItems)
     {
         sendTo->addAction(sendItem.icon, sendItem.name, this, [=](bool){
-            QStringList fileNames = selectedFileNames();
+            QStringList fileNames = getSelectedFileNames();
             sendItem.exec(fileNames);
         });
     }
@@ -774,7 +784,7 @@ void LocalDirDockWidget::customNormalContextMenu(const QPoint & pos)
     }
     menu.addSeparator();
     menu.addAction(tr("Properties"), this, [&](bool) {
-        QStringList fileNames = selectedFileNames(false, true);
+        QStringList fileNames = getSelectedFileNames(false, true);
         if(fileNames.size() > 1)
             WinShell::Property(fileNames);
         else
@@ -783,7 +793,7 @@ void LocalDirDockWidget::customNormalContextMenu(const QPoint & pos)
     menu.addSeparator();
     QPoint cursorPos = QCursor::pos();
     menu.addAction(tr("Show More Items"), this, [&](bool) {
-        QStringList fileNames = selectedFileNames(false, true);
+        QStringList fileNames = getSelectedFileNames(false, true);
         ContextMenu::show(fileNames, (void *)winId(), cursorPos);
     });
 
@@ -809,7 +819,7 @@ void LocalDirDockWidget::customCompressContextMenu(const QPoint &pos)
         foreach(auto const& item, items)
         {
             menu.addAction(item.icon, item.name, [=](bool){
-                QStringList fileNames = selectedFileNames(false, true);
+                QStringList fileNames = getSelectedFileNames(false, true);
                 item.exec(fileNames);
             });
         }
@@ -907,7 +917,7 @@ void LocalDirDockWidget::normalBeginDragFile(QPoint const& point)
         return;
 
     QDrag *drag = new QDrag(ui->tvNormal);
-    QStringList fileNames = ClipBoard::fileNames(selectedFileNames());
+    QStringList fileNames = ClipBoard::fileNames(getSelectedFileNames());
     QMimeData* mimeData = WinShell::dropMimeData(fileNames);
     drag->setMimeData(mimeData);
     drag->setPixmap(QPixmap(":/image/copy.png"));
@@ -1075,13 +1085,13 @@ void LocalDirDockWidget::compressDrop(QDropEvent * event)
 
 void LocalDirDockWidget::cut()
 {
-    QStringList fileNames = selectedFileNames(false, true);
+    QStringList fileNames = getSelectedFileNames(false, true);
     WinShell::Copy(fileNames, true);
 }
 
 void LocalDirDockWidget::copy()
 {
-    QStringList fileNames = selectedFileNames(false, true);
+    QStringList fileNames = getSelectedFileNames(false, true);
     WinShell::Copy(fileNames, false);
 }
 
@@ -1099,7 +1109,7 @@ void LocalDirDockWidget::deleteFiles()
 {
     QStringList fileNames;
     if(ui->tvNormal->isVisible())
-        fileNames = selectedFileNames(true);
+        fileNames = getSelectedFileNames(true);
     else
         fileNames = selectedCompressedFileNames();
     QString tipText;
@@ -1143,7 +1153,7 @@ void LocalDirDockWidget::deleteFiles()
 
 void LocalDirDockWidget::delFiles()
 {
-    QStringList fileNames = selectedFileNames();
+    QStringList fileNames = getSelectedFileNames();
     FileManager fileManger;
     fileManger.delereFiles(fileNames);
     model_->refresh();
@@ -1162,7 +1172,7 @@ void LocalDirDockWidget::rename()
 
 void LocalDirDockWidget::createShortcut()
 {
-    QStringList fileNames = selectedFileNames(false, true);
+    QStringList fileNames = getSelectedFileNames(false, true);
     foreach(auto const& fileName,  fileNames)
     {
         WinShell::CreateShortcut(QString("%1 - shortcut.lnk")
@@ -1253,7 +1263,7 @@ void LocalDirDockWidget::copyFiles(QString const& dstFilePath)
     if(showMode() == Compress)
         fileNames = selectedCompressedFileNames();
     else
-        fileNames = selectedFileNames(true);
+        fileNames = getSelectedFileNames(true);
 
     if(fileNames.isEmpty())
     {
@@ -1282,7 +1292,7 @@ void LocalDirDockWidget::copyFiles(QString const& dstFilePath)
         if(showMode() == Compress)
             extractFiles(fileNames, dialog.path(), false);
         else
-            copyFilels(selectedFileNames(), dialog.path());
+            copyFilels(getSelectedFileNames(), dialog.path());
     }
 }
 
@@ -1292,7 +1302,7 @@ void LocalDirDockWidget::moveFiles(QString const& dstFilePath)
     if(showMode() == Compress)
         fileNames = selectedCompressedFileNames();
     else
-        fileNames = selectedFileNames(true);
+        fileNames = getSelectedFileNames(true);
 
     if(fileNames.isEmpty())
     {
@@ -1324,7 +1334,7 @@ void LocalDirDockWidget::moveFiles(QString const& dstFilePath)
         }
         else if(showMode() == Normal)
         {
-            cutFiles(selectedFileNames(), dialog.path());
+            cutFiles(getSelectedFileNames(), dialog.path());
             model_->refresh();
         }
     }
@@ -1363,7 +1373,7 @@ void LocalDirDockWidget::selectAll()
 
 void LocalDirDockWidget::compressFiles(QString const& dstFilePath)
 {
-    QStringList fileNames = selectedFileNames();
+    QStringList fileNames = getSelectedFileNames();
     if(fileNames.isEmpty())
     {
         Utils::warring(tr("No select files!"));
@@ -1428,7 +1438,7 @@ void LocalDirDockWidget::compressFiles(QString const& dstFilePath)
 
 void LocalDirDockWidget::uncompressFiles(QString const& dstFilePath)
 {
-    QStringList fileNames = selectedFileNames();
+    QStringList fileNames = getSelectedFileNames();
     if(fileNames.isEmpty())
     {
         Utils::warring("No select files!");
@@ -1556,8 +1566,8 @@ bool LocalDirDockWidget::isCompressFiles(QString const& suffix)
     return suffixs.contains(suffix.toLower());
 }
 
-QStringList LocalDirDockWidget::selectedFileNames(bool isOnlyFilename,
-                                                  bool isParent)
+QStringList LocalDirDockWidget::getSelectedFileNames(bool isOnlyFilename,
+                                                  bool isParent) const
 {
     QModelIndexList indexs = ui->tvNormal->selectionModel()->selectedRows(0);
     QStringList names;
