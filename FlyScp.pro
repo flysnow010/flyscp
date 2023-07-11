@@ -36,6 +36,7 @@ SOURCES += \
     dialog/aboutdialog.cpp \
     dialog/compressconfirmdialog.cpp \
     dialog/connectdialog.cpp \
+    dialog/favoritesettingsdialog.cpp \
     dialog/fileoperateconfirmdialog.cpp \
     dialog/fileprogressdialog.cpp \
     dialog/networksettingsdialog.cpp \
@@ -49,6 +50,7 @@ SOURCES += \
     mainwindow.cpp \
     model/compressdirmodel.cpp \
     model/dirmodel.cpp \
+    model/favoritedirmodel.cpp \
     model/localdirmodel.cpp \
     model/netsettingsmodel.cpp \
     model/remotedirmodel.cpp \
@@ -101,6 +103,7 @@ HEADERS += \
     dialog/aboutdialog.h \
     dialog/compressconfirmdialog.h \
     dialog/connectdialog.h \
+    dialog/favoritesettingsdialog.h \
     dialog/fileoperateconfirmdialog.h \
     dialog/fileprogressdialog.h \
     dialog/networksettingsdialog.h \
@@ -113,6 +116,7 @@ HEADERS += \
     mainwindow.h \
     model/compressdirmodel.h \
     model/dirmodel.h \
+    model/favoritedirmodel.h \
     model/localdirmodel.h \
     model/netsettingsmodel.h \
     model/remotedirmodel.h \
@@ -143,6 +147,7 @@ FORMS += \
     dialog/aboutdialog.ui \
     dialog/compressconfirmdialog.ui \
     dialog/connectdialog.ui \
+    dialog/favoritesettingsdialog.ui \
     dialog/fileoperateconfirmdialog.ui \
     dialog/fileprogressdialog.ui \
     dialog/networksettingsdialog.ui \
