@@ -96,7 +96,8 @@ SearchFileDialog::SearchFileDialog(Mode mode, QWidget *parent)
 
     connect(ui->btnStartSearch, &QPushButton::clicked,
             this, &SearchFileDialog::searchFiles);
-    loadSettings();
+    if(mode_ == Local)
+        loadSettings();
 }
 
 SearchFileDialog::~SearchFileDialog()
