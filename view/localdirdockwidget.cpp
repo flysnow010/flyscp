@@ -1452,7 +1452,11 @@ void LocalDirDockWidget::uncompressFiles(QString const& dstFilePath)
             FileProgressDialog dialog(this);
             dialog.setStatusTextMode();
             if(uncompresser.isEncrypted(fileNames[0]))
+            {
                 param.password = Utils::getPassword(tr("Input password"));
+                if(param.password.isEmpty())
+                    return;
+            }
 
             connect(&uncompresser, &FileUncompresser::progress,
                     &dialog, &FileProgressDialog::progressText);
@@ -1464,7 +1468,8 @@ void LocalDirDockWidget::uncompressFiles(QString const& dstFilePath)
             dialog.setModal(true);
             dialog.show();
 
-            uncompresser.uncompress(fileNames, param, targetPath);
+            uncompresser.uncompress(fileNames, param, targetPath,
+                                    FileUncompresser::isMultiVol(fileNames));
             while(!dialog.isFinished())
             {
                 if(dialog.isCancel())
