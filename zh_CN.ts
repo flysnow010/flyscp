@@ -265,6 +265,72 @@
     </message>
 </context>
 <context>
+    <name>FavoriteDirModel</name>
+    <message>
+        <location filename="model/favoritedirmodel.cpp" line="20"/>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FavoriteSettingsDialog</name>
+    <message>
+        <location filename="dialog/favoritesettingsdialog.ui" line="14"/>
+        <source>Favorite Settings</source>
+        <translation type="unfinished">收藏配置</translation>
+    </message>
+    <message>
+        <location filename="dialog/favoritesettingsdialog.ui" line="20"/>
+        <source>Favorite Menu</source>
+        <translation type="unfinished">收藏菜单</translation>
+    </message>
+    <message>
+        <location filename="dialog/favoritesettingsdialog.ui" line="43"/>
+        <source>File Path</source>
+        <translation type="unfinished">文件路径</translation>
+    </message>
+    <message>
+        <location filename="dialog/favoritesettingsdialog.ui" line="59"/>
+        <source>New Item</source>
+        <translation type="unfinished">新建菜单</translation>
+    </message>
+    <message>
+        <location filename="dialog/favoritesettingsdialog.ui" line="86"/>
+        <source> Delete Item </source>
+        <translation type="unfinished"> 删除菜单 </translation>
+    </message>
+    <message>
+        <location filename="dialog/favoritesettingsdialog.ui" line="66"/>
+        <source>Up Move</source>
+        <translation type="unfinished">上移</translation>
+    </message>
+    <message>
+        <location filename="dialog/favoritesettingsdialog.ui" line="73"/>
+        <source>Down Move</source>
+        <translation type="unfinished">下移</translation>
+    </message>
+    <message>
+        <location filename="dialog/favoritesettingsdialog.ui" line="93"/>
+        <source>Rename</source>
+        <translation type="unfinished">重命名</translation>
+    </message>
+    <message>
+        <location filename="dialog/favoritesettingsdialog.ui" line="100"/>
+        <source>OK</source>
+        <translation type="unfinished">确定</translation>
+    </message>
+    <message>
+        <location filename="dialog/favoritesettingsdialog.ui" line="107"/>
+        <source>Cancel</source>
+        <translation type="unfinished">取消</translation>
+    </message>
+    <message>
+        <location filename="dialog/favoritesettingsdialog.cpp" line="29"/>
+        <source>Menu&apos;s Caption</source>
+        <translation type="unfinished">菜单标题</translation>
+    </message>
+</context>
+<context>
     <name>FileOperateConfirmDialog</name>
     <message>
         <location filename="dialog/fileoperateconfirmdialog.ui" line="14"/>
@@ -343,147 +409,147 @@
 <context>
     <name>LocalDirDockWidget</name>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="618"/>
+        <location filename="view/localdirdockwidget.cpp" line="621"/>
         <source>Remove Current Folder</source>
         <translation type="unfinished">移除当前文件夹</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="622"/>
+        <location filename="view/localdirdockwidget.cpp" line="625"/>
         <source>Add Current Folder</source>
         <translation type="unfinished">增加当前文件夹</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="623"/>
+        <location filename="view/localdirdockwidget.cpp" line="626"/>
         <source>Caption of New Menu</source>
         <translation type="unfinished">新菜单标题</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="628"/>
+        <location filename="view/localdirdockwidget.cpp" line="631"/>
         <source>Settings</source>
         <translation type="unfinished">配置</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="694"/>
+        <location filename="view/localdirdockwidget.cpp" line="701"/>
         <source>Open with</source>
         <translation type="unfinished">打开方式</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="724"/>
-        <location filename="view/localdirdockwidget.cpp" line="814"/>
+        <location filename="view/localdirdockwidget.cpp" line="731"/>
+        <location filename="view/localdirdockwidget.cpp" line="821"/>
         <source>Copy File Path</source>
         <translation type="unfinished">复制文件地址</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="729"/>
-        <location filename="view/localdirdockwidget.cpp" line="818"/>
+        <location filename="view/localdirdockwidget.cpp" line="736"/>
+        <location filename="view/localdirdockwidget.cpp" line="825"/>
         <source>Send to</source>
         <translation type="unfinished">发送到</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="741"/>
+        <location filename="view/localdirdockwidget.cpp" line="748"/>
         <source>Cut</source>
         <translation type="unfinished">剪切</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="742"/>
+        <location filename="view/localdirdockwidget.cpp" line="749"/>
         <source>Copy</source>
         <translation type="unfinished">复制</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="744"/>
+        <location filename="view/localdirdockwidget.cpp" line="751"/>
         <source>Paste</source>
         <translation type="unfinished">粘贴</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="759"/>
+        <location filename="view/localdirdockwidget.cpp" line="766"/>
         <source>Create Shortcut</source>
         <translation type="unfinished">创建快捷方式</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="764"/>
-        <location filename="view/localdirdockwidget.cpp" line="883"/>
+        <location filename="view/localdirdockwidget.cpp" line="771"/>
+        <location filename="view/localdirdockwidget.cpp" line="890"/>
         <source>Delete</source>
         <translation type="unfinished">删除</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="765"/>
-        <location filename="view/localdirdockwidget.cpp" line="879"/>
+        <location filename="view/localdirdockwidget.cpp" line="772"/>
+        <location filename="view/localdirdockwidget.cpp" line="886"/>
         <source>Rename</source>
         <translation type="unfinished">重命名</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="770"/>
-        <location filename="view/localdirdockwidget.cpp" line="828"/>
-        <location filename="view/localdirdockwidget.cpp" line="888"/>
+        <location filename="view/localdirdockwidget.cpp" line="777"/>
+        <location filename="view/localdirdockwidget.cpp" line="835"/>
+        <location filename="view/localdirdockwidget.cpp" line="895"/>
         <source>New Folder</source>
         <translation type="unfinished">新建文件夹</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="771"/>
-        <location filename="view/localdirdockwidget.cpp" line="829"/>
-        <location filename="view/localdirdockwidget.cpp" line="889"/>
+        <location filename="view/localdirdockwidget.cpp" line="778"/>
+        <location filename="view/localdirdockwidget.cpp" line="836"/>
+        <location filename="view/localdirdockwidget.cpp" line="896"/>
         <source>New Txt File</source>
         <translation type="unfinished">新建文本文件</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="774"/>
-        <location filename="view/localdirdockwidget.cpp" line="831"/>
-        <location filename="view/localdirdockwidget.cpp" line="891"/>
+        <location filename="view/localdirdockwidget.cpp" line="781"/>
+        <location filename="view/localdirdockwidget.cpp" line="838"/>
+        <location filename="view/localdirdockwidget.cpp" line="898"/>
         <source>Properties</source>
         <translation type="unfinished">属性</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="783"/>
+        <location filename="view/localdirdockwidget.cpp" line="790"/>
         <source>Show More Items</source>
         <translation type="unfinished">显示更多选项</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="842"/>
+        <location filename="view/localdirdockwidget.cpp" line="849"/>
         <source>Open</source>
         <translation type="unfinished">打开</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="853"/>
+        <location filename="view/localdirdockwidget.cpp" line="860"/>
         <source>View</source>
         <translation type="unfinished">查看</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="862"/>
+        <location filename="view/localdirdockwidget.cpp" line="869"/>
         <source>Edit</source>
         <translation type="unfinished">编辑</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="873"/>
+        <location filename="view/localdirdockwidget.cpp" line="880"/>
         <source>Copy to...</source>
         <translation type="unfinished">复制到...</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="876"/>
+        <location filename="view/localdirdockwidget.cpp" line="883"/>
         <source>Move to...</source>
         <translation type="unfinished">移动到...</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="1009"/>
+        <location filename="view/localdirdockwidget.cpp" line="1016"/>
         <source>Move %1 files or folders to
 %2</source>
         <translation type="unfinished">移动%1个文件(夹)到
 %2</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="1016"/>
-        <location filename="view/localdirdockwidget.cpp" line="1067"/>
+        <location filename="view/localdirdockwidget.cpp" line="1023"/>
+        <location filename="view/localdirdockwidget.cpp" line="1074"/>
         <source>Copy %1 files or folders to
 %2</source>
         <translation type="unfinished">复制%1个文件(夹)到
 %2</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="1033"/>
+        <location filename="view/localdirdockwidget.cpp" line="1040"/>
         <source>Create %1 shortcuts in %2</source>
         <translation type="unfinished">在 %2 中创建%1个快捷方式</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="1105"/>
+        <location filename="view/localdirdockwidget.cpp" line="1112"/>
         <source>Are you sure you want to delete %1 files or folders?
 
 %2</source>
@@ -492,80 +558,80 @@
 %2</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="1115"/>
-        <location filename="view/localdirdockwidget.cpp" line="1120"/>
-        <location filename="view/localdirdockwidget.cpp" line="1271"/>
-        <location filename="view/localdirdockwidget.cpp" line="1309"/>
+        <location filename="view/localdirdockwidget.cpp" line="1122"/>
+        <location filename="view/localdirdockwidget.cpp" line="1127"/>
+        <location filename="view/localdirdockwidget.cpp" line="1278"/>
+        <location filename="view/localdirdockwidget.cpp" line="1316"/>
         <source>folder</source>
         <translation type="unfinished">文件夹</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="1115"/>
-        <location filename="view/localdirdockwidget.cpp" line="1120"/>
-        <location filename="view/localdirdockwidget.cpp" line="1273"/>
-        <location filename="view/localdirdockwidget.cpp" line="1311"/>
+        <location filename="view/localdirdockwidget.cpp" line="1122"/>
+        <location filename="view/localdirdockwidget.cpp" line="1127"/>
+        <location filename="view/localdirdockwidget.cpp" line="1280"/>
+        <location filename="view/localdirdockwidget.cpp" line="1318"/>
         <source>file</source>
         <translation type="unfinished">文件</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="1122"/>
+        <location filename="view/localdirdockwidget.cpp" line="1129"/>
         <source>Are you sure you want to delete the %1 %2?</source>
         <oldsource>Are you sure you want to delete the %1 &quot;%2&quot;?</oldsource>
         <translation type="unfinished">你确实要删除%1 %2 吗?</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="1127"/>
-        <location filename="view/localdirdockwidget.cpp" line="1258"/>
-        <location filename="view/localdirdockwidget.cpp" line="1297"/>
+        <location filename="view/localdirdockwidget.cpp" line="1134"/>
+        <location filename="view/localdirdockwidget.cpp" line="1265"/>
+        <location filename="view/localdirdockwidget.cpp" line="1304"/>
         <source>No files or folders selected!</source>
         <translation type="unfinished">没有选择文件(夹)！</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="1174"/>
+        <location filename="view/localdirdockwidget.cpp" line="1181"/>
         <source>Folder Name</source>
         <translation type="unfinished">文件夹名</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="1264"/>
+        <location filename="view/localdirdockwidget.cpp" line="1271"/>
         <source>Copy %1 files or folders to:</source>
         <translation type="unfinished">复制%1个文件(夹)到:</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="1274"/>
+        <location filename="view/localdirdockwidget.cpp" line="1281"/>
         <source>Copy the %1 %2 to:</source>
         <oldsource>Copy the %1 &quot;%2&quot; to:</oldsource>
         <translation type="unfinished">复制%1 %2 到:</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="1302"/>
+        <location filename="view/localdirdockwidget.cpp" line="1309"/>
         <source>Move %1 files or folders to:</source>
         <translation type="unfinished">移动%1个文件(夹)到:</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="1312"/>
+        <location filename="view/localdirdockwidget.cpp" line="1319"/>
         <source>Move the %1 %2 to:</source>
         <oldsource>Move the %1 &quot;%2&quot; to:</oldsource>
         <translation type="unfinished">移动%1 %2 到:</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="1367"/>
+        <location filename="view/localdirdockwidget.cpp" line="1374"/>
         <source>No select files!</source>
         <translation type="unfinished">没有选择文件!</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="1438"/>
+        <location filename="view/localdirdockwidget.cpp" line="1445"/>
         <source>Compression package error!
 %1</source>
         <translation type="unfinished">压缩包错误!
 %1</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="1453"/>
+        <location filename="view/localdirdockwidget.cpp" line="1460"/>
         <source>Input password</source>
         <translation type="unfinished">输入密码</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="1521"/>
+        <location filename="view/localdirdockwidget.cpp" line="1528"/>
         <source>File Name</source>
         <translation type="unfinished">文件名</translation>
     </message>
@@ -576,17 +642,17 @@
         <translation type="obsolete">文件名</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="1640"/>
+        <location filename="view/localdirdockwidget.cpp" line="1647"/>
         <source>MoveFiles</source>
         <translation type="unfinished">移动文件</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="1645"/>
+        <location filename="view/localdirdockwidget.cpp" line="1652"/>
         <source>CopyFiles</source>
         <translation type="unfinished">复制文件</translation>
     </message>
     <message>
-        <location filename="view/localdirdockwidget.cpp" line="1780"/>
+        <location filename="view/localdirdockwidget.cpp" line="1787"/>
         <source>%1/%2,%3/%4 files,%5/%6 dir(s)</source>
         <oldsource>%1/%2,%3/%4 files,%5/%6 dirs(s)</oldsource>
         <translation type="unfinished">%1/%2,%3/%4 文件,%5/%6 文件夹</translation>
@@ -654,7 +720,7 @@
     </message>
     <message>
         <location filename="mainwindow.ui" line="122"/>
-        <location filename="mainwindow.cpp" line="154"/>
+        <location filename="mainwindow.cpp" line="156"/>
         <source>Connect</source>
         <translation type="unfinished">连接</translation>
     </message>
@@ -886,56 +952,54 @@
         <translation type="unfinished">网络配置...</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="65"/>
+        <location filename="mainwindow.cpp" line="66"/>
         <source>Only one FlyScp can run simultaneously!</source>
         <oldsource>Only one Flyscp can run simultaneously</oldsource>
         <translation type="unfinished">同时只能有一个FlyScp运行!</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="108"/>
-        <location filename="mainwindow.cpp" line="749"/>
+        <location filename="mainwindow.cpp" line="110"/>
+        <location filename="mainwindow.cpp" line="733"/>
         <source>Local File(Left)</source>
         <oldsource>Local File(left)</oldsource>
         <translation type="unfinished">本地文件(左)</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="109"/>
-        <location filename="mainwindow.cpp" line="750"/>
+        <location filename="mainwindow.cpp" line="111"/>
+        <location filename="mainwindow.cpp" line="734"/>
         <source>Local File(Right)</source>
         <oldsource>Local File(right)</oldsource>
         <translation type="unfinished">本地文件(右)</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="142"/>
-        <location filename="mainwindow.cpp" line="744"/>
+        <location filename="mainwindow.cpp" line="144"/>
+        <location filename="mainwindow.cpp" line="728"/>
         <source>Diff Files</source>
         <translation type="unfinished">比较文件</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="153"/>
+        <location filename="mainwindow.cpp" line="155"/>
         <source>Diff folders</source>
         <translation type="unfinished">比较文件夹</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="155"/>
+        <location filename="mainwindow.cpp" line="157"/>
         <source>Diff two folders</source>
         <translation type="unfinished">比较两个文件夹</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="156"/>
+        <location filename="mainwindow.cpp" line="158"/>
         <source>Connect a stfp</source>
         <translation type="unfinished">连接SFTP</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="178"/>
-        <location filename="mainwindow.cpp" line="688"/>
-        <location filename="mainwindow.cpp" line="775"/>
+        <location filename="mainwindow.cpp" line="776"/>
         <source>Password for %1</source>
         <translation type="unfinished">%1的密码</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="191"/>
-        <location filename="mainwindow.cpp" line="745"/>
+        <location filename="mainwindow.cpp" line="182"/>
+        <location filename="mainwindow.cpp" line="729"/>
         <source>Settings</source>
         <translation type="unfinished">网络配置</translation>
     </message>
@@ -1627,7 +1691,7 @@ abcdefghijklmnopqrstuvwxyz</source>
         <translation type="obsolete">新建路径</translation>
     </message>
     <message>
-        <location filename="view/remotedockwidget.cpp" line="698"/>
+        <location filename="view/remotedockwidget.cpp" line="699"/>
         <source>File Name</source>
         <oldsource>New File</oldsource>
         <translation type="unfinished">文件名</translation>
@@ -1754,27 +1818,27 @@ abcdefghijklmnopqrstuvwxyz</source>
         <translation type="unfinished">属性</translation>
     </message>
     <message>
-        <location filename="view/remotedockwidget.cpp" line="689"/>
+        <location filename="view/remotedockwidget.cpp" line="690"/>
         <source>Folder Name</source>
         <translation type="unfinished">文件夹名</translation>
     </message>
     <message>
-        <location filename="view/remotedockwidget.cpp" line="830"/>
+        <location filename="view/remotedockwidget.cpp" line="831"/>
         <source>Permission denied</source>
         <translation type="unfinished">权限禁止</translation>
     </message>
     <message>
-        <location filename="view/remotedockwidget.cpp" line="894"/>
+        <location filename="view/remotedockwidget.cpp" line="895"/>
         <source>DownloadFiles</source>
         <translation type="unfinished">下载文件</translation>
     </message>
     <message>
-        <location filename="view/remotedockwidget.cpp" line="899"/>
+        <location filename="view/remotedockwidget.cpp" line="900"/>
         <source>UploadFiles</source>
         <translation type="unfinished">上传文件</translation>
     </message>
     <message>
-        <location filename="view/remotedockwidget.cpp" line="904"/>
+        <location filename="view/remotedockwidget.cpp" line="905"/>
         <source>DeleteFiles</source>
         <translation type="unfinished">删除文件</translation>
     </message>

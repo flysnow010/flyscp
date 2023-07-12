@@ -34,6 +34,7 @@ public:
                 QString const& caption = QString(),
                 bool  isNavigation = false) override;
     QString dir() const override;
+    QStringList selectedFileNames() const override;
     QString findDir(QString const& prefix) const override;
     void cd(QString const& dir) override;
     void preDir() override;
@@ -72,6 +73,8 @@ public:
     void newTxtFile() override;
     void deleteFiles() override;
     void selectAll() override;
+    void copyFiles(QString const& dstFilePath) override;
+    void moveFiles(QString const& dstFilePath) override;
     void searchFiles(QString const& dstFilePath) override;
     void setActived(bool isActived) override;
     bool isActived() const override;
@@ -124,8 +127,6 @@ private slots:
 private:
     void saveSettings();
     void loadSettings();
-
-    QStringList selectedileNames();
 
     void openDir(ssh::FileInfoPtr const& fileInfo);
     QString download(ssh::FileInfoPtr const& fileInfo,

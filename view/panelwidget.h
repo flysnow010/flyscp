@@ -24,6 +24,9 @@ public:
                    QString const& text);
     void updateTexts(QWidget* widget);
 
+    bool isRemote() const;
+    QString currentDir() const;
+    QStringList selectedFileNames() const;
     void preDir();
     void nextDir();
 
@@ -66,6 +69,9 @@ public:
     void newTxtFile();
     void deleteFiles();
     void selectAll();
+    void uploadFiles(QStringList const& fileNames);
+    void copyFiles(QString const& dstFilePath);
+    void moveFiles(QString const& dstFilePath);
     void searchFiles(QString const& dstFilePath);
     bool isActived() const;
     void setUnActived();

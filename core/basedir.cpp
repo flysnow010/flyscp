@@ -2,5 +2,8 @@
 
 BaseDir::BaseDir()
 {
+}
 
+void BaseDir::uploadFiles(QStringList const&)
+{
 }

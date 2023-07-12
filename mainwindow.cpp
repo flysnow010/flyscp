@@ -571,29 +571,85 @@ void MainWindow::editFile()
 
 void MainWindow::copyFiles()
 {
-    if(leftDirView->isActived())
+    if(leftPanelWidget->isActived())
     {
-        leftDirView->copyFiles(rightDirView->dir());
-        rightDirView->refresh();
+        //leftPanelWidget->isRemote = false
+        //rightPanelWidget->isRemote = false;
+        if(rightPanelWidget->isRemote())
+        {
+            if(leftPanelWidget->isRemote())
+                ;//remote -> remote
+            else
+                rightPanelWidget->uploadFiles(leftPanelWidget->selectedFileNames());
+        }
+        else
+        {
+            leftPanelWidget->copyFiles(rightPanelWidget->currentDir());
+            rightPanelWidget->refreshCurrent();
+        }
     }
     else
     {
-        rightDirView->copyFiles(leftDirView->dir());
-        leftDirView->refresh();
+        if(leftPanelWidget->isRemote())
+        {
+            if(rightPanelWidget->isRemote())
+                ;//remote -> remote
+            else
+                leftPanelWidget->uploadFiles(rightPanelWidget->selectedFileNames());
+        }
+        else
+        {
+            rightPanelWidget->copyFiles(leftPanelWidget->currentDir());
+            leftPanelWidget->refreshCurrent();
+        }
     }
 }
 
 void MainWindow::moveFiles()
 {
-    if(leftDirView->isActived())
+    if(leftPanelWidget->isActived())
     {
-        leftDirView->moveFiles(rightDirView->dir());
-        rightDirView->refresh();
+        //leftPanelWidget->isRemote = false
+        //rightPanelWidget->isRemote = false;
+        if(rightPanelWidget->isRemote())
+        {
+            if(leftPanelWidget->isRemote())
+                ;//remote -> remote
+            else
+            {
+                rightPanelWidget->uploadFiles(leftPanelWidget->selectedFileNames());
+                leftPanelWidget->deleteFiles();
+                leftPanelWidget->refreshCurrent();
+                rightPanelWidget->refreshCurrent();
+            }
+        }
+        else
+        {
+            leftPanelWidget->moveFiles(rightPanelWidget->currentDir());
+            leftPanelWidget->refreshCurrent();
+            rightPanelWidget->refreshCurrent();
+        }
     }
     else
     {
-        rightDirView->moveFiles(leftDirView->dir());
-        leftDirView->refresh();
+        if(leftPanelWidget->isRemote())
+        {
+            if(rightPanelWidget->isRemote())
+                ;//remote -> remote
+            else
+            {
+                leftPanelWidget->uploadFiles(rightPanelWidget->selectedFileNames());
+                rightPanelWidget->deleteFiles();
+                leftPanelWidget->refreshCurrent();
+                rightPanelWidget->refreshCurrent();
+            }
+        }
+        else
+        {
+            rightPanelWidget->moveFiles(leftPanelWidget->currentDir());
+            leftPanelWidget->refreshCurrent();
+            rightPanelWidget->refreshCurrent();
+        }
     }
 }
 

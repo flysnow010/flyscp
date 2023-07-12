@@ -54,6 +54,30 @@ void PanelWidget::setTabBarAutoHide(int count)
     ui->tabWidget->setTabBarAutoHide(count > 1 ? false : true);
 }
 
+bool PanelWidget::isRemote() const
+{
+    BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
+    if(dir)
+        return dir->isRemote();
+    return  false;
+}
+
+QString PanelWidget::currentDir() const
+{
+    BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
+    if(dir)
+        return dir->dir();
+    return  QString();
+}
+
+QStringList PanelWidget::selectedFileNames() const
+{
+    BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
+    if(dir)
+        return dir->selectedFileNames();
+    return  QStringList();
+}
+
 void PanelWidget::preDir()
 {
     BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
@@ -464,6 +488,26 @@ void PanelWidget::selectAll()
     BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
     if(dir)
         dir->selectAll();
+}
+
+void PanelWidget::uploadFiles(QStringList const& fileNames)
+{
+    BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
+    if(dir)
+        dir->uploadFiles(fileNames);
+}
+
+void PanelWidget::copyFiles(QString const& dstFilePath)
+{
+    BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
+    if(dir)
+        dir->copyFiles(dstFilePath);
+}
+void PanelWidget::moveFiles(QString const& dstFilePath)
+{
+    BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
+     if(dir)
+         dir->moveFiles(dstFilePath);
 }
 
 void PanelWidget::searchFiles(QString const& dstFilePath)
