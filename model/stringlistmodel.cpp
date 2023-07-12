@@ -109,6 +109,9 @@ bool StringListModel::insertRow(int row,
 bool StringListModel::appendRows(int row,
                                  QStringList const& texts)
 {
+    if(texts.count() -1 < row)
+        return false;
+
     beginInsertRows(QModelIndex(), row, texts.count() -1);
 
     for(int i = row; i < texts.size(); i++)
