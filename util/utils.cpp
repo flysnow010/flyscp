@@ -26,7 +26,7 @@ QString Utils::currentPath()
 
 QString Utils::tempPath()
 {
-    return QDir::tempPath();
+    return tempDir().path();
 }
 
 QString Utils::sshSettingsPath()
