@@ -307,6 +307,17 @@ QVariant RemoteDirModel::userData(const QModelIndex &index) const
     return QVariant();
 }
 
+int RemoteDirModel::indexOfFile(QString const& fileName)
+{
+    std::string name = fileName.toStdString();
+    for(size_t i = 0; i < fileInfos_.size(); i++)
+    {
+        if(std::string(fileInfos_[i]->name()) == name)
+            return i;
+    }
+    return -1;
+}
+
 QVariant RemoteDirModel::toolTip(const QModelIndex &index) const
 {
     if(index.column() == 0)

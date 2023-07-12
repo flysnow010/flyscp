@@ -42,6 +42,7 @@ public:
     bool isDir(int index) const override;
     bool isFile(int index) const override;
     qint64 fileSize(int index) const override;
+    int indexOfFile(QString const& fileName);
 
 protected:
     TreeItem *createRootItem() override;
