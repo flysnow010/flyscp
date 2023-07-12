@@ -580,7 +580,10 @@ void MainWindow::copyFiles()
             if(leftPanelWidget->isRemote())
                 ;//remote -> remote
             else
+            {
                 rightPanelWidget->uploadFiles(leftPanelWidget->selectedFileNames());
+                rightPanelWidget->refreshCurrent();
+            }
         }
         else
         {
@@ -595,7 +598,10 @@ void MainWindow::copyFiles()
             if(rightPanelWidget->isRemote())
                 ;//remote -> remote
             else
+            {
                 leftPanelWidget->uploadFiles(rightPanelWidget->selectedFileNames());
+                leftPanelWidget->refreshCurrent();
+            }
         }
         else
         {
@@ -618,7 +624,7 @@ void MainWindow::moveFiles()
             else
             {
                 rightPanelWidget->uploadFiles(leftPanelWidget->selectedFileNames());
-                leftPanelWidget->deleteFiles();
+                leftPanelWidget->deleteFiles(false);
                 leftPanelWidget->refreshCurrent();
                 rightPanelWidget->refreshCurrent();
             }
@@ -639,7 +645,7 @@ void MainWindow::moveFiles()
             else
             {
                 leftPanelWidget->uploadFiles(rightPanelWidget->selectedFileNames());
-                rightPanelWidget->deleteFiles();
+                rightPanelWidget->deleteFiles(false);
                 leftPanelWidget->refreshCurrent();
                 rightPanelWidget->refreshCurrent();
             }
@@ -700,9 +706,9 @@ void MainWindow::uncompressFiles()
 void MainWindow::searchFiles()
 {
     if(leftPanelWidget->isActived())
-        leftPanelWidget->searchFiles(leftDirView->dir());
+        leftPanelWidget->searchFiles(leftPanelWidget->currentDir());
     else
-        rightPanelWidget->searchFiles(rightDirView->dir());
+        rightPanelWidget->searchFiles(rightPanelWidget->currentDir());
 }
 
 void MainWindow::diffFolders()
