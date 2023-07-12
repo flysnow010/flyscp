@@ -71,8 +71,9 @@ public:
     void viewFile() override;
     void newFolder() override;
     void newTxtFile() override;
-    void deleteFiles() override;
+    void deleteFiles(bool isPrompt) override;
     void selectAll() override;
+    void uploadFiles(QStringList const& fileNames) override;
     void copyFiles(QString const& dstFilePath) override;
     void moveFiles(QString const& dstFilePath) override;
     void searchFiles(QString const& dstFilePath) override;
@@ -129,8 +130,9 @@ private:
     void loadSettings();
 
     void openDir(ssh::FileInfoPtr const& fileInfo);
-    QString download(ssh::FileInfoPtr const& fileInfo,
-                     QDir const& dstDir);
+    QString download(QString const& fileName,
+                     QString const& dstFilePath);
+    void goToFile(QString const& fileName);
     bool upload(QString const& fileName);
     void fileTransfer(QStringList const& srcFileNames,
                       QString const& srcFilePath,

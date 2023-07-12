@@ -10,6 +10,7 @@ class SearchFileDialog;
 class StringListModel;
 class QMenu;
 class QComboBox;
+class SFtpSession;
 class SearchFileDialog : public QDialog
 {
     Q_OBJECT
@@ -20,12 +21,14 @@ public:
     ~SearchFileDialog();
 
     void setSearchPath(QString  const& filePath);
+    void setSfpSession(SFtpSession* session);
 signals:
     void viewFile(QString const& fileName);
     void goToFile(QString const& fileName);
 
 private slots:
     void searchFiles();
+
 private:
     void setSeearchState(bool isSearching);
     void startSearch(bool isStart);
@@ -38,6 +41,7 @@ private:
     Ui::SearchFileDialog *ui;
     Mode mode_;
     QMenu* dirverMenu;
+    SFtpSession* sftpSession;
     StringListModel* model;
     QStringList fileNames;
     bool isSearching;

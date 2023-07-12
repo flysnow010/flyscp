@@ -3,6 +3,8 @@
 #include "util/utils.h"
 
 #include "core/filetransfer.h"
+#include "core/sftpfilemanager.h"
+#include "core/remotefiletransfer.h"
 #include "model/stringlistmodel.h"
 #include <QApplication>
 #include <QFileInfo>
@@ -16,6 +18,7 @@ SearchFileDialog::SearchFileDialog(Mode mode, QWidget *parent)
     , ui(new Ui::SearchFileDialog)
     , mode_(mode)
     , dirverMenu(new QMenu(this))
+    , sftpSession(0)
     , model(new StringListModel(this))
     , isSearching(false)
 {
@@ -96,8 +99,8 @@ SearchFileDialog::SearchFileDialog(Mode mode, QWidget *parent)
 
     connect(ui->btnStartSearch, &QPushButton::clicked,
             this, &SearchFileDialog::searchFiles);
-    if(mode_ == Local)
-        loadSettings();
+
+    loadSettings();
 }
 
 SearchFileDialog::~SearchFileDialog()
@@ -111,6 +114,11 @@ void SearchFileDialog::setSearchPath(QString  const& filePath)
     ui->cbFolder->setCurrentText(filePath);
 }
 
+void SearchFileDialog::setSfpSession(SFtpSession* session)
+{
+    sftpSession = session;
+}
+
 void SearchFileDialog::searchFiles()
 {
     startSearch(true);
@@ -119,52 +127,96 @@ void SearchFileDialog::searchFiles()
     model->setStringList(fileNames);
     ui->lwResult->setModel(model);
 
-    FileTransfer fileSearcher;
     bool isFinished = false;
     int fileCount = 0;
     int dirCount = 0;
     int index = 0;
     isSearching = true;
-
     setSeearchState(isSearching);
-
-    connect(&fileSearcher, &FileTransfer::currentFolder,
-            this, [&](QString const& filePath)
+    if(mode_ == Local)
     {
-        ui->labelCurentPath->setText(filePath);
-    });
+        FileTransfer fileSearcher;
 
-    connect(&fileSearcher, &FileTransfer::foundFile,
-            this, [&](QString const& fileName)
-    {
-        fileNames << fileName;
-        fileCount++;
-    });
-
-    connect(&fileSearcher, &FileTransfer::foundFolder,
-            this, [&](QString const& filePath)
-    {
-        fileNames << filePath;
-        dirCount++;
-    });
-
-    connect(&fileSearcher, &FileTransfer::finished,
-            this, [&](){ isFinished = true; });
-
-    fileSearcher.searchFiles(ui->cbFolder->currentText(),
-                             ui->cbFileName->currentText());
-    addCurentItem(ui->cbFileName);
-    addCurentItem(ui->cbFolder);
-    while(!isFinished)
-    {
-        if(!isSearching)
-            fileSearcher.cancel();
-        if(index < fileNames.size())
+        connect(&fileSearcher, &FileTransfer::currentFolder,
+                this, [&](QString const& filePath)
         {
-            model->insertRow(index, fileNames[index]);
-            index++;
+            ui->labelCurentPath->setText(filePath);
+        });
+
+        connect(&fileSearcher, &FileTransfer::foundFile,
+                this, [&](QString const& fileName)
+        {
+            fileNames << fileName;
+            fileCount++;
+        });
+
+        connect(&fileSearcher, &FileTransfer::foundFolder,
+                this, [&](QString const& filePath)
+        {
+            fileNames << filePath;
+            dirCount++;
+        });
+
+        connect(&fileSearcher, &FileTransfer::finished,
+                this, [&](){ isFinished = true; });
+
+        fileSearcher.searchFiles(ui->cbFolder->currentText(),
+                                 ui->cbFileName->currentText());
+        addCurentItem(ui->cbFileName);
+        addCurentItem(ui->cbFolder);
+        while(!isFinished)
+        {
+            if(!isSearching)
+                fileSearcher.cancel();
+            if(index < fileNames.size())
+            {
+                model->insertRow(index, fileNames[index]);
+                index++;
+            }
+            QApplication::processEvents();
         }
-        QApplication::processEvents();
+    }
+    else
+    {
+        RemoteFileTransfer fileSearcher(new SFtpFileManager(sftpSession));
+        connect(&fileSearcher, &RemoteFileTransfer::currentFolder,
+                this, [&](QString const& filePath)
+        {
+            ui->labelCurentPath->setText(filePath);
+        });
+
+        connect(&fileSearcher, &RemoteFileTransfer::foundFile,
+                this, [&](QString const& fileName)
+        {
+            fileNames << fileName;
+            fileCount++;
+        });
+
+        connect(&fileSearcher, &RemoteFileTransfer::foundFolder,
+                this, [&](QString const& filePath)
+        {
+            fileNames << filePath;
+            dirCount++;
+        });
+
+        connect(&fileSearcher, &RemoteFileTransfer::finished,
+                this, [&](){ isFinished = true; });
+
+        fileSearcher.searchFiles(ui->cbFolder->currentText(),
+                                 ui->cbFileName->currentText());
+        addCurentItem(ui->cbFileName);
+        addCurentItem(ui->cbFolder);
+        while(!isFinished)
+        {
+            if(!isSearching)
+                fileSearcher.cancel();
+            if(index < fileNames.size())
+            {
+                model->insertRow(index, fileNames[index]);
+                index++;
+            }
+            QApplication::processEvents();
+        }
     }
 
     QString result = QString(tr("Found %1 files, %2 folders"))
@@ -253,7 +305,10 @@ void SearchFileDialog::saveSettings()
     QSettings settings(QCoreApplication::applicationName(),
                        QCoreApplication::applicationVersion());
     settings.beginGroup("SerchFileDialog");
-
+    if(mode_ == Local)
+        settings.beginGroup("Local");
+    else
+        settings.beginGroup("Remote");
     settings.setValue("currentFileName", ui->cbFileName->currentText());
     settings.setValue("currentFilePath", ui->cbFolder->currentText());
 
@@ -272,6 +327,7 @@ void SearchFileDialog::saveSettings()
         settings.setValue("filePath", ui->cbFolder->itemText(i));
     }
     settings.endArray();
+    settings.endGroup();
 
     settings.endGroup();
 }
@@ -282,6 +338,10 @@ void SearchFileDialog::loadSettings()
                        QCoreApplication::applicationVersion());
     settings.beginGroup("SerchFileDialog");
 
+    if(mode_ == Local)
+        settings.beginGroup("Local");
+    else
+        settings.beginGroup("Remote");
     int size = settings.beginReadArray("fileNames");
     for(int i = 0; i < size; i++)
     {
@@ -297,6 +357,8 @@ void SearchFileDialog::loadSettings()
         ui->cbFolder->addItem(settings.value("filePath").toString());
     }
     settings.endArray();
+
+    settings.endGroup();
 
     QString currentFileName = settings.value("currentFileName").toString();
     QString currentFilePath = settings.value("currentFilePath").toString();

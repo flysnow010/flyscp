@@ -406,16 +406,24 @@ void RemoteDockWidget::viewFile()
     ssh::FileInfoPtr fileInfo = model_->fileInfo(index.row());
     if(!fileInfo || fileInfo->is_dir())
         return;
-    QString fileName = download(fileInfo, Utils::tempDir());
-    if(fileName.isEmpty())
+
+    QString fileName = QString::fromStdString(model_->filePath(fileInfo->name()));
+    QString localFileName = download(fileName, Utils::tempPath());
+    if(localFileName.isEmpty())
         return;
 
-    FileNames::MakeFileNameAsParams(fileName);
-    WinShell::Exec(Utils::viewApp(), fileName);
+    FileNames::MakeFileNameAsParams(localFileName);
+    WinShell::Exec(Utils::viewApp(), localFileName);
 }
 
-void RemoteDockWidget::deleteFiles()
+void RemoteDockWidget::deleteFiles(bool isPrompt)
 {
+    if(!isPrompt)
+    {
+        delFiles();
+        return;
+    }
+
     QStringList fileNames = selectedFileNames();
     QString tipText;
     if(fileNames.size() > 1)
@@ -451,6 +459,11 @@ void RemoteDockWidget::selectAll()
     }
 }
 
+void RemoteDockWidget::uploadFiles(QStringList const& fileNames)
+{
+    fileTransfer(fileNames, QString(), model_->dirName(), Upload);
+}
+
 void RemoteDockWidget::copyFiles(QString const& dstFilePath)
 {
     fileTransfer(selectedFileNames(), model_->dirName(), dstFilePath, Download);
@@ -467,6 +480,20 @@ void RemoteDockWidget::moveFiles(QString const& dstFilePath)
 void RemoteDockWidget::searchFiles(QString const& dstFilePath)
 {
     SearchFileDialog dialog(SearchFileDialog::Remote);
+    dialog.setSearchPath(dstFilePath);
+    dialog.setSfpSession(sftp);
+    connect(&dialog, &SearchFileDialog::viewFile,
+            this, [=](QString const& fileName)
+    {
+        QString localFileName = download(fileName, Utils::tempPath());
+        if(!localFileName.isEmpty())
+            WinShell::Exec(Utils::viewApp(), localFileName);
+    });
+    connect(&dialog, &SearchFileDialog::goToFile,
+            this, [=](QString const& fileName)
+    {
+        goToFile(fileName);
+    });
     dialog.exec();
 }
 
@@ -734,9 +761,10 @@ void RemoteDockWidget::open()
         openDir(fileInfo);
     else
     {
-        QString fileName = download(fileInfo, Utils::tempDir());
-        if(!fileName.isEmpty())
-            WinShell::Open(fileName);
+        QString fileName = QString::fromStdString(model_->filePath(fileInfo->name()));
+        QString localFileName = download(fileName, Utils::tempPath());
+        if(!localFileName.isEmpty())
+            WinShell::Open(localFileName);
     }
 }
 
@@ -747,9 +775,10 @@ void RemoteDockWidget::openWith()
     if(!fileInfo)
         return;
 
-    QString fileName = download(fileInfo, Utils::tempDir());
-    if(!fileName.isEmpty())
-        WinShell::OpenWith(fileName);
+    QString fileName = QString::fromStdString(model_->filePath(fileInfo->name()));
+    QString localFileName = download(fileName, Utils::tempPath());
+    if(!localFileName.isEmpty())
+        WinShell::OpenWith(localFileName);
 }
 
 void RemoteDockWidget::download()
@@ -855,31 +884,55 @@ void RemoteDockWidget::openDir(ssh::FileInfoPtr const& fileInfo)
     updateCurrentDir(dir);
 }
 
-QString RemoteDockWidget::download(ssh::FileInfoPtr const& fileInfo,
-                                   QDir const& dstDir)
+QString RemoteDockWidget::download(QString const& fileName,
+                 QString const& dstFilePath)
 {
-    ssh::File::Ptr remotefile = sftp->openForRead(model_->filePath(fileInfo->name()).c_str());
-    if(!remotefile)
+    RemoteFileTransfer transfer(new SFtpFileManager(sftp));
+    FileProgressDialog dialog(this);
+
+    connect(&transfer, &RemoteFileTransfer::totalProgress, &dialog, &FileProgressDialog::totalProgress);
+    connect(&transfer, &RemoteFileTransfer::fileProgress, &dialog, &FileProgressDialog::fileProgress);
+    connect(&transfer, &RemoteFileTransfer::finished, &dialog, &FileProgressDialog::finished);
+    connect(&transfer, &RemoteFileTransfer::error, &dialog, &FileProgressDialog::error);
+    dialog.setModal(true);
+    dialog.show();
+    dialog.setWindowTitle(tr("DownloadFiles"));
+    transfer.downloadFile(fileName, dstFilePath);
+    while(!dialog.isFinished())
+    {
+        if(dialog.isCancel())
+        {
+            transfer.cancel();
+            while(!dialog.isFinished())
+                QApplication::processEvents();
+        }
+        QApplication::processEvents();
+    }
+    if(dialog.isCancel())
         return QString();
+    return QDir(dstFilePath).filePath(QFileInfo(fileName).fileName());
+}
 
-     QString fileName =  dstDir.filePath(QString::fromStdString(fileInfo->name()));
-     QFile file(fileName);
-     if(!file.open(QIODevice::WriteOnly))
-         return QString();
+void RemoteDockWidget::goToFile(QString const& fileName)
+{
+    QFileInfo fileInfo(fileName);
+    QString filePath = fileInfo.dir().path();
+    QString baseName = fileInfo.fileName();
 
-     uint64_t filesize = fileInfo->size();
-     while(filesize > 0)
-     {
-         char data[1024];
-         ssize_t size = remotefile->read(data, sizeof(data));
-         if(size <= 0)
-             break;
-         filesize -= size;
-         file.write(data, size);
-     }
-     if(filesize > 0)
-         return QString();
-     return fileName;
+    if(model_->dirName() != filePath)
+        setDir(filePath);
+
+    int index = model_->indexOfFile(baseName);
+    if(index != -1)
+    {
+        for(int col = 0; col < model_->columnCount(); col++)
+        {
+            QModelIndex modeIndex = model_->index(index, col);
+            ui->treeView->selectionModel()->select(modeIndex,
+                                                   QItemSelectionModel::Select);
+        }
+    }
+    emit statusTextChanged(getStatusText());
 }
 
 bool RemoteDockWidget::upload(QString const& fileName)

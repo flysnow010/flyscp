@@ -14,9 +14,13 @@ public:
 public slots:
     virtual void uploadFiles(QStringList const& srcFileNames,
                              QString const& dstFilePath) = 0;
+    virtual void downloadFile(QString const& fileName,
+                              QString const& dstFilePath) = 0;
     virtual void downloadFiles(QStringList const& srcFileNames,
                                QString const& srcFilePath,
                                QString const& dstFilePath) = 0;
+    virtual void searchFiles(QString const& filePath,
+                             QString const& filter) = 0;
     virtual void deleteFiles(QStringList const& fileNames,
                              QString const& filePath,
                              bool isDst) = 0;
@@ -29,6 +33,9 @@ signals:
                        int totalSizeTransferred);
     void fileProgress(qint64 totalFileSize,
                       qint64 totalBytesTransferred);
+    void currentFolder(QString const& filePath);
+    void foundFile(QString const& fileName);
+    void foundFolder(QString const& filePath);
     void error(QString const& e);
     void finished();
 
