@@ -68,7 +68,7 @@ public:
     void viewFile() override;
     void newFolder() override;
     void newTxtFile() override;
-    void deleteFiles() override;
+    void deleteFiles(bool isPrompt) override;
     void selectAll() override;
     void copyFiles(QString const& dstFilePath) override;
     void moveFiles(QString const& dstFilePath) override;

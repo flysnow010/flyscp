@@ -50,7 +50,7 @@ public:
     virtual void viewFile() = 0;
     virtual void newFolder() = 0;
     virtual void newTxtFile() = 0;
-    virtual void deleteFiles() = 0;
+    virtual void deleteFiles(bool isPrompt) = 0;
     virtual void selectAll() = 0;
     virtual void uploadFiles(QStringList const& fileNames);
     virtual void copyFiles(QString const& dstFilePath) = 0;

@@ -476,11 +476,11 @@ void PanelWidget::newTxtFile()
         dir->newTxtFile();
 }
 
-void PanelWidget::deleteFiles()
+void PanelWidget::deleteFiles(bool isPrompt)
 {
     BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
     if(dir)
-        dir->deleteFiles();
+        dir->deleteFiles(isPrompt);
 }
 
 void PanelWidget::selectAll()

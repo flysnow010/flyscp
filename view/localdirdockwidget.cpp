@@ -507,7 +507,7 @@ bool LocalDirDockWidget::eventFilter(QObject *obj, QEvent *event)
          }
          else if(keyEvent->matches(QKeySequence::Delete) && obj == ui->tvNormal)
          {
-             deleteFiles();
+             deleteFiles(true);
              return true;
          }
     }
@@ -1105,8 +1105,20 @@ void LocalDirDockWidget::paste()
     model_->refresh();
 }
 
-void LocalDirDockWidget::deleteFiles()
+void LocalDirDockWidget::deleteFiles(bool isPrompt)
 {
+    if(!isPrompt)
+    {
+        if(ui->tvNormal->isVisible())
+            delFiles();
+        else
+        {
+            compressModel_->rm(selectedCompressedFileNames());
+            compressModel_->refresh();
+        }
+        return;
+    }
+
     QStringList fileNames;
     if(ui->tvNormal->isVisible())
         fileNames = getSelectedFileNames(true);

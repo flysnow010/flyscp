@@ -67,7 +67,7 @@ public:
     void viewFile();
     void newFolder();
     void newTxtFile();
-    void deleteFiles();
+    void deleteFiles(bool isPrompt = true);
     void selectAll();
     void uploadFiles(QStringList const& fileNames);
     void copyFiles(QString const& dstFilePath);
