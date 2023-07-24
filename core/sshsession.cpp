@@ -11,7 +11,6 @@ void SSHSession::start(SSHSettings const& settings)
     sessioin_->set_host(settings.hostName.toStdString().c_str());
     sessioin_->set_port(settings.port);
     username_ = settings.userName.toStdString();
-    sessioin_->set_user(username_.c_str());
 
     if(!sessioin_->connect())
     {
@@ -25,10 +24,23 @@ void SSHSession::start(SSHSettings const& settings)
         return;
     }
 
-    if(!sessioin_->login(settings.passWord.toStdString().c_str()))
+    if(settings.usePrivateKey)
     {
-        emit connectionError("login is failed");
-        return;
+        if(!sessioin_->login_by_prikey(settings.userName.toStdString().c_str(),
+                             settings.privateKeyFileName.toStdString().c_str()))
+        {
+            emit connectionError("login is failed");
+            return;
+        }
+    }
+    else
+    {
+        if(!sessioin_->login(settings.userName.toStdString().c_str(),
+                             settings.passWord.toStdString().c_str()))
+        {
+            emit connectionError("login is failed");
+            return;
+        }
     }
     emit connected();
 }

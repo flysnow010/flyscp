@@ -824,6 +824,12 @@ void MainWindow::netsettings()
 
 void MainWindow::connectToSSh(SSHSettings & settings)
 {
+    if(settings.usePrivateKey)
+    {
+        createRemoteDirWidget(settings, false);
+        return;
+    }
+
     QString key = UserAuth::hash(settings.key());
     UserAuth::Ptr userAuth = userAuthManager_->findUserAuth(key);
 

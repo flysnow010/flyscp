@@ -9,6 +9,7 @@ Session::Session()
     ssh_options_set(d->session, SSH_OPTIONS_HOSTKEYS, "ssh-rsa");
     ssh_options_set(d->session, SSH_OPTIONS_PUBLICKEY_ACCEPTED_TYPES, "ssh-rsa");
 }
+
 Session::~Session()
 {
     ssh_free(d->session);
@@ -77,6 +78,28 @@ bool Session::login(const char* password)
 bool Session::login(const char* user, const char* password)
 {
     return ssh_userauth_password(d->session, user, password) == SSH_AUTH_SUCCESS;
+}
+
+bool Session::login_by_prikey(const char* user, const char* privkeyfile)
+{
+    ssh_key key = 0;
+    int r = ssh_pki_import_privkey_file(privkeyfile, 0, 0, 0, &key);
+    if(r != SSH_AUTH_SUCCESS)
+        return false;
+    r = ssh_userauth_publickey(d->session, user, key);
+    ssh_key_free(key);
+    return r == SSH_OK;
+}
+
+bool Session::login_by_pubkey(const char* user, const char* pubkeyfile)
+{
+    ssh_key key = 0;
+    int r = ssh_pki_import_pubkey_file(pubkeyfile, &key);
+    if(r != SSH_AUTH_SUCCESS)
+        return false;
+    r = ssh_userauth_try_publickey(d->session, user, key);
+    ssh_key_free(key);
+    return r == SSH_OK;
 }
 
 const char* Session::error()
