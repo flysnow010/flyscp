@@ -87,43 +87,29 @@ CompressFileInfos CompressFile::fileInfoList(SortFlag sortFlag)
         if(fileInfo->isFile())
         {
             if(fileInfo->path() == currentDir_)
-                fileInfos << fileInfo;
-        }
-        else if(fileInfo->isDir())
-        {
-            QString subDir = getSubDir(fileInfo->path_, currentDir_, true);
-            if(subDir.isEmpty())
-                continue;
-
-            QStringList paths = subDir.split(WINDOWS_SEP);
-            if(!paths.isEmpty())
             {
-                if(paths.size() == 1)
-                {
-                    if(!findFileInfo(fileInfos, paths[0]))
-                    {
-                        CompressFileInfo::Ptr newFileInfo(new CompressFileInfo());
-                        newFileInfo->parent_ = currentDir_;
-                        newFileInfo->path_ = paths[0];
-                        newFileInfo->timeText_ = fileInfo->timeText_;
-                        newFileInfo->attributes_ = QString("D.....");
-                        newFileInfo->isDir_ = true;
-                        fileInfos << newFileInfo;
-                    }
-                }
-                else if(currentDir_.isEmpty())
-                {
-                    if(!findFileInfo(fileInfos, paths[0]))
-                    {
-                        CompressFileInfo::Ptr newFileInfo(new CompressFileInfo());
-                        newFileInfo->path_ = paths[0];
-                        newFileInfo->timeText_ = fileInfo->timeText_;
-                        newFileInfo->attributes_ = QString("D.....");
-                        newFileInfo->isDir_ = true;
-                        fileInfos << newFileInfo;
-                    }
-                }
+                fileInfos << fileInfo;
+                continue;
             }
+        }
+
+        QString subDir = getSubDir(fileInfo->path_, currentDir_, true);
+        if(subDir.isEmpty())
+            continue;
+
+        QStringList paths = subDir.split(WINDOWS_SEP);
+        if(paths.isEmpty())
+            continue;
+
+        if(!findFileInfo(fileInfos, paths[0]))
+        {
+            CompressFileInfo::Ptr newFileInfo(new CompressFileInfo());
+            newFileInfo->parent_ = currentDir_;
+            newFileInfo->path_ = paths[0];
+            newFileInfo->timeText_ = fileInfo->timeText_;
+            newFileInfo->attributes_ = QString("D.....");
+            newFileInfo->isDir_ = true;
+            fileInfos << newFileInfo;
         }
     }
     sort(fileInfos, sortFlag);
