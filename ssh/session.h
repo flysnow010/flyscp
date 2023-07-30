@@ -21,6 +21,8 @@ public:
     bool verify();
     bool login(const char* password);
     bool login(const char* user, const char* password);
+    bool login_by_prikey(const char* user, const char* privkeyfile);
+    bool login_by_pubkey(const char* user, const char* pubkeyfile);
     const char* error();
 private:
     friend class Channel;

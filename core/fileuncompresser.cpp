@@ -32,7 +32,7 @@ FileUncompresser::FileUncompresser(QObject *parent)
     connect(process, &QProcess::readyReadStandardOutput, this, [=](){
         while(process->canReadLine())
         {
-            QString text = QString::fromUtf8(process->readLine()).remove("\r\n");
+            QString text = QString::fromLocal8Bit(process->readLine()).remove("\r\n");
             if(!text.isEmpty())
             {
                 if(mode == Uncompress)

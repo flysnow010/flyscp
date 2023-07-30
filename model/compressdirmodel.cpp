@@ -281,8 +281,12 @@ void CompressDirModel::setupModelData(TreeItem *parent)
         }
         else
         {
-            rowData << fileInfos_[i]->baseName() << fileInfos_[i]->suffix()
-                    << Utils::formatFileSizeB(fileInfos_[i]->size());
+            QString baseName = fileInfos_[i]->baseName();
+            if(baseName.isEmpty())
+                rowData << fileInfos_[i]->fileName() << QString();
+            else
+                rowData << baseName << fileInfos_[i]->suffix();
+            rowData << Utils::formatFileSizeB(fileInfos_[i]->size());
             fileCount_++;
             fileSizes_ += fileInfos_[i]->size();
         }

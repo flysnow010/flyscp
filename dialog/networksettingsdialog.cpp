@@ -87,7 +87,8 @@ void NetworkSettingsDialog::createConnects()
         if(index >= 0)
         {
             SSHSettings::Ptr settings = sshSettingsManager_->settings(index);
-            userAuthManager_->delUserAuth(settings->key());
+            userAuthManager_->delUserAuth(UserAuth::hash(settings->key()));
+            userAuthManager_->save();
             sshSettingsManager_->removeSettings(settings);
             model_->refresh();
         }
