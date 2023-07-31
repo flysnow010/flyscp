@@ -55,7 +55,7 @@ const char * SFtp::extension_data(unsigned int index)
 
 bool SFtp::mkdir(const char* dirname)
 {
-    if(sftp_mkdir(d->sftp, dirname, S_IRWXU) != SSH_OK)
+    if(sftp_mkdir(d->sftp, dirname, 0775) != SSH_OK)
         return false;
     return true;
 }

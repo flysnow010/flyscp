@@ -199,7 +199,7 @@ void SftpDirPrivate::closedir()
 
 bool SftpDirPrivate::mkdir(const char* path)
 {
-    if(sftp_mkdir(sftp, path, S_IRWXU) != SSH_OK)
+    if(sftp_mkdir(sftp, path, 0775) != SSH_OK)
         return false;
     return true;
 }
