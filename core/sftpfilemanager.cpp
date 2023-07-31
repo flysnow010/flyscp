@@ -7,8 +7,8 @@
 #include <QDir>
 #include <QFileInfo>
 
-int const UPLOAD_BUF_SIZE = 0x19000;//50K
-int const DOWNLOAD_BUF_SIZE = 0x8000;//500K
+int const UPLOAD_BUF_SIZE   = 0x19000;//50K
+int const DOWNLOAD_BUF_SIZE = 0x19000;//50K
 
 SFtpFileManager::SFtpFileManager(SFtpSession* sftp, QObject *parent)
     : RemoteFileManager(parent)
