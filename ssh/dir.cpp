@@ -174,8 +174,8 @@ namespace  {
 
         SKIP_SPACES(s); //log
         p = s;
-        SKIP_TEXT(s, ' ');
-        info->name = strndup(p, s);
+        //SKIP_TEXT(s, ' ');
+        info->name = strdup(p);
     }
 }
 
