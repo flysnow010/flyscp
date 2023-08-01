@@ -19,6 +19,8 @@ public:
     bool is_open();
     bool is_eof();
 
+    bool shell_size(int cols, int rows);
+
     bool exec(const char* command);
 
     int poll();
