@@ -103,7 +103,7 @@ ssize_t Scp::write(const void *buf, size_t count)
 
 bool Scp::mkdir(const char* dirname)
 {
-    if(ssh_scp_push_directory(d->scp, dirname, S_IRWXU)  != SSH_OK)
+    if(ssh_scp_push_directory(d->scp, dirname, 0775)  != SSH_OK)
         return false;
     return true;
 }

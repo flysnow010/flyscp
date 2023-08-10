@@ -92,6 +92,13 @@ bool Channel::run_shell(int cols, int rows)
     return true;
 }
 
+bool Channel::shell_size(int cols, int rows)
+{
+    if (ssh_channel_change_pty_size(d->channel, cols, rows) != SSH_OK)
+        return false;
+    return true;
+}
+
 bool Channel::is_open()
 {
     if(ssh_channel_is_open(d->channel))

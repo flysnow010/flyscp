@@ -2,9 +2,13 @@
 #include "sftp/sftpsession.h"
 #include "ssh/fileinfo.h"
 #include "filename.h"
+
 #include <QDebug>
 #include <QDir>
 #include <QFileInfo>
+
+int const UPLOAD_BUF_SIZE   = 0x19000;//50K
+int const DOWNLOAD_BUF_SIZE = 0x19000;//50K
 
 SFtpFileManager::SFtpFileManager(SFtpSession* sftp, QObject *parent)
     : RemoteFileManager(parent)
@@ -132,17 +136,23 @@ bool SFtpFileManager::uploadFile(QString const& srcFileName,
     if(!remotefile)
         return false;
     qint64 writedsize = 0;
+    int percent = 0;
+    QByteArray buf(UPLOAD_BUF_SIZE, Qt::Uninitialized);
     while(writedsize < filesize && !singled())
     {
-        char data[1024];
-        qint64 size = file.read(data, sizeof(data));
+        qint64 size = file.read(buf.data(), buf.size());
         if(size <= 0)
             break;
-        ssize_t write_size = remotefile->write(data, size);
+        ssize_t write_size = remotefile->write(buf.data(), size);
         if(write_size != size)
             break;
         writedsize += size;
-        emit fileProgress(filesize, writedsize);
+        int newpercent = writedsize * 100 / filesize;
+        if(newpercent != percent)
+        {
+            percent = newpercent;
+            emit fileProgress(filesize, writedsize);
+        }
     }
     if(writedsize != filesize)
         return false;
@@ -162,15 +172,21 @@ bool SFtpFileManager::downloadOneFile(QString const& srcFileName,
 
     qint64 filesize = fileSizes[srcFileName];
     qint64 writedsize = 0;
+    int percent = 0;
+    QByteArray buf(DOWNLOAD_BUF_SIZE, Qt::Uninitialized);
     while(writedsize < filesize && !singled())
     {
-        char data[1024];
-        ssize_t size = remotefile->read(data, sizeof(data));
+        ssize_t size = remotefile->read(buf.data(), buf.size());
         if(size <= 0)
             break;
-        file.write(data, size);
+        file.write(buf.data(), size);
         writedsize += size;
-        emit fileProgress(filesize, writedsize);
+        int newpercent = writedsize * 100 / filesize;
+        if(newpercent != percent)
+        {
+            percent = newpercent;
+            emit fileProgress(filesize, writedsize);
+        }
     }
     if(writedsize != filesize)
         return false;
