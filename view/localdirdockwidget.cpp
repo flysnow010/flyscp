@@ -1536,12 +1536,14 @@ void LocalDirDockWidget::execCommand(QString const& command)
     QStringList args = command.split(" ");
     if(args.size() < 2)
     {
-        ;
+        WinShell::Run(command, QString(), model_->dir());
     }
     else
     {
         if(args[0] == "cd")
             cd(args[1]);
+        else
+            WinShell::Run(args[0], args.mid(1).join(" "), model_->dir());
     }
 }
 

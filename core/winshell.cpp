@@ -234,6 +234,17 @@ void WinShell::OpenByExplorer(QString const& fileName)
                  SW_SHOWNORMAL);
 }
 
+void WinShell::Run(QString const& appName, QString const& params,
+                   QString const& directory)
+{
+    ShellExecute(0,
+                 L"open",
+                 appName.toStdWString().c_str(),
+                 params.toStdWString().c_str(),
+                 directory.toStdWString().c_str(),
+                 SW_SHOWNORMAL);
+}
+
 void WinShell::Exec(QString const& appName, QStringList const& params)
 {
     Exec(appName, params.join(" "));

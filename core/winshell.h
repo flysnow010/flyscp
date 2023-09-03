@@ -56,6 +56,8 @@ public:
     static void Open(QString const& fileName);
     static void OpenWith(QString const& fileName);
     static void OpenByExplorer(QString const& fileName);
+    static void Run(QString const& appName, QString const& params,
+                    QString const& directory);
     static void Exec(QString const& appName,
                      QStringList const& params);
     static void Exec(QString const& appName,
