@@ -22,11 +22,18 @@ FileProgressDialog::~FileProgressDialog()
     delete ui;
 }
 
+void FileProgressDialog::hideTotalProgress()
+{
+    ui->totalProgressBar->hide();
+    ui->totalLabel->hide();
+    adjustSize();
+}
+
 void FileProgressDialog::setStatusTextMode()
 {
     ui->label1->hide();
     ui->label2->hide();
-    ui->label3->hide();
+    ui->totalLabel->hide();
     ui->label4->hide();
     ui->totalProgressBar->hide();
     ui->fileProgressBar->hide();

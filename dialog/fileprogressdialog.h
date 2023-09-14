@@ -18,6 +18,7 @@ public:
     bool isFinished() const { return isFinished_; }
     bool isCancel() const { return isCancel_; }
 
+    void hideTotalProgress();
     void setStatusTextMode();
 public slots:
     void totalProgress(QString const& srcFilename,

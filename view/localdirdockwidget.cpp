@@ -1665,6 +1665,8 @@ void LocalDirDockWidget::fileTransfer(FileNames const& fileNames,
             &dialog, &FileProgressDialog::error);
 
     dialog.setModal(true);
+    if(fileNames.size() == 1)
+        dialog.hideTotalProgress();
     dialog.show();
     if(isMove)
     {
