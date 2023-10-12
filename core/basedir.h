@@ -29,7 +29,7 @@ public:
     virtual void showHiddenAndSystem(bool isShow) = 0;
     virtual void showToolTips(bool isShow) = 0;
     virtual void showParentInRoot(bool isShow) = 0;
-    virtual void setDirSoryByTime(bool isOn) = 0;
+    virtual void setDirSortByTime(bool isOn) = 0;
     virtual void setRenameFileName(bool isOn) = 0;
     virtual void showAllIconWithExeAndLink(bool isShow) = 0;
     virtual void showAllIcon(bool isShow) = 0;

@@ -43,7 +43,7 @@ public:
     void showToolTips(bool isShow);
     void showDriveToolTips(bool isShow);
     void showParentInRoot(bool isShow);
-    void setDirSoryByTime(bool isOn);
+    void setDirSortByTime(bool isOn);
     void setRenameFileName(bool isOn);
     void showAllIconWithExeAndLink(bool isShow);
     void showAllIcon(bool isShow);

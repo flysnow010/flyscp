@@ -216,7 +216,7 @@ void RemoteDockWidget::showToolTips(bool isShow)
     model_->showToolTips(isShow);
 }
 
-void RemoteDockWidget::setDirSoryByTime(bool isOn)
+void RemoteDockWidget::setDirSortByTime(bool isOn)
 {
     model_->setDirSortByTime(isOn);
 }
@@ -1042,7 +1042,7 @@ void RemoteDockWidget::applyOptions()
         RemoteDockWidget::showHiddenAndSystem(o.isShowHideAndSystemFile);
         RemoteDockWidget::showParentInRoot(o.isShowParentDirInRootDrive);
         RemoteDockWidget::showToolTips(o.isShowFilenameTooltips);
-        RemoteDockWidget::setDirSoryByTime(!o.isDirSortByName);
+        RemoteDockWidget::setDirSortByTime(!o.isDirSortByName);
     }
     {
         IconsOption const& o = theOptionManager.iconOption();

@@ -235,7 +235,7 @@ void LocalDirDockWidget::showParentInRoot(bool isShow)
     compressModel_->showParentInRoot(isShow);
 }
 
-void LocalDirDockWidget::setDirSoryByTime(bool isOn)
+void LocalDirDockWidget::setDirSortByTime(bool isOn)
 {
     model_->setDirSortByTime(isOn);
     compressModel_->setDirSortByTime(isOn);

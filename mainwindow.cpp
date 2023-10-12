@@ -961,14 +961,14 @@ void MainWindow::updateDisplay(DisplayOption const& o, bool isRefresh)
     leftPanelWidget->showParentInRoot(o.isShowParentDirInRootDrive);
     leftPanelWidget->showDriveToolTips(o.isShowDriveTooltips);
     leftPanelWidget->showToolTips(o.isShowFilenameTooltips);
-    leftPanelWidget->setDirSoryByTime(!o.isDirSortByName);
+    leftPanelWidget->setDirSortByTime(!o.isDirSortByName);
     isShowTips_ = o.isShowToolbarTooltips;
 
     rightPanelWidget->showHiddenAndSystem(o.isShowHideAndSystemFile);
     rightPanelWidget->showParentInRoot(o.isShowParentDirInRootDrive);
     rightPanelWidget->showDriveToolTips(o.isShowDriveTooltips);
     rightPanelWidget->showToolTips(o.isShowFilenameTooltips);
-    rightPanelWidget->setDirSoryByTime(!o.isDirSortByName);
+    rightPanelWidget->setDirSortByTime(!o.isDirSortByName);
 
     if(isRefresh)
     {
