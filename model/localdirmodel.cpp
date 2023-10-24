@@ -175,7 +175,8 @@ QVariant LocalDirModel::editText(const QModelIndex &index) const
     if(index.column() == 0)
     {
         if(!isRenameBaseName()
-                || fileInfos_[index.row()].completeBaseName().isEmpty())
+                || fileInfos_[index.row()].completeBaseName().isEmpty()
+                || fileInfos_[index.row()].isDir())
             return fileInfos_[index.row()].fileName();
         else
             return fileInfos_[index.row()].completeBaseName();
