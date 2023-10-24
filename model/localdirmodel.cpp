@@ -112,7 +112,7 @@ bool LocalDirModel::setData(const QModelIndex &index,
             QString oldFileName = fileInfo.fileName();
             QString suffix = fileInfo.suffix();
             QString newFileName;
-            if(!isRenameBaseName() || suffix.isEmpty())
+            if(!isRenameBaseName() || suffix.isEmpty() || fileInfo.isDir())
                 newFileName = newName;
             else
                newFileName = QString("%1.%2").arg(newName, suffix);
