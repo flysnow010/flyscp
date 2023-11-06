@@ -337,9 +337,9 @@ void PanelWidget::showParentInRoot(bool isShow)
     CALL_FUNCTION(showParentInRoot, isShow)
 }
 
-void PanelWidget::setDirSoryByTime(bool isOn)
+void PanelWidget::setDirSortByTime(bool isOn)
 {
-    CALL_FUNCTION(setDirSoryByTime, isOn)
+    CALL_FUNCTION(setDirSortByTime, isOn)
 }
 
 void PanelWidget::setRenameFileName(bool isOn)

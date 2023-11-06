@@ -47,7 +47,7 @@ public:
     void showHiddenAndSystem(bool isShow) override;
     void showToolTips(bool isShow) override;
     void showParentInRoot(bool isShow) override;
-    void setDirSoryByTime(bool isOn) override;
+    void setDirSortByTime(bool isOn) override;
     void setRenameFileName(bool isOn) override;
     void showAllIconWithExeAndLink(bool isShow) override;
     void showAllIcon(bool isShow) override;

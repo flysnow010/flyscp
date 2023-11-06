@@ -216,7 +216,7 @@ void RemoteDockWidget::showToolTips(bool isShow)
     model_->showToolTips(isShow);
 }
 
-void RemoteDockWidget::setDirSoryByTime(bool isOn)
+void RemoteDockWidget::setDirSortByTime(bool isOn)
 {
     model_->setDirSortByTime(isOn);
 }
@@ -895,6 +895,7 @@ QString RemoteDockWidget::download(QString const& fileName,
     connect(&transfer, &RemoteFileTransfer::finished, &dialog, &FileProgressDialog::finished);
     connect(&transfer, &RemoteFileTransfer::error, &dialog, &FileProgressDialog::error);
     dialog.setModal(true);
+    dialog.hideTotalProgress();
     dialog.show();
     dialog.setWindowTitle(tr("DownloadFiles"));
     transfer.downloadFile(fileName, dstFilePath);
@@ -955,6 +956,8 @@ void RemoteDockWidget::fileTransfer(QStringList const& srcFileNames,
     connect(&transfer, &RemoteFileTransfer::finished, &dialog, &FileProgressDialog::finished);
     connect(&transfer, &RemoteFileTransfer::error, &dialog, &FileProgressDialog::error);
     dialog.setModal(true);
+    if(srcFileNames.size() == 1)
+        dialog.hideTotalProgress();
     dialog.show();
     if(type == Download)
     {
@@ -1039,7 +1042,7 @@ void RemoteDockWidget::applyOptions()
         RemoteDockWidget::showHiddenAndSystem(o.isShowHideAndSystemFile);
         RemoteDockWidget::showParentInRoot(o.isShowParentDirInRootDrive);
         RemoteDockWidget::showToolTips(o.isShowFilenameTooltips);
-        RemoteDockWidget::setDirSoryByTime(!o.isDirSortByName);
+        RemoteDockWidget::setDirSortByTime(!o.isDirSortByName);
     }
     {
         IconsOption const& o = theOptionManager.iconOption();

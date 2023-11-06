@@ -72,7 +72,7 @@ ssh::File::Ptr SFtpSession::openForWrite(const char* filename, uint64_t filesize
 {
     ssh::File::Ptr file = createFile();
     file->set_filesize(filesize);
-    if(file->open(filename, O_CREAT | O_WRONLY, 0644))
+    if(file->open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0644))
         return file;
     return ssh::File::Ptr();
 }

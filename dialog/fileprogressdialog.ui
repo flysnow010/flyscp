@@ -43,7 +43,7 @@
     </widget>
    </item>
    <item row="2" column="0">
-    <widget class="QLabel" name="label3">
+    <widget class="QLabel" name="totalLabel">
      <property name="text">
       <string>Total:</string>
      </property>

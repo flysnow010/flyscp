@@ -20,7 +20,7 @@ struct UncompressParam
 class QStringList;
 class QProcess;
 
-class FileUncompresser: public QObject
+class FileUncompresser : public QObject
 {
     Q_OBJECT
 public:
