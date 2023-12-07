@@ -84,14 +84,10 @@ public:
 
     void editFile();
 
-
-
     void compressFiles(QString const& dstFilePath);
     void uncompressFiles(QString const& dstFilePath);
     void extractFiles(QStringList const& fileNames,
                       QString const& targetPath);
-
-
 signals:
     void sectionResized(int logicalIndex,
                         int oldSize,

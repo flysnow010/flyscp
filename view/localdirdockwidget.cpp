@@ -1397,7 +1397,7 @@ void LocalDirDockWidget::compressFiles(QString const& dstFilePath)
         QString fileName;
         if(fileNames.size() > 1)
         {
-            QString baseName = QFileInfo(model_->dir()).baseName();
+            QString baseName = QFileInfo(model_->dir()).fileName();
             if(baseName.isEmpty())
                 baseName = "archive";
             fileName = baseName + CompressConfirmDialog::CurrentSuffix();
@@ -1406,7 +1406,7 @@ void LocalDirDockWidget::compressFiles(QString const& dstFilePath)
         {
             QFileInfo fileInfo(fileNames[0]);
             if(fileInfo.isDir())
-                fileName = fileInfo.baseName() + CompressConfirmDialog::CurrentSuffix();
+                fileName = fileInfo.fileName() + CompressConfirmDialog::CurrentSuffix();
             else
                 fileName = fileInfo.completeBaseName() + CompressConfirmDialog::CurrentSuffix();
         }
