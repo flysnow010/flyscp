@@ -11,6 +11,8 @@ public:
     Channel(Session const& session);
     ~Channel();
 
+    void reset();
+
     bool open();
     bool close();
     bool send_eof();
