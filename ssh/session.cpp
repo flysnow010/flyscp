@@ -3,10 +3,20 @@
 #include <libssh/libssh.h>
 namespace ssh {
 
+#define HOSTKEYS "ssh-ed25519," \
+                 "ecdsa-sha2-nistp521," \
+                 "ecdsa-sha2-nistp384," \
+                 "ecdsa-sha2-nistp256," \
+                 "sk-ssh-ed25519@openssh.com," \
+                 "sk-ecdsa-sha2-nistp256@openssh.com," \
+                 "rsa-sha2-512," \
+                 "rsa-sha2-256," \
+                 "ssh-rsa"
+
 Session::Session()
     : d(new SessionPrivate(ssh_new()))
 {
-    ssh_options_set(d->session, SSH_OPTIONS_HOSTKEYS, "ssh-rsa");
+    ssh_options_set(d->session, SSH_OPTIONS_HOSTKEYS, HOSTKEYS);
     ssh_options_set(d->session, SSH_OPTIONS_PUBLICKEY_ACCEPTED_TYPES, "ssh-rsa");
 }
 
@@ -71,6 +81,24 @@ bool Session::verify()
     return true;
 }
 
+AuthMethod Session::auth_method(const char *username)
+{
+    AuthMethod method = AuthMethod_Unknow;
+    if(ssh_userauth_none(d->session, username) == SSH_AUTH_ERROR)
+        return method;
+
+    int mask = ssh_userauth_list(d->session, 0);
+    if(mask & SSH_AUTH_METHOD_NONE)
+        method |= AuthMethod_None;
+    if(mask & SSH_AUTH_METHOD_PASSWORD)
+        method |= AuthMethod_PassWord;
+    if(mask & SSH_AUTH_METHOD_PUBLICKEY)
+        method |= AuthMethod_PubKey;
+    if(mask & SSH_AUTH_METHOD_INTERACTIVE)
+        method |= AuthMethod_Interactive;
+    return method;
+}
+
 bool Session::login(const char* password)
 {
     return login(0, password);
@@ -79,6 +107,78 @@ bool Session::login(const char* password)
 bool Session::login(const char* user, const char* password)
 {
     return ssh_userauth_password(d->session, user, password) == SSH_AUTH_SUCCESS;
+}
+
+bool Session::login_by_interactive(const char* user,
+                                   const char* password)
+{
+    int err = ssh_userauth_kbdint(d->session, user, 0);
+    while (err == SSH_AUTH_INFO) {
+        const char *instruction;
+        const char *name;
+        char buffer[128];
+        int i, n;
+
+        name = ssh_userauth_kbdint_getname(d->session);
+        instruction = ssh_userauth_kbdint_getinstruction(d->session);
+        n = ssh_userauth_kbdint_getnprompts(d->session);
+        if (name && strlen(name) > 0) {
+            printf("%s\n", name);
+        }
+
+        if (instruction && strlen(instruction) > 0) {
+            printf("%s\n", instruction);
+        }
+        for (i = 0; i < n; i++) {
+            const char *answer;
+            const char *prompt;
+            char echo;
+
+            prompt = ssh_userauth_kbdint_getprompt(d->session, i, &echo);
+            if (prompt == NULL) {
+                break;
+            }
+
+            if (echo) {
+                char *p;
+
+                printf("%s", prompt);
+
+                if (fgets(buffer, sizeof(buffer), stdin) == NULL) {
+                    return false;
+                }
+
+                buffer[sizeof(buffer) - 1] = '\0';
+                if ((p = strchr(buffer, '\n'))) {
+                    *p = '\0';
+                }
+
+                if (ssh_userauth_kbdint_setanswer(d->session, i, buffer) < 0) {
+                    return false;
+                }
+
+                memset(buffer, 0, strlen(buffer));
+            } else {
+                if (password && strstr(prompt, "Password:")) {
+                    answer = password;
+                } else {
+                    buffer[0] = '\0';
+
+                    if (ssh_getpass(prompt, buffer, sizeof(buffer), 0, 0) < 0) {
+                        return false;
+                    }
+                    answer = buffer;
+                }
+                err = ssh_userauth_kbdint_setanswer(d->session, i, answer);
+                memset(buffer, 0, sizeof(buffer));
+                if (err < 0) {
+                    return false;
+                }
+            }
+        }
+        err = ssh_userauth_kbdint(d->session, 0, 0);
+    }
+    return err == SSH_AUTH_SUCCESS;
 }
 
 bool Session::login_by_prikey(const char* user, const char* privkeyfile)
