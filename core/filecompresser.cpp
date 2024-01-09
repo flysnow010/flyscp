@@ -126,13 +126,34 @@ bool FileCompresser::compress(QStringList const& fileNames,
     return true;
 }
 
-bool FileCompresser::update(QStringList const& fileNames,
+bool FileCompresser::add(QStringList const& fileNames,
                             QString const& archiveFileName,
                             bool isWaitForFinished)
 {
     QStringList args;
 
     args << "a" << archiveFileName;
+    foreach(auto fileName, fileNames)
+        args << fileName;
+    addArgs(args);
+
+    currentIndex = 0;
+    process->setProgram(Utils::compressApp());
+    process->setArguments(nextArgs());
+    process->start();
+    if(isWaitForFinished)
+        process->waitForFinished();
+
+    return true;
+}
+
+bool FileCompresser::update(QStringList const& fileNames,
+                            QString const& archiveFileName,
+                            bool isWaitForFinished)
+{
+    QStringList args;
+
+    args << "u" << archiveFileName;
     foreach(auto fileName, fileNames)
         args << fileName;
     addArgs(args);

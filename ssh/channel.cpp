@@ -18,6 +18,11 @@ Channel::~Channel()
     delete d;
 }
 
+void Channel::reset()
+{
+    d->channel = 0;
+}
+
 bool Channel::open()
 {
     if(d->isOpened)
@@ -80,10 +85,17 @@ int Channel::write(void *dest, uint32_t count)
 
 bool Channel::run_shell(int cols, int rows)
 {
-    if (ssh_channel_request_pty(d->channel) != SSH_OK)
-        return false;
-
-    if (ssh_channel_change_pty_size(d->channel, cols, rows) != SSH_OK)
+    /*
+     *
+        vt200 as VT220/VT240,
+        vt300 as VT320/VT340,
+        vt400 as VT420, and
+        vt500 as VT510/VT520/VT525.
+        xterm
+        xterm-256color
+    */
+    const char* term = "xterm-256color";//vt100 vt400 xterm xterm-256color
+    if (ssh_channel_request_pty_size(d->channel, term, cols, rows) != SSH_OK)
         return false;
 
     if (ssh_channel_request_shell(d->channel))

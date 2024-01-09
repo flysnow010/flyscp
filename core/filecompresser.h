@@ -33,6 +33,9 @@ public:
     bool compress(QStringList const& fileNames,
                   CompressParam const& param,
                   QString const& targetFilePath);
+    bool add(QStringList const& fileNames,
+             QString const& archiveFileName,
+             bool isWaitForFinished = true);
     bool update(QStringList const& fileNames,
                 QString const& archiveFileName,
                 bool isWaitForFinished = true);
