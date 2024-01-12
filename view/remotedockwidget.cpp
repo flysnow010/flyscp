@@ -64,6 +64,7 @@ RemoteDockWidget::RemoteDockWidget(QWidget *parent)
     {
             emit statusTextChanged(getStatusText());
     });
+    connect(model_, &RemoteDirModel::nameChanged, this, [=](){ refresh(); });
 
     connect(sftp, &SFtpSession::connected,
             this, &RemoteDockWidget::connected);

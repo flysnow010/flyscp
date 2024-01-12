@@ -196,7 +196,7 @@ bool RemoteDirModel::rmFile(std::string const& filename)
 bool RemoteDirModel::rename(std::string const& original,
                             std::string const& newname)
 {
-    if(dir_)
+    if(dir_ && original != newname)
     {
         std::string originalPath = filePath(original.c_str());
         std::string newnamePath = filePath(newname.c_str());
@@ -268,12 +268,16 @@ bool RemoteDirModel::setData(const QModelIndex &index,
             if(!isRenameBaseName() || suffix.empty())
                 newFileName = newName.toStdString();
             else
-               newFileName = QString("%1.%2").arg(newName,
+                newFileName = QString("%1.%2").arg(newName,
                                                   QString::fromStdString(suffix)).toStdString();
             if(rename(oldFileName, newFileName))
             {
                 TreeItem *item = static_cast<TreeItem*>(index.internalPointer());
-                return item->setData(index.column(), value);
+                if(item->setData(index.column(), value))
+                {
+                    emit nameChanged();
+                    return true;
+                }
             }
         }
     }
