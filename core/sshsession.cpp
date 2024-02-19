@@ -68,4 +68,3 @@ void SSHSession::stop()
     sessioin_->disconnect();
     emit unconnected();
 }
-
