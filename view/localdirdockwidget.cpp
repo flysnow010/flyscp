@@ -429,7 +429,7 @@ void LocalDirDockWidget::saveSettings(QString const& name)
         settings.setArrayIndex(i);
         settings.setValue("caption", items[i].caption);
         settings.setValue("command", items[i].command);
-        settings.setValue("fileName", items[i].fileName);
+        settings.setValue("filePath", items[i].filePath);
     }
 
     settings.endArray();
@@ -476,7 +476,7 @@ void LocalDirDockWidget::loadSettings(QString const& name)
         FavoriteItem item;
         item.caption = settings.value("caption").toString();
         item.command = settings.value("command").toString();
-        item.fileName = settings.value("fileName").toString();
+        item.filePath = settings.value("filePath").toString();
         items << item;
     }
     dirFavorite->setFavoriteItems(items);
@@ -607,10 +607,12 @@ void LocalDirDockWidget::favoritesDirContextMenu()
     {
         QAction* action = menu.addAction(item.caption, this, [&](bool)
         {
-            setDir(item.fileName);
+            setDir(item.filePath);
+            if(item.isCommand())
+                execCommand(item.getCommand());
         }
         );
-        if(currentFileName == item.fileName)
+        if(currentFileName == item.filePath)
         {
             action->setCheckable(true);
             action->setChecked(true);
@@ -620,7 +622,7 @@ void LocalDirDockWidget::favoritesDirContextMenu()
     menu.addSeparator();
     FavoriteItem item;
     item.caption = QFileInfo(currentFileName).fileName();
-    item.fileName = currentFileName;
+    item.filePath = currentFileName;
 
     if(isCurrent)
         menu.addAction(tr("Remove Current Folder"), this, [&](bool){
@@ -630,8 +632,10 @@ void LocalDirDockWidget::favoritesDirContextMenu()
         menu.addAction(tr("Add Current Folder"), this, [&](bool){
             QString caption = Utils::getText(tr("Caption of New Menu"), item.caption);
             if(!caption.isEmpty())
+            {
                 item.caption = caption;
-            dirFavorite->addItem(item);
+                dirFavorite->addItem(item);
+            }
     });
     menu.addAction(tr("Settings"), this, [=]{
         FavoriteSettingsDialog dialog;
