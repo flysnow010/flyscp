@@ -312,7 +312,6 @@ void RemoteDockWidget::fileFont(QFont const& font)
         ui->treeView->header()->setFont(font);
 }
 
-
 void RemoteDockWidget::showParentInRoot(bool isShow)
 {
     model_->showParentInRoot(isShow);
@@ -329,10 +328,10 @@ void RemoteDockWidget::favoritesDirContextMenu()
     {
         QAction* action = menu.addAction(item.caption, this, [&](bool)
         {
-            this->setDir(item.fileName);
+            this->setDir(item.filePath);
         }
         );
-        if(currentFileName == item.fileName)
+        if(currentFileName == item.filePath)
         {
             action->setCheckable(true);
             action->setChecked(true);
@@ -342,7 +341,7 @@ void RemoteDockWidget::favoritesDirContextMenu()
     menu.addSeparator();
     FavoriteItem item;
     item.caption = QFileInfo(currentFileName).fileName();
-    item.fileName = currentFileName;
+    item.filePath = currentFileName;
 
     if(isCurrent)
         menu.addAction(tr("Remove Current Folder"), this, [&](bool){
@@ -352,8 +351,10 @@ void RemoteDockWidget::favoritesDirContextMenu()
         menu.addAction(tr("Add Current Folder"), this, [&](bool){
             QString caption = Utils::getText(tr("Caption of New Menu"), item.caption);
             if(!caption.isEmpty())
+            {
                 item.caption = caption;
-            dirFavorite->addItem(item);
+                dirFavorite->addItem(item);
+            }
     });
     menu.addAction(tr("Settings"));
     menu.exec(QCursor::pos());
