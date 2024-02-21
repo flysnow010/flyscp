@@ -5,14 +5,55 @@
 
 #define ARRAY_SIZE(Array) (sizeof(Array) / sizeof(Array[0]))
 
+QString CompressConfirmDialog::currentSuffix(".zip");
+
 CompressConfirmDialog::CompressConfirmDialog(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::CompressConfirmDialog)
-    , suffix_(".zip")
 {
     ui->setupUi(this);
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
+    ui->comboBoxVolumeSize->addItem("10M", 10);
+    ui->comboBoxVolumeSize->addItem("100M", 100);
+    ui->comboBoxVolumeSize->addItem("1000M", 1000);
+    ui->comboBoxVolumeSize->addItem("650M - CD", 650);
+    ui->comboBoxVolumeSize->addItem("700M - CD", 700);
+    ui->comboBoxVolumeSize->addItem("4092M - FAT", 4092);
+    ui->comboBoxVolumeSize->addItem("4480M - DVD", 4480);
+    ui->comboBoxVolumeSize->addItem("8128M - DVD DL", 8128);
+    ui->comboBoxVolumeSize->addItem("23040M - BD", 23040);
+
+    QRadioButton* radioButtons[] = {
+        ui->rbZip, ui->rb7z, ui->rbWim, ui->rbTar,
+        ui->rbGZ, ui->rbXZ, ui->rbBZ2,
+        ui->rbTarGz, ui->rbTarXz, ui->rbTarBz2
+    };
+
+    for(quint16 i = 0; i < ARRAY_SIZE(radioButtons); i++)
+    {
+        QString suffix = QString(".%1").arg(radioButtons[i]->text());
+        if(suffix == currentSuffix)
+        {
+            radioButtons[i]->setChecked(true);
+            if(suffix == ".7z")
+            {
+                ui->cbCreateSFX->setEnabled(true);
+                ui->rbConsoleSFX->setEnabled(true);
+                ui->rbGUISFX->setEnabled(true);
+            }
+            break;
+        }
+    }
+}
+
+CompressConfirmDialog::~CompressConfirmDialog()
+{
+    delete ui;
+}
+
+void CompressConfirmDialog::setConnect()
+{
     connect(ui->rbZip, &QAbstractButton::clicked, this, [&](bool isChecked){
         if(isChecked)
             changeSuffix(".zip", true);
@@ -58,49 +99,17 @@ CompressConfirmDialog::CompressConfirmDialog(QWidget *parent)
         if(isChecked)
         {
             QFileInfo fileInfo(ui->lineEditFileName->text());
-            QString fileName = fileInfo.dir().filePath(fileInfo.baseName() + ".exe");
+            QString fileName = fileInfo.dir().filePath(baseFileName + ".exe");
             ui->lineEditFileName->setText(fileName);
         }
     });
-
-    ui->comboBoxVolumeSize->addItem("10M", 10);
-    ui->comboBoxVolumeSize->addItem("100M", 100);
-    ui->comboBoxVolumeSize->addItem("1000M", 1000);
-    ui->comboBoxVolumeSize->addItem("650M - CD", 650);
-    ui->comboBoxVolumeSize->addItem("700M - CD", 700);
-    ui->comboBoxVolumeSize->addItem("4092M - FAT", 4092);
-    ui->comboBoxVolumeSize->addItem("4480M - DVD", 4480);
-    ui->comboBoxVolumeSize->addItem("8128M - DVD DL", 8128);
-    ui->comboBoxVolumeSize->addItem("23040M - BD", 23040);
-
-    QRadioButton* radioButtons[] = {
-        ui->rbZip, ui->rb7z, ui->rbWim, ui->rbTar,
-        ui->rbGZ, ui->rbXZ, ui->rbBZ2,
-        ui->rbTarGz, ui->rbTarXz, ui->rbTarBz2
-    };
-
-    for(quint16 i = 0; i < ARRAY_SIZE(radioButtons); i++)
-    {
-        QString suffix = QString(".%1").arg(radioButtons[i]->text());
-        if(suffix == currentSuffix)
-        {
-            radioButtons[i]->setChecked(true);
-            radioButtons[i]->click();
-            break;
-        }
-    }
-}
-
-CompressConfirmDialog::~CompressConfirmDialog()
-{
-    delete ui;
 }
 
 void CompressConfirmDialog::changeSuffix(QString const& suffix,
                                          bool isCanEncryption)
 {
     QFileInfo fileInfo(ui->lineEditFileName->text());
-    QString fileName = fileInfo.dir().filePath(fileInfo.baseName() + suffix);
+    QString fileName = fileInfo.dir().filePath(baseFileName + suffix);
     ui->lineEditFileName->setText(fileName);
     if(isCanEncryption)
         ui->cbEncryption->setEnabled(true);
@@ -123,8 +132,7 @@ void CompressConfirmDialog::changeSuffix(QString const& suffix,
         ui->rbGUISFX->setEnabled(false);
         ui->cbCreateSFX->setChecked(false);
     }
-    suffix_ = suffix;
-    setCurrentSuffix(suffix);
+    currentSuffix = suffix;
 }
 
 void CompressConfirmDialog::setLabel(int size)
@@ -135,9 +143,11 @@ void CompressConfirmDialog::setLabel(int size)
         ui->labelTip->setText(QString(tr("Compress these %1 files or folders into:")).arg(size));
 }
 
-void CompressConfirmDialog::setFileNames(QStringList const& fileNames)
+void CompressConfirmDialog::setFileNames(QStringList const& fileNames,
+                  QString const& targetPath)
 {
     setLabel(fileNames.size());
+    bool isDir = false;
     foreach(auto const& fileName, fileNames)
     {
         if(QFileInfo(fileName).isDir())
@@ -145,18 +155,42 @@ void CompressConfirmDialog::setFileNames(QStringList const& fileNames)
             ui->rbBZ2->hide();
             ui->rbGZ->hide();
             ui->rbXZ->hide();
-            return;
+            isDir = true;
+            break;;
         }
     }
-    ui->rbTarGz->hide();
-    ui->rbTarXz->hide();
-    ui->rbTarBz2->hide();
-}
+    if(!isDir)
+    {
+        ui->rbTarGz->hide();
+        ui->rbTarXz->hide();
+        ui->rbTarBz2->hide();
+    }
 
-void CompressConfirmDialog::setTargetFileName(QString const& fileName)
-{
-    ui->lineEditFileName->setText(fileName);
+    QFileInfo fileInfo(fileNames[0]);
+
+    if(fileNames.size() > 1)
+    {
+        baseFileName = QFileInfo(fileInfo.path()).fileName();
+    }
+    else
+    {
+        if(fileInfo.isDir())
+            baseFileName = fileInfo.fileName();
+        else
+        {
+            QString fileName = fileInfo.fileName().toLower();
+            if(fileName.endsWith(".tar.gz")
+                    || fileName.endsWith(".tar.gz")
+                    || fileName.endsWith(".tar.xz"))
+                baseFileName = fileInfo.fileName();
+            else
+                baseFileName = fileInfo.completeBaseName();
+        }
+    }
+    QString dstFileName = baseFileName + CompressConfirmDialog::currentSuffix;
+    ui->lineEditFileName->setText(QDir(targetPath).filePath(dstFileName));
     ui->lineEditFileName->setFocus();
+    setConnect();
 }
 
 QString CompressConfirmDialog::targetFileName()
@@ -190,19 +224,7 @@ CompressParam CompressConfirmDialog::settings() const
     param.isEncryption = ui->cbEncryption->isChecked();
     param.password = ui->lineEditPassword->text();
     param.filter = ui->comboBoxFilter->currentText();
-    param.suffix = suffix_;
+    param.suffix = currentSuffix;
     param.volumeSize = ui->comboBoxVolumeSize->currentData().toUInt();
     return param;
 }
-
-QString CompressConfirmDialog::currentSuffix(".zip");
-
-QString CompressConfirmDialog::CurrentSuffix()
-{
-    return currentSuffix;
-}
-void CompressConfirmDialog::setCurrentSuffix(QString const& suffix)
-{
-    currentSuffix = suffix;
-}
-

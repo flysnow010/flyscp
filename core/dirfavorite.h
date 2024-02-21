@@ -6,10 +6,15 @@ struct FavoriteItem
 {
     QString caption;
     QString command;
-    QString fileName;
+    QString filePath;
 
     bool operator==(FavoriteItem const& item) {
-        return item.fileName == fileName;
+        return item.filePath == filePath;
+    }
+    bool isCommand() const { return !command.isEmpty(); }
+    QString getCommand() const
+    {
+        return QString("%1/%2").arg(filePath, command);
     }
 };
 

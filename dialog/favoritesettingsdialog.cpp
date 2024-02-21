@@ -15,14 +15,24 @@ FavoriteSettingsDialog::FavoriteSettingsDialog(QWidget *parent)
     ui->treeView->setModel(model);
 
     connect(ui->treeView, &QTreeView::clicked, this, [=](QModelIndex const& index){
-        ui->lineEdit->setText(model->item(index.row())->fileName);
+        ui->lineEditFilePath->setText(model->item(index.row())->filePath);
+        ui->lineEditCommand->setText(model->item(index.row())->command);
     });
-    connect(ui->lineEdit, &QLineEdit::textChanged, this, [=](){
+    connect(ui->lineEditFilePath, &QLineEdit::textChanged, this, [=](){
         QModelIndex index = ui->treeView->currentIndex();
         if(index.isValid())
         {
             FavoriteItem* item = dirFavorite->item(index.row());
-            item->fileName = ui->lineEdit->text();
+            item->filePath = ui->lineEditFilePath->text();
+        }
+    });
+
+    connect(ui->lineEditCommand, &QLineEdit::textChanged, this, [=](){
+        QModelIndex index = ui->treeView->currentIndex();
+        if(index.isValid())
+        {
+            FavoriteItem* item = dirFavorite->item(index.row());
+            item->command = ui->lineEditCommand->text();
         }
     });
     connect(ui->btnNew, &QPushButton::clicked, this, [=](){

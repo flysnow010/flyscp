@@ -44,6 +44,8 @@ public:
     qint64 fileSize(int index) const override;
     int indexOfFile(QString const& fileName);
 
+signals:
+    void nameChanged();
 protected:
     TreeItem *createRootItem() override;
     QVariant textAlignment(const QModelIndex &index) const override;
