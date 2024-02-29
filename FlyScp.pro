@@ -5,7 +5,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 CONFIG += c++11
 
 INCLUDEPATH += ./include
-LIBS += -L$$(PWD)\lib -lssh.dll -lrsa -lshlwapi
+LIBS += -L$$(PWD)\lib -lssh.dll -lrsa -lshlwapi -lsetupapi
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
@@ -17,6 +17,7 @@ SOURCES += \
     core/contextmenu.cpp \
     core/dirfavorite.cpp \
     core/dirhistory.cpp \
+    core/diskmanager.cpp \
     core/filecompresser.cpp \
     core/filemanager.cpp \
     core/filename.cpp \
@@ -84,6 +85,7 @@ HEADERS += \
     core/contextmenu.h \
     core/dirfavorite.h \
     core/dirhistory.h \
+    core/diskmanager.h \
     core/filecompresser.h \
     core/filemanager.h \
     core/filename.h \
