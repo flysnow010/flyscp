@@ -98,6 +98,7 @@ private slots:
     void currentChanged(int index);
     void tabCloseRequested(int index);
 private:
+    void driverContextMenu(QString const& driver);
     void initDrivers();
     void updateDir(QString const& driver);
 private:

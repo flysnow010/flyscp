@@ -3,6 +3,8 @@
 #include "view/localdirdockwidget.h"
 #include "util/utils.h"
 #include "core/winshell.h"
+#include "core/diskmanager.h"
+#include "core/contextmenu.h"
 
 #include <QDir>
 #include <QHBoxLayout>
@@ -185,6 +187,44 @@ void PanelWidget::updateTexts(QWidget* widget)
     }
 }
 
+void PanelWidget::driverContextMenu(QString const& driver)
+{
+    QString rootDriver = QString("%1:").arg(driver);
+    DiskManager diskManager(rootDriver);
+    QMenu contextMenu;
+
+    contextMenu.addAction(tr("Open"), this, [=](){
+        WinShell::OpenByExplorer(rootDriver);
+    });
+
+    if(diskManager.dirverType() != DiskManager::DRIVER_TYPE_CDROM
+            && diskManager.dirverType() != DiskManager::DRIVER_TYPE_REMOTE)
+        contextMenu.addAction(tr("Format..."), this, [=](){
+            DiskManager::Format(driver);
+        });
+
+    if(diskManager.dirverType() == DiskManager::DRIVER_TYPE_REMOVABLE
+            || diskManager.dirverType() == DiskManager::DRIVER_TYPE_CDROM)
+        contextMenu.addAction(tr("Eject"), this, [&](){
+            diskManager.removeDisk();
+        });
+
+    if(diskManager.dirverType() == DiskManager::DRIVER_TYPE_REMOTE)
+        contextMenu.addAction(tr("Disconnect"), this, [=](){
+            DiskManager::Disconnect(driver);
+        });
+
+    contextMenu.addAction(tr("Properties"),this, [=](){
+        WinShell::Property(rootDriver);
+    });
+    contextMenu.addSeparator();
+    QPoint cursorPos = QCursor::pos();
+    contextMenu.addAction(tr("Show More Items"),this, [&](){
+        ContextMenu::show(QStringList() << QString("%1:/").arg(driver.toUpper()), (void *)winId(), cursorPos);
+    });
+    contextMenu.exec(cursorPos);
+}
+
 void PanelWidget::initDrivers()
 {
     QHBoxLayout* layout = new QHBoxLayout();
@@ -195,13 +235,20 @@ void PanelWidget::initDrivers()
     {
         QToolButton* button = new QToolButton();
         button->setCheckable(true);
+        button->setAutoRaise(true);
         button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        button->setContextMenuPolicy(Qt::CustomContextMenu);
         button->setText(QString::fromLocal8Bit(&ch, 1));
         button->setIconSize(QSize(10, 10));
         button->installEventFilter(this);
         layout->addWidget(button);
         buttonGroup->addButton(button, QChar(ch).unicode());
         button->hide();
+
+        connect(button, &QWidget::customContextMenuRequested,
+                this, [=](){
+            driverContextMenu(button->text());
+        });
     }
 
     QFileIconProvider fip;
