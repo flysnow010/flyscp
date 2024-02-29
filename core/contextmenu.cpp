@@ -68,10 +68,16 @@ struct ContextMenuHelper
         }
     }
 
+    bool isRootPath(QString const& path)
+    {
+        //for dirver D: D:/
+        //for virtual driver, the path's len is larger than 3
+        return path.size() > 1 && path.size() <= 3;
+    }
     void showContextMenu(QStringList const& fileNames, void* handle, int x, int y)
     {
         QString parentPath = Utils::toWindowsPath(QFileInfo(fileNames[0]).path());
-        LPSHELLFOLDER pParentFolder = getParentFolder(parentPath);
+        LPSHELLFOLDER pParentFolder = getParentFolder(parentPath, isRootPath(fileNames[0]));
         if(!pParentFolder)
             return;
 
@@ -155,7 +161,7 @@ struct ContextMenuHelper
         pParentFolder->Release();
     }
 
-    LPSHELLFOLDER getParentFolder(QString const& filePath)
+    LPSHELLFOLDER getParentFolder(QString const& filePath, bool isRoot = false)
     {
         LPSHELLFOLDER pDrives = getSpecialFolder(CSIDL_DRIVES);
         ShellItem::Ptr item;
@@ -173,7 +179,8 @@ struct ContextMenuHelper
                 {
                     pDrives->GetDisplayNameOf(pidl, SHGDN_FORPARSING, &str);
                     childPath = strToString(pidl, &str);
-                    if(childPath.size() <= 3 && filePath.startsWith(childPath))
+
+                    if(isRootPath(childPath) && filePath.startsWith(childPath))
                     {
                         item = ShellItem::Ptr(new ShellItem());
                         item->pidlRel = pidl;
@@ -182,7 +189,6 @@ struct ContextMenuHelper
                         break;
                     }
                 }
-
                 while(true)
                 {
                     if(childPath == filePath)
@@ -192,14 +198,17 @@ struct ContextMenuHelper
                        break;
                 }
                 pEnum->Release();
+                if(item)
+                {
+                    if(isRoot)
+                        return item->pParentFolder;
+
+                    LPSHELLFOLDER pParentFolder = 0;
+                    item->pParentFolder->BindToObject(item->pidlRel, 0, IID_IShellFolder,
+                                                                                 (LPVOID*)&pParentFolder);
+                    return pParentFolder;
+                }
             }
-        }
-        if(item)
-        {
-            LPSHELLFOLDER pParentFolder = 0;
-            item->pParentFolder->BindToObject(item->pidlRel, 0, IID_IShellFolder,
-                                                                         (LPVOID*)&pParentFolder);
-            return pParentFolder;
         }
         return 0;
     }
