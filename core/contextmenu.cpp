@@ -155,7 +155,7 @@ struct ContextMenuHelper
                 DestroyMenu(hPopup);
             }
         }
-        for(int i = 0; i < size; i++)
+        for(int i = 0; i < fileNames.size(); i++)
             ILFree(pidlFiles[i]);
         free(pidlFiles);
         pParentFolder->Release();
