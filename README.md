@@ -1,11 +1,35 @@
 # FlyScp
 
 #### 介绍
-基于Qt的资源管理器，支持多Tab和双窗口。
+基于Qt开发的Windows平台资源管理器。
+- 支持双窗口和多Tab页
+- 支持命令行操作。 
+- 支持文件夹收藏。
+- 支持文件浏览历史。
+- 支持文件搜索操作。
+- 支持桌面文件夹。
+- ssh配置加密保存。
+- 支持文本文件查看/编辑操作(利用MobaTextEditor).
+- 支持文件拖放操作，包括双窗口拖放及与其它应用脱发操作。
+- 类似Windows11的简介右键菜单。
+- 支持远程文件系统sftp及scp。
+- 支持压缩文件夹浏览/编辑/修改/删除等操作(利用7zip)。
+- 支持文件压缩操作，包括多卷压缩，自解压(命令行和GUI)和加密压缩。
+- 支持文件/文件夹比较操作(利用MobaDiff)。
+- 界面支持中英文。
 
 #### 软件架构
 软件架构说明
-
+```
+                  FlyScp
+----------------------------------------------
+      |     |       |     |      |    |   
+    core  model   stftp dialog  view  util 
+                    |
+                   ssh
+                    |
+                  libssh
+```
 
 #### 安装教程
 
@@ -18,20 +42,3 @@
 1.  xxxx
 2.  xxxx
 3.  xxxx
-
-#### 参与贡献
-
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
-
-
-#### 特技
-
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
