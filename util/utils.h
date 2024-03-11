@@ -48,6 +48,7 @@ public:
     static QString toWindowsPath(QString const& linuxPath);
     static QString toLinuxPath(QString const& windowsPath);
     static bool question(QString const& text);
+    static void information(QString const& text);
     static void warring(QString const& text);
     static bool saveFile(QString const& fileName, QString const& text);
 };
