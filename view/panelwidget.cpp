@@ -23,6 +23,7 @@ PanelWidget::PanelWidget(QWidget *parent)
     , ui(new Ui::PanelWidget)
     , buttonGroup(new QButtonGroup(this))
     , labelDiskInfo(new QLabel(this))
+    , diskManagerController(new DiskManagerController(this))
     , isShowTips_(true)
     , isGotRoot_(false)
 {
@@ -35,6 +36,8 @@ PanelWidget::PanelWidget(QWidget *parent)
             this, &PanelWidget::currentChanged);
     connect(ui->tabWidget, &QTabWidget::tabCloseRequested,
             this, &PanelWidget::tabCloseRequested);
+    connect(diskManagerController, &DiskManagerController::finished,
+            this, &PanelWidget::ejectDiskFinished);
 }
 
 PanelWidget::~PanelWidget()
@@ -206,7 +209,7 @@ void PanelWidget::driverContextMenu(QString const& driver)
     if(diskManager.dirverType() == DiskManager::DRIVER_TYPE_REMOVABLE
             || diskManager.dirverType() == DiskManager::DRIVER_TYPE_CDROM)
         contextMenu.addAction(tr("Eject"), this, [&](){
-            diskManager.removeDisk();
+            diskManagerController->ejectDisk(rootDriver);
         });
 
     if(diskManager.dirverType() == DiskManager::DRIVER_TYPE_REMOTE)
@@ -663,6 +666,11 @@ void PanelWidget::tabCloseRequested(int index)
     w->deleteLater();
     ui->tabWidget->removeTab(index);
     emit tabCountChanged(ui->tabWidget->count());
+}
+
+void PanelWidget::ejectDiskFinished(QString const& result)
+{
+    Utils::information(result);
 }
 
 bool PanelWidget::eventFilter(QObject *obj, QEvent *event)
