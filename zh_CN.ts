@@ -265,6 +265,24 @@
     </message>
 </context>
 <context>
+    <name>DiskManager</name>
+    <message>
+        <location filename="core/diskmanager.cpp" line="163"/>
+        <source>Disk is not removeable!</source>
+        <translation type="unfinished">磁盘不可移动,无法弹出！</translation>
+    </message>
+    <message>
+        <location filename="core/diskmanager.cpp" line="167"/>
+        <source>Eject is successful!</source>
+        <translation type="unfinished">弹出成功!</translation>
+    </message>
+    <message>
+        <location filename="core/diskmanager.cpp" line="169"/>
+        <source>Eject is fail! Disk is using!</source>
+        <translation type="unfinished">弹出失败！磁盘正在使用！</translation>
+    </message>
+</context>
+<context>
     <name>FavoriteDirModel</name>
     <message>
         <location filename="model/favoritedirmodel.cpp" line="20"/>
@@ -742,7 +760,7 @@
     <message>
         <location filename="mainwindow.ui" line="137"/>
         <source>Disconnect</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">断开链接</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="142"/>
@@ -1480,37 +1498,37 @@ abcdefghijklmnopqrstuvwxyz</source>
         <translation type="obsolete">配置</translation>
     </message>
     <message>
-        <location filename="view/panelwidget.cpp" line="179"/>
+        <location filename="view/panelwidget.cpp" line="182"/>
         <source>[%1] %2 available, %3 in total</source>
         <translation type="unfinished">[%1] %2 可用,共 %3</translation>
     </message>
     <message>
-        <location filename="view/panelwidget.cpp" line="196"/>
+        <location filename="view/panelwidget.cpp" line="199"/>
         <source>Open</source>
         <translation type="unfinished">打开</translation>
     </message>
     <message>
-        <location filename="view/panelwidget.cpp" line="201"/>
+        <location filename="view/panelwidget.cpp" line="205"/>
         <source>Format...</source>
         <translation type="unfinished">格式化...</translation>
     </message>
     <message>
-        <location filename="view/panelwidget.cpp" line="207"/>
+        <location filename="view/panelwidget.cpp" line="211"/>
         <source>Eject</source>
         <translation type="unfinished">弹出</translation>
     </message>
     <message>
-        <location filename="view/panelwidget.cpp" line="212"/>
+        <location filename="view/panelwidget.cpp" line="216"/>
         <source>Disconnect</source>
         <translation type="unfinished">断开链接</translation>
     </message>
     <message>
-        <location filename="view/panelwidget.cpp" line="216"/>
+        <location filename="view/panelwidget.cpp" line="220"/>
         <source>Properties</source>
         <translation type="unfinished">属性</translation>
     </message>
     <message>
-        <location filename="view/panelwidget.cpp" line="221"/>
+        <location filename="view/panelwidget.cpp" line="225"/>
         <source>Show More Items</source>
         <translation type="unfinished">显示更多选项</translation>
     </message>

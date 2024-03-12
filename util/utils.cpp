@@ -332,6 +332,11 @@ QString Utils::toLinuxPath(QString const& windowsPath)
     return linuxPath;
 }
 
+void Utils::information(QString const& text)
+{
+    QMessageBox::information(0, QApplication::applicationName(), text);
+}
+
 void Utils::warring(QString const& text)
 {
     QMessageBox::warning(0, QApplication::applicationName(), text);

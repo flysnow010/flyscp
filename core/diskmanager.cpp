@@ -154,6 +154,21 @@ bool DiskManager::removeDisk()
     return RemoveDisk(diskNumber_, (long)dirverType_);
 }
 
+void  DiskManager::ejectDisk(QString const& dirverPath)
+{
+    DriverType dirverType(static_cast<DriverType>(GetDriverType(dirverPath)));
+    long diskNumber(GetDiskNumber(dirverPath));
+
+    if(dirverType != DRIVER_TYPE_REMOVABLE)
+        emit finished(tr("Disk is not removeable!"));
+
+    bool isOK =  RemoveDisk(diskNumber, (long)dirverType);
+    if(isOK)
+        emit finished(tr("Eject is successful!"));
+    else
+        emit finished(tr("Eject is fail! Disk is using!"));
+}
+
 void DiskManager::Format(QString const& driver)
 {
     int diskId = driver[0].toLatin1() - 'a';
@@ -163,8 +178,28 @@ void DiskManager::Format(QString const& driver)
 bool DiskManager::Connect(QString const& driver)
 {
     //WnetAddConnection2
+    return true;
 }
 bool DiskManager::Disconnect(QString const& driver)
 {
     //WNetCancelConnection2
+    return true;
 }
+
+DiskManagerController::DiskManagerController(QObject *parent)
+    : QObject(parent)
+{
+    DiskManager* worker = new DiskManager;
+    worker->moveToThread(&workerThread);
+    connect(&workerThread, &QThread::finished, worker, &QObject::deleteLater);
+    connect(this, &DiskManagerController::onEjectDisk, worker, &DiskManager::ejectDisk);
+    connect(worker, &DiskManager::finished, this, &DiskManagerController::finished);
+    workerThread.start();
+}
+
+DiskManagerController::~DiskManagerController()
+{
+    workerThread.quit();
+    workerThread.wait();
+}
+

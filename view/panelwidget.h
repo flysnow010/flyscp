@@ -11,10 +11,10 @@ class QButtonGroup;
 class QAbstractButton;
 class QIcon;
 class QLabel;
+class DiskManagerController;
 class PanelWidget : public QWidget
 {
     Q_OBJECT
-
 public:
     explicit PanelWidget(QWidget *parent = nullptr);
     ~PanelWidget();
@@ -97,6 +97,7 @@ private slots:
     void backToPrePath();
     void currentChanged(int index);
     void tabCloseRequested(int index);
+    void ejectDiskFinished(QString const& result);
 private:
     void driverContextMenu(QString const& driver);
     void initDrivers();
@@ -105,6 +106,7 @@ private:
     Ui::PanelWidget *ui;
     QButtonGroup* buttonGroup;
     QLabel* labelDiskInfo;
+    DiskManagerController *diskManagerController;
     bool isShowTips_;
     bool isGotRoot_;
 };
