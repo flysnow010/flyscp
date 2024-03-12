@@ -1,7 +1,8 @@
 # FlyScp
-
+一款基于Qt开发的Windows资源管理器。
+![界面图](./image/ui.png)
 #### 介绍
-基于Qt开发的Windows平台资源管理器。
+功能列表：
 - 支持双窗口和多Tab页
 - 支持命令行操作。 
 - 支持文件夹收藏。
@@ -10,7 +11,7 @@
 - 支持桌面文件夹。
 - ssh配置加密保存。
 - 支持文本文件查看/编辑操作(利用MobaTextEditor).
-- 支持文件拖放操作，包括双窗口拖放及与其它应用脱发操作。
+- 支持文件拖放操作，包括双窗口拖放及与其它应用拖放操作。
 - 类似Windows11的简介右键菜单。
 - 支持远程文件系统sftp及scp。
 - 支持压缩文件夹浏览/编辑/修改/删除等操作(利用7zip)。
@@ -19,26 +20,8 @@
 - 界面支持中英文。
 
 #### 软件架构
-软件架构说明
-```
-                  FlyScp
-----------------------------------------------
-      |     |       |     |      |    |   
-    core  model   stftp dialog  view  util 
-                    |
-                   ssh
-                    |
-                  libssh
-```
+![软件架构](./image/FlyscpArchitecture.png)
 
 #### 安装教程
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### 使用说明
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
+1.  运行setup/release/Flyscp1.0-win-x64_202xxxxx.exe安装
+2.  安装完毕在桌面上点击FlyScp快捷方式运行。

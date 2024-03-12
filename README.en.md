@@ -1,36 +1,27 @@
 # FlyScp
-
+A Windows Explorer developed based on Qt.
+![UI](./image/ui.png)
 #### Description
-基于Qt的资源管理器，支持多Tab和双窗口。
-
+Function List:
+- Supports dual windows and multiple tab pages.
+- Support command-line operations.
+- Support folder favorites.
+- Support file browsing history.
+- Support file search operations.
+- Support desktop folders.
+- SSH configuration encryption save.
+- Support text file viewing/editing operations(Using MobaTextEditor).
+- Support file drag and drop operations, including dual window drag and drop and other application drag and drop operations.
+- A concise right-click menu similar to Windows 11。
+- Support remote file system sftp and scp。
+- Support operations such as browsing, editing, modifying, and deleting compressed folders(Using 7zip)。
+- Support file compression operations, including multi volume compression, self decompression(cmd and GUI) and encryption compression。
+- Support file/folder comparison operations(Using MobaDiff).
+- Interface supports both Chinese and English.
 #### Software Architecture
-Software architecture description
+![Software Architecture](./image/FlyscpArchitecture.png)
 
 #### Installation
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### Instructions
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### Contribution
-
-1.  Fork the repository
-2.  Create Feat_xxx branch
-3.  Commit your code
-4.  Create Pull Request
-
-
-#### Gitee Feature
-
-1.  You can use Readme\_XXX.md to support different languages, such as Readme\_en.md, Readme\_zh.md
-2.  Gitee blog [blog.gitee.com](https://blog.gitee.com)
-3.  Explore open source project [https://gitee.com/explore](https://gitee.com/explore)
-4.  The most valuable open source project [GVP](https://gitee.com/gvp)
-5.  The manual of Gitee [https://gitee.com/help](https://gitee.com/help)
-6.  The most popular members  [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+1.  Run setup/release/Flyscp1.0-win-x64_202xxxxx.exe to setup.
+2.  After installation, click on the FlyScp shortcut on the desktop to run it。
