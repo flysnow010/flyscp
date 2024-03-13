@@ -31,6 +31,11 @@ void CommandBar::setDirFont(QFont const& font)
     ui->cbbCommand->setFont(font);
 }
 
+void CommandBar::setActived()
+{
+    ui->cbbCommand->setFocus();
+}
+
 bool CommandBar::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::KeyPress)

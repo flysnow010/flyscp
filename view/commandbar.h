@@ -17,6 +17,7 @@ public:
 
     void setDir(QString const& dir);
     void setDirFont(QFont const& font);
+    void setActived();
 signals:
     void commanded(QString const& commnad);
 protected:
