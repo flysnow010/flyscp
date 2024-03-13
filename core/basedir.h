@@ -47,6 +47,7 @@ public:
                                       QString const& mark,
                                       QString const&cursor) = 0;
     virtual void execCommand(QString const& command) = 0;
+    virtual bool setActived() = 0;
     virtual void viewFile() = 0;
     virtual void newFolder() = 0;
     virtual void newTxtFile() = 0;

@@ -475,6 +475,12 @@ void PanelWidget::setItemSelectedColor(QString const& back,
     }
 }
 
+bool PanelWidget::setActived()
+{
+    BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());
+    return dir ? dir->setActived() : false;
+}
+
 void PanelWidget::setUnActived()
 {
     for(int i = 0; i < ui->tabWidget->count(); i++)
@@ -553,6 +559,7 @@ void PanelWidget::copyFiles(QString const& dstFilePath)
     if(dir)
         dir->copyFiles(dstFilePath);
 }
+
 void PanelWidget::moveFiles(QString const& dstFilePath)
 {
     BaseDir* dir = dynamic_cast<BaseDir *>(ui->tabWidget->currentWidget());

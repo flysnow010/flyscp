@@ -68,6 +68,7 @@ public:
                       QString const& mark,
                       QString const&cursor) override;
     void execCommand(QString const& command) override;
+    bool setActived() override;
     void viewFile() override;
     void newFolder() override;
     void newTxtFile() override;

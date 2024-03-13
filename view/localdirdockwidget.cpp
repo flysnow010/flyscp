@@ -1214,6 +1214,23 @@ void LocalDirDockWidget::newFolder()
     }
 }
 
+bool LocalDirDockWidget::setActived()
+{
+    if(ui->tvNormal->isVisible())
+    {
+        if(ui->tvNormal->hasFocus())
+            return false;
+        ui->tvNormal->setFocus();
+    }
+    else
+    {
+        if(ui->tvCompress->hasFocus())
+            return false;
+        ui->tvCompress->setFocus();
+    }
+    return true;
+}
+
 void LocalDirDockWidget::viewFile()
 {
     if(ui->tvNormal->isVisible())

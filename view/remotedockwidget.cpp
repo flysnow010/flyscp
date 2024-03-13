@@ -402,6 +402,14 @@ void RemoteDockWidget::execCommand(QString const& command)
     }
 }
 
+bool RemoteDockWidget::setActived()
+{
+    if(ui->treeView->hasFocus())
+        return false;
+    ui->treeView->setFocus();
+    return true;
+}
+
 void RemoteDockWidget::viewFile()
 {
     QModelIndex index = ui->treeView->currentIndex();

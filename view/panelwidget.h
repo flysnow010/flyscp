@@ -74,6 +74,7 @@ public:
     void moveFiles(QString const& dstFilePath);
     void searchFiles(QString const& dstFilePath);
     bool isActived() const;
+    bool setActived();
     void setUnActived();
     void refreshCurrent();
 
