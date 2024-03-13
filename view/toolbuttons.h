@@ -18,6 +18,8 @@ public:
     void setButtonFont(QFont const& font);
     void retranslateUi();
 signals:
+    void switchClicked();
+    void cmdClicked();
     void viewClicked();
     void editClicked();
     void copyClicked();

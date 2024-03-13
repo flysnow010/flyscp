@@ -6,6 +6,8 @@ ToolButtons::ToolButtons(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    connect(ui->btnSwitch, SIGNAL(clicked()), SIGNAL(switchClicked()));
+    connect(ui->btnCmd, SIGNAL(clicked()), SIGNAL(cmdClicked()));
     connect(ui->btnView, SIGNAL(clicked()), SIGNAL(viewClicked()));
     connect(ui->btnEdit, SIGNAL(clicked()), SIGNAL(editClicked()));
     connect(ui->btnCopy, SIGNAL(clicked()), SIGNAL(copyClicked()));
@@ -23,6 +25,8 @@ ToolButtons::~ToolButtons()
 
 void ToolButtons::setButtonFont(QFont const& font)
 {
+    ui->btnSwitch->setFont(font);
+    ui->btnCmd->setFont(font);
     ui->btnView->setFont(font);
     ui->btnEdit->setFont(font);
     ui->btnCopy->setFont(font);
