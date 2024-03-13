@@ -238,6 +238,8 @@ void MainWindow::createMenuConnect()
     connect(ui->actionFileFolder, SIGNAL(triggered(bool)), this, SLOT(newFolder()));
     connect(ui->actionTextFile, SIGNAL(triggered(bool)), this, SLOT(newFile()));
     connect(ui->actionViewIt, SIGNAL(triggered(bool)), this, SLOT(viewFile()));
+    connect(ui->actionSwitch, SIGNAL(triggered(bool)), this, SLOT(switchView()));
+    connect(ui->actionCmd, SIGNAL(triggered(bool)), this, SLOT(cmdView()));
     connect(ui->actionCopy, SIGNAL(triggered(bool)), this, SLOT(copyFiles()));
     connect(ui->actionMove, SIGNAL(triggered(bool)), this, SLOT(moveFiles()));
     connect(ui->actionDelete, SIGNAL(triggered(bool)), this, SLOT(delFiles()));
@@ -449,6 +451,8 @@ void MainWindow::createButtonsConnect()
 {
     connect(toolButtons, &ToolButtons::newFolderClicked, this, &MainWindow::newFolder);
     connect(toolButtons, &ToolButtons::newFileClicked, this, &MainWindow::newFile);
+    connect(toolButtons, &ToolButtons::switchClicked, this, &MainWindow::switchView);
+    connect(toolButtons, &ToolButtons::cmdClicked, this, &MainWindow::cmdView);
     connect(toolButtons, &ToolButtons::viewClicked, this, &MainWindow::viewFile);
     connect(toolButtons, &ToolButtons::editClicked, this, &MainWindow::editFile);
     connect(toolButtons, &ToolButtons::copyClicked, this, &MainWindow::copyFiles);
@@ -551,6 +555,25 @@ void MainWindow::newFile()
         leftPanelWidget->newTxtFile();
     else
         rightPanelWidget->newTxtFile();
+}
+
+void MainWindow::switchView()
+{
+    if(leftPanelWidget->isActived())
+    {
+        if(!leftPanelWidget->setActived())
+            rightPanelWidget->setActived();
+    }
+    else
+    {
+        if(!rightPanelWidget->setActived())
+            leftPanelWidget->setActived();
+    }
+}
+
+void MainWindow::cmdView()
+{
+    commandBar->setActived();
 }
 
 void MainWindow::viewFile()

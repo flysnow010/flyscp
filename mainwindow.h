@@ -44,6 +44,8 @@ protected:
 private slots:
     void newFolder();
     void newFile();
+    void switchView();
+    void cmdView();
     void viewFile();
     void editFile();
     void copyFiles();

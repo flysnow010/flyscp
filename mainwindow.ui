@@ -50,6 +50,9 @@
     <property name="title">
      <string>&amp;View</string>
     </property>
+    <addaction name="actionSwitch"/>
+    <addaction name="actionCmd"/>
+    <addaction name="separator"/>
     <addaction name="actionToolBar"/>
     <addaction name="actionStatusBar"/>
     <addaction name="actionCommandBar"/>
@@ -385,6 +388,22 @@
   <action name="actionSettings">
    <property name="text">
     <string>Settings...</string>
+   </property>
+  </action>
+  <action name="actionSwitch">
+   <property name="text">
+    <string>Switch View</string>
+   </property>
+   <property name="shortcut">
+    <string>F1</string>
+   </property>
+  </action>
+  <action name="actionCmd">
+   <property name="text">
+    <string>Cmd</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+Up</string>
    </property>
   </action>
  </widget>
