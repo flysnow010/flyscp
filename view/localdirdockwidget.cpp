@@ -1552,7 +1552,8 @@ void LocalDirDockWidget::execCommand(QString const& command)
 
 void LocalDirDockWidget::newTxtFile()
 {
-    QString fileName = Utils::getText(tr("File Name"), "*.txt");
+    QString name = QFileInfo(selectedFileName()).fileName();
+    QString fileName = Utils::getText(tr("File Name"), name.isEmpty() ? "*.txt" : name);
     if(fileName.isEmpty())
         return;
     if(ui->tvNormal->isVisible())
